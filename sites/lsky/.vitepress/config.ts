@@ -14,8 +14,26 @@ export default defineSiteConfig({
   logo: '/logo.png',
   nav: [
     { text: '文档', link: DOCS_HOME, activeMatch: '^/docs/(?!archive/)' },
+    { text: '主题', link: '/themes' },
     { text: '接口文档', link: 'https://lsky-pro.apifox.cn' },
+    { text: '演示', link: 'https://v2.lskypro.com' },
+    {
+      text: '社区',
+      items: [
+        { text: '论坛', link: 'https://bbs.lskypro.com' },
+        { text: 'Telegram 群组', link: 'https://t.me/lsky_pro' },
+      ],
+    },
+    {
+      text: '授权',
+      items: [
+        { text: '购买授权', link: 'https://huohuastudio.com/products/lsky-pro#plans' },
+        { text: '授权中心', link: 'https://huohuastudio.com/dashboard' },
+        { text: '正版查询', link: 'https://huohuastudio.com/verify' },
+      ],
+    },
   ],
+  socialLinks: [{ icon: 'github', link: 'https://github.com/lsky-org/lsky-pro' }],
   versions: {
     text: 'V2.x',
     current: { text: '付费版 V2.x（当前）', link: DOCS_HOME },
