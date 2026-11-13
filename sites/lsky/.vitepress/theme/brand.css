@@ -1,0 +1,16 @@
+/* 品牌色。链接用 brand-1，悬停 brand-2；按钮底色深浅模式通用，白字对比度都 ≥ 4.5:1 */
+:root {
+  --vp-c-brand-1: #4f46e5;
+  --vp-c-brand-2: #4338ca;
+  --vp-c-brand-3: #4f46e5;
+  --vp-c-brand-soft: color-mix(in srgb, #4f46e5 14%, transparent);
+
+  --vp-button-brand-hover-bg: #4338ca;
+  --vp-button-brand-active-bg: #3730a3;
+}
+
+.dark {
+  --vp-c-brand-1: #a5b4fc;
+  --vp-c-brand-2: #c3cdfd;
+  --vp-c-brand-soft: color-mix(in srgb, #a5b4fc 16%, transparent);
+}

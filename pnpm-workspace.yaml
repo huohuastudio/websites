@@ -1,0 +1,9 @@
+packages:
+  - packages/*
+  - sites/*
+
+# 依赖至少发布两周后才安装（单位：分钟）
+minimumReleaseAge: 20160
+
+onlyBuiltDependencies:
+  - esbuild

@@ -1,0 +1,24 @@
+{
+  "name": "huohuastudio-websites",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@10.33.3",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:keepbay": "pnpm --filter ./sites/keepbay dev",
+    "dev:novaix": "pnpm --filter ./sites/novaix dev",
+    "dev:lsky": "pnpm --filter ./sites/lsky dev",
+    "build": "pnpm --filter './sites/*' build",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.0",
+    "typescript": "6.0.3",
+    "vitepress": "2.0.0-alpha.21",
+    "vue": "3.5.44",
+    "vue-tsc": "3.3.13"
+  }
+}

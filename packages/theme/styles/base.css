@@ -1,0 +1,78 @@
+/* 主题切换：圆形扩散（动画由 Layout.vue 驱动） */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root),
+.dark::view-transition-new(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root),
+.dark::view-transition-old(root) {
+  z-index: 9999;
+}
+
+/* 旧版本提示 */
+.version-notice {
+  margin: 0 0 24px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: var(--vp-c-warning-soft);
+  color: var(--vp-c-text-1);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.version-notice a {
+  color: var(--vp-c-brand-1);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* 文档中的图片 */
+.vp-doc img {
+  border-radius: 8px;
+}
+
+.medium-zoom-overlay {
+  z-index: 30;
+}
+
+.medium-zoom-image--opened {
+  z-index: 31;
+}
+
+/* 嵌入模式：只留正文，隐藏导航栏、侧栏、本页目录和页脚，内容区占满 */
+.embed-mode {
+  --vp-nav-height: 0px;
+  --vp-layout-top-height: 0px;
+}
+
+.embed-mode .VPNav,
+.embed-mode .VPLocalNav,
+.embed-mode .VPSidebar,
+.embed-mode .VPDoc .aside,
+.embed-mode .VPFooter,
+.embed-mode .VPDocFooter {
+  display: none !important;
+}
+
+.embed-mode .VPContent.has-sidebar {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.embed-mode .VPDoc {
+  padding: 16px 24px 48px !important;
+}
+
+.embed-mode .VPDoc .container,
+.embed-mode .VPDoc .content,
+.embed-mode .VPDoc .content-container {
+  max-width: 100% !important;
+  padding: 0 !important;
+}
