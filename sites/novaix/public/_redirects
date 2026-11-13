@@ -1,0 +1,5 @@
+# 旧文档站 docs.huohuastudio.com 的源站也指向本站，旧地址在同一域名内跳到 /docs/，
+# 已发布的 Novaix 后台在 iframe 中内嵌 docs.huohuastudio.com/novaix/xxx?embed=1，跨域跳转会被其 CSP 拦下
+/novaix /docs/ 301
+/novaix/* /docs/:splat 301
+/lsky-pro/* https://www.lsky.pro/docs/:splat 301

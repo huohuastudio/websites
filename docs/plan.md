@@ -110,29 +110,13 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 - W4d 核对中发现（按代码写）：收件箱会整理收件箱中已有的文件（包括设为收件箱前就在的和子文件夹中的），开了自动模式时命中规则的直接移动、不逐个确认；AI 不会建智能文件夹；"直接删除"不能撤销；激活专业版会提交安装 ID，不能说"不知道您装了几台"；联网清单还有在线更新、自动续期、测试代理和自定义模型清单（`--model-manifest` 或 `KEEPBAY_MODEL_MANIFEST`）；rclone 缓存默认只保留 1 小时，云盘页的挂载命令加了 `--vfs-cache-max-age 720h`。首发版不做"省流量"选项（Keepbay 窗口转告，用户定），云盘页写了用缓存和 `--bwlimit` 减少流量
 - W4a 核对中发现（写文档时按代码，不按设计文档）：「不让 AI 看」的文件夹只有后端接口、界面没有入口，文档暂不写；系统繁忙降速、重活时间段没有实现；二进制没有 garble；ONNX Runtime 在 `models/runtime/`；更新服务期（`updates_until`）还没有用于限制可装的版本，文档不写"到期后不能升级"
 
-## 旧地址跳转（不能断）
+## 旧地址跳转
 
-- `docs.huohuastudio.com/novaix/*` → `novaix.cc/docs/*`（参数原样带上，Novaix 后台的内嵌帮助跟着跳转）
-- `docs.huohuastudio.com/lsky-pro/*` → `www.lsky.pro/docs/*`（旧版本路径另做对照表）
-- `docs.lsky.pro/*` → `www.lsky.pro/docs/*`：2026-11-13 确认，docs.lsky.pro 是 `lsky-docs` 仓库发布到 GitHub Pages 的独立文档站（CNAME 在其工作流中写入），路径为 `/guide/xxx`、`/advanced/xxx`、`/archive/...`（没有 `/lsky-pro` 前缀），页面顶部有横幅提示迁到 docs.huohuastudio.com/lsky-pro
-- `docs.huohuastudio.com/` → 工作室主页
-- **Lsky 对照**（docs.huohuastudio.com 去掉 `/lsky-pro` 前缀后与 docs.lsky.pro 相同）：
-  - `/lsky-pro/`、docs.lsky.pro 的 `/` → `/docs/guide/introduce`
-  - `guide/*`、`advanced/*`、`archive/free/v2/*`、`archive/enterprise/v1/*` → `/docs/` 下同名路径
-  - 例外：`advanced/storage`（自定义储存，W3c-2 删除，产品不支持自定义储存驱动）→ `/docs/guide/storage#drivers`；新站内的 `/docs/advanced/storage` 也要跳到同一地址
-  - `archive/free/v1/` 下改了名的页面（其余同名）：
+W5 开工时用户定：只要旧域名整体转到新站即可，不逐页对照、不逐条验证。各站点的 `_redirects` 只写几条前缀规则：
 
-    | 旧路径 | 新路径 |
-    |---|---|
-    | `Install` | `install` |
-    | `StorageStrategy` | `storage/` |
-    | `SS/Local`、`SS/AliyunOSS`、`SS/TencentCloudCOS`、`SS/UpyunUSS`、`SS/KODO`、`SS/FTP` | `storage/local`、`storage/aliyun-oss`、`storage/tencent-cos`、`storage/upyun-uss`、`storage/qiniu-kodo`、`storage/ftp` |
-    | `SystemParameters` | `settings/` |
-    | `SP/BasicConf`、`SP/UploadConf`、`SP/UserConf`、`SP/MailConf`、`SP/OtherConf`、`SP/ImgSex` | `settings/basic`、`settings/upload`、`settings/user`、`settings/mail`、`settings/other`、`settings/image-audit` |
-    | `Watermark`、`SystemUpdate`、`CommonQ`、`UpdateLog` | `watermark`、`upgrade`、`faq`、`changelog` |
-
-  - 锚点：当前版沿用 docs.lsky.pro 的自定义锚点；docs.huohuastudio.com 上的版本没有自定义锚点，从那里复制的带中文锚点的链接跳过来后停在页面顶部
-- 用 Cloudflare 的批量跳转或各站点的 `_redirects` 实现；从旧站生成一份新旧地址对照表，上线前逐条验证
+- **docs.huohuastudio.com**：CDN 源站指向 Novaix 的 Worker（不做整域名跳转）。`/novaix/*` 在同一域名内跳到 `/docs/*`：已发布的 Novaix 后台用 iframe 内嵌 `docs.huohuastudio.com/novaix/xxx?embed=1`，CSP 的 `frame-src` 只允许 docs.huohuastudio.com，跨域跳转会被拦下；`/lsky-pro/*` 跳到 `www.lsky.pro/docs/*`；根路径显示 Novaix 首页
+- **docs.lsky.pro**：CDN 整域名跳到 www.lsky.pro（保留路径）或源站指向 Lsky 的 Worker；`/guide/*`、`/advanced/*`、`/archive/*` 跳到 `/docs/` 下同名路径。开源版 V1 改了名的页面和已删除的自定义储存页不做对照，会落到 404
+- Novaix 以后的版本把帮助地址（`ui/src/components/help-doc.tsx`）和 CSP（`internal/server/middleware/security.go`）改成 novaix.cc 后，docs.huohuastudio.com 才能改成整域名跳转（由用户在 Novaix 仓库处理）
 
 ## 批次
 

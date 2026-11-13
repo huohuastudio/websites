@@ -124,6 +124,8 @@ export function defineSiteConfig(options: SiteOptions) {
 
     async buildEnd({ outDir }) {
       await writeFile(join(outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${hostname}/sitemap.xml\n`)
+      // Cloudflare 默认让所有文件每次都回源校验；/assets/ 下的文件名带哈希，内容变了文件名就变，可以长期缓存
+      await writeFile(join(outDir, '_headers'), '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n')
     },
 
     themeConfig: {
