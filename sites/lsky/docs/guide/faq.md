@@ -36,12 +36,7 @@ docker compose -p lsky-pro exec lsky-pro ls /app/storage/logs
 
 ## 我多次上传了相同的图片，图片管理中也出现了图片，这是 bug 还是 feature? {#duplicate-image-upload-bug-or-feature}
 
-这是正常现象。程序按储存的命名规则生成文件路径：
-
-- 路径相同时（例如命名规则只用文件的 MD5），文件只保存一份；同一个用户重复上传时还会沿用原来的图片记录，图片管理中不会多出一张
-- 路径不同时（例如命名规则中有 `{uuid}` 或日期），每次上传都会保存为新的文件和新的图片
-
-另外，上传后还要在队列中处理的图片，会单独保存文件，不与其他图片共用。
+这是正常现象。程序不会拒绝重复上传，是否保存新文件取决于储存的命名规则，详见[重复上传](./storage#duplicate-upload)。
 
 ## 我的图片中，「复制图片」出错，显示 复制失败 {#copy-image-failed}
 
@@ -75,7 +70,7 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
 ## 能不能支持 xxxx 、xxxx 储存？ {#support-custom-storage}
 
-目前支持本地、AWS S3、阿里云 OSS、腾讯云 COS、七牛云、又拍云、多吉云、SFTP、FTP 和 WebDAV。兼容 S3 接口的储存（如 MinIO、Backblaze B2）可以使用 AWS S3 驱动接入。需要其他储存时，可以到[论坛](https://bbs.lskypro.com)提出需求。
+目前支持 10 种储存驱动，不支持自行添加；兼容 S3、WebDAV、SFTP 或 FTP 协议的储存可以用对应驱动接入，详见[支持的储存](./storage#drivers)。需要其他储存时，可以到[论坛](https://bbs.lskypro.com)提出需求。
 
 ## 激活邮件中的激活链接，访问显示 403 INVALID SIGNATURE？ {#activation-link-403-invalid-signature}
 
@@ -86,12 +81,8 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
 ## 分离部署后，第三方授权登录失败？ {#third-party-login-failed-after-deployment}
 
-通常是回调地址不对。创建社会化登录驱动时，后台会根据「应用网址」自动生成回调地址；前后端分离部署后，GitHub、QQ 等驱动的回调地址需要改为前端绑定的域名，保存后生效。
-
-同时请在「系统设置」→「常规设置」中填写「前端地址」，否则通用 OAuth2 和彩虹聚合登录完成后无法跳回前端。
+通常是回调地址或「前端地址」没有设置对，详见[第三方登录 - 分离部署](./login#separate-deploy)。
 
 ## 如何连接 Backblaze B2？ {#how-to-connect-backblaze-b2}
 
-创建储存时选择 AWS S3 驱动，`Region` 填写 `auto`，在自定义配置中添加一项：配置名填写 `params.ACL`，配置值留空。
-
-Backblaze B2 的 Bucket 默认保留文件的历史版本，在图床后台删除图片后，B2 控制台中仍然能看到文件，这是正常现象。可以在 B2 的 Bucket 设置中调整生命周期规则，自动清除旧版本。
+使用 AWS S3 驱动，`Region` 填写 `auto`，在自定义配置中添加配置名 `params.ACL`、配置值留空，详见[储存 - 如何连接 Backblaze B2](./storage#how-to-connect-backblaze-b2)。

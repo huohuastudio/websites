@@ -106,6 +106,7 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 - **Lsky 对照**（docs.huohuastudio.com 去掉 `/lsky-pro` 前缀后与 docs.lsky.pro 相同）：
   - `/lsky-pro/`、docs.lsky.pro 的 `/` → `/docs/guide/introduce`
   - `guide/*`、`advanced/*`、`archive/free/v2/*`、`archive/enterprise/v1/*` → `/docs/` 下同名路径
+  - 例外：`advanced/storage`（自定义储存，W3c-2 删除，产品不支持自定义储存驱动）→ `/docs/guide/storage#drivers`；新站内的 `/docs/advanced/storage` 也要跳到同一地址
   - `archive/free/v1/` 下改了名的页面（其余同名）：
 
     | 旧路径 | 新路径 |
@@ -128,7 +129,7 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 | W2 | Novaix 文档迁移 + 官网 | 已完成 |
 | W3 | Lsky Pro+ 文档迁移（含旧版本）+ 官网 + 主题页 | 已完成 |
 | W3c-1 | Lsky 当前版文档按 2.5.x 更新和改写：简介和入门（介绍、快速开始、环境要求、安装、升级、迁移、导入、常见问题、许可与免责声明） | 已完成 |
-| W3c-2 | Lsky 当前版文档按 2.5.x 更新和改写：核心功能和进阶（储存、角色组、图片处理、云处理、AI、支付、缓存、命令、接口、分离部署、自定义储存、主题） | 未开始 |
+| W3c-2 | Lsky 当前版文档按 2.5.x 更新和改写：核心功能和进阶（储存、角色组、图片处理、云处理、AI、支付、缓存、命令、接口、分离部署、主题），新增第三方登录页，删除自定义储存页 | 已完成 |
 | W4 | Keepbay 官网 + 文档菜单（在 Keepbay 演示站上线之后，要用演示站的入口和截图） | 未开始 |
 | W5 | 上线：Cloudflare 项目、域名、旧地址跳转、停掉旧部署（DNS 和旧部署由用户操作，这里写好步骤） | 未开始 |
 
@@ -137,6 +138,9 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 - **Lsky 产品的导入命令有两个 bug（W3c-1 审查发现，产品仓库 lsky-pro-enterprise 的 `app/Console/Commands/ImportCommand.php`，本仓库不改产品代码，已告知用户）**：文档按现状写成"系统设置无法迁移""导入的分享请删除后重建"，产品修复后再改文档
   - 系统设置不会写入：`$configData` 是数字索引的数组，`Arr::undot` 后组名是 0、1……，永远不等于 `app`，`fill` 不会执行（约 207–225 行）
   - 分享关联错误：每个图片分享都关联旧库 `share_images` 整张表的图片，相册分享取整张 `share_albums` 表中的第一个相册，没有按分享 ID 筛选，可能把别人分享的图片暴露出去（约 525–535 行）
+
+- **Lsky 支付驱动编辑页的「支付结果异步回调通知地址」显示值不对（W3c-2 发现，产品问题，已告知用户）**：显示的是 `站点域名/payment/callback`（`AppService::getPaymentNotifyUrl`），实际回调地址是 `/api/v2/payment/callback/{驱动 ID}/{订单号}`，由程序下单时自动传入。文档写"不需要在支付平台填写"，没有引用这个显示值
+- **Lsky 社会化登录的报错文案写「站点地址」，后台字段实际叫「应用网址」**（`OAuthService` 中的回跳地址校验和 OAuth2 回调地址说明），文档统一写「应用网址」
 
 - 首页 FAQ 的回答是 frontmatter 中的 HTML（`HomeFaq` 用 v-html 输出），其中的站内链接不经过 markdown，构建时的坏链检查查不到；文档页改名或删除时，要同时搜一遍各站点 `index.md` 中的 `href="/docs/`
 
@@ -148,8 +152,8 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 ## 待确认
 
 - **Lsky 许可与免责声明（W3c-1 发现，法律文本未改，待用户决定）**：
-  - "购买须知"第 1 条写付款后提供"前端完整源码"，但产品打包脚本 `compile.sh` 排除了 `web/` 目录，安装包中没有前端源码；首页常见问题和快速开始都没有承诺前端源码
   - "许可证权利"写"在购买许可证的设备数量范围内安装"，授权实际按域名（每个授权含 1 个域名，含子域名）；"在许可证有效期内获得更新和技术支持"与"一次付费、永久使用、免费更新"的说法容易混淆
+  - 更正（W3c-2）：原先记的"安装包不含前端源码"有误。`compile.sh` 只是生成文件校验清单 `hashes.json` 时跳过 `web/`，发布流程打的 zip 安装包中有 `web/`（只删了 `node_modules` 和 `dist`）；只有 Docker 镜像删掉了整个 `web/`。"购买须知"中"前端完整源码"的说法与安装包一致
 
 ## 已确认（2026-11-13 用户定）
 

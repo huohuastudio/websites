@@ -1,56 +1,77 @@
 # 主题 {#theme}
 
-兰空图床 2.x 是一个全新的前后端分离架构，后端使用 [Laravel](https://laravel.com)，前端使用 [Vue3](https://cn.vuejs.org)、[Pinia](https://pinia.vuejs.org/zh)、[Native UI](https://www.naiveui.com)。
+主题决定前台（用户访问的页面）的外观，管理后台不受主题影响。可以安装他人开发的主题，也可以自己开发：主题可以是用 Laravel Blade 渲染的普通页面，也可以是调用接口的单页应用（SPA）。内置的默认主题就是一个用 Vue 3 开发的单页应用。
 
-相较于以前的版本，现在的版本使用了 Native UI 作为前端框架，使得样式一致、更统一。除了后台管理，我们可以自定义前端的样式，甚至可以直接替换整个前端。
+开发主题需要熟悉 [Laravel](https://laravel.com)、[Blade 模板](https://laravel.com/docs/12.x/blade) 和用于构建配置表单的 [Filament](https://filamentphp.com)。修改默认主题还需要熟悉 [Node.js](https://nodejs.org)、[Vite](https://cn.vitejs.dev)、[Vue 3](https://cn.vuejs.org)、[Pinia](https://pinia.vuejs.org/zh)、[Vue Router](https://router.vuejs.org)、[Naive UI](https://www.naiveui.com) 和 [Tailwind CSS](https://tailwindcss.com)。
 
-若想要修改前端样式，您需要熟悉以下前端技术：
+## 安装主题 {#install-theme}
 
-- [NodeJS](https://nodejs.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Vite](https://cn.vitejs.dev)
-- [Vue3](https://cn.vuejs.org)
-- [Pinia](https://pinia.vuejs.org)
-- [Vue Router](https://router.vuejs.org)
-- [Tailwind CSS](https://tailwindcss.com)
+[主题](../../themes)页面列出了已收录的主题。安装主题有两种方式：
 
-若想要开发新的主题，您需要熟悉以下技能和框架
-- [Laravel](https://laravel.com)
-- [Laravel Blade](https://laravel.com/docs/12.x/blade)
-- [Filamentphp](https://filamentphp.com)
+- **上传到 `themes` 目录**：把主题文件夹上传到程序根目录的 `themes` 目录中。使用 Docker 安装时，放到映射的 `themes` 目录（见[Docker 容器启动](../guide/install#docker-container)）
+- **在后台导入**：在管理后台的「主题管理」页面，点击「导入主题」按钮，上传主题的 zip 压缩包
+
+安装后，在「主题管理」页面的「选择主题」中选择这个主题，按需填写主题配置，点击「保存」即可启用。
+
+### 在后台导入主题 {#import-theme}
+
+主题中包含 PHP 代码，导入主题等同于在服务器上执行代码，因此从 2.5.1 起「导入主题」默认禁用。需要在线导入时：
+
+1. 在程序根目录的 `.env` 文件中设置：
+
+   ```bash
+   APP_THEME_IMPORT_ENABLED=true
+   ```
+
+2. 如果执行过 `php artisan optimize` 或 `php artisan config:cache`，再执行 `php artisan config:clear` 使设置生效
+3. 导入完成后，建议把这一项改回 `false`
+
+压缩包中需要包含主题入口类文件（`*Theme.php`），可以直接放在压缩包根目录，也可以放在压缩包中唯一的文件夹里。已经存在同名主题时，需要勾选「覆盖已有主题」才能导入。
+
+:::danger
+请只安装来源可信的主题。主题中的 PHP 代码拥有和程序相同的权限，可以读取数据库和服务器上的文件。
+:::
+
+在「主题管理」页面还可以导出主题（打包为 zip）和删除主题。删除会删除主题的所有文件，并自动切回默认主题；内置的默认主题不能删除。
 
 ## 主题是如何运作的？ {#theme-works}
 
-系统存在两个不同的主题存放位置：
+程序从两个位置读取主题：
 
-- `app/Themes/` 系统内置主题
-- `themes/` 第三方主题
+- `app/Themes/`：内置主题（默认主题）
+- `themes/`：第三方主题和自己开发的主题
 
-我们添加新开发的主题，需要将主题存放到程序根目录中的 `themes/` 文件夹。
-
-主题系统可以使用标准的 PHP 8.2+ 的语法，使用 Laravel 框架进行开发。一个完整的插件的基本目录结构如下：
+一个主题的目录结构如下：
 
 ```
-my-test/                    # 主题文件夹名称，需要与主题 id 保持一致
- ├─ assets/                 # 静态资产目录
- │  ├─ css/                 # css 样式文件目录
- │  ├─ fonts/               # 字体文件目录
- │  ├─ images/              # 图片目录
- │  └─ js/                  # js 文件
- ├─ controllers/            # PHP 控制器目录
- │  └─ YourController.php   # 控制器示例文件
- ├─ views/                  # 视图层，需要以 *.blade.php 结尾
- │  ├─ components/          # blade 组件目录
- │  │  └─ button.blade.php  # 示例 button 组件
- │  ├─ layouts/             # 布局目录
- │  │  └─ app.blade.php     # 示例布局组件
- │  ├─ pages/               # 视图文件
- │  └─ └─ index.blade.php   # 示例布局组件
- ├─ README.md               # 主题说明文档
+my-test/                    # 主题文件夹，名称与主题 id 保持一致
+ ├─ assets/                 # 静态资源目录
+ │  ├─ css/
+ │  ├─ fonts/
+ │  ├─ images/
+ │  └─ js/
+ ├─ controllers/            # PHP 控制器目录（可选）
+ │  └─ YourController.php
+ ├─ views/                  # 视图，文件名以 .blade.php 结尾
+ │  ├─ components/
+ │  │  └─ button.blade.php
+ │  ├─ layouts/
+ │  │  └─ app.blade.php
+ │  └─ pages/
+ │     └─ index.blade.php
+ ├─ README.md               # 主题说明
  └─ MyTestTheme.php         # 主题入口类
 ```
 
+程序根据文件夹名称推导入口类的类名和命名空间：文件夹 `my-test` 对应命名空间 `Themes\MyTest`、入口文件 `MyTestTheme.php`。启用主题后，程序会把 `public/assets` 链接到当前主题的 `assets` 目录，页面中用 `/assets/...` 引用静态资源。
+
 ### 主题入口类 {#entrance}
+
+入口类继承 `App\Contracts\ThemeAbstract`，用属性声明主题信息，并实现以下方法：
+
+- **`configurable()`**：必须实现，返回后台「主题管理」中的配置表单，见 [configurable 方法](#configurable)
+- **`routes()`**：定义主题的路由，见 [routes 方法](#routes)
+- **`casts()`**：可选，转换配置值，见 [casts 方法](#casts)
 
 ```php
 <?php
@@ -60,22 +81,15 @@ namespace Themes\MyTest;
 use App\Contracts\ThemeAbstract;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Illuminate\Support\Facades\Route;
 
-/**
- * 测试主题 - 这是一个测试主题
- * 
- * @author Unknown
- * @version 1.0.0
- */
 class MyTestTheme extends ThemeAbstract
 {
-    /** @var string 主题唯一标识符 */
+    /** @var string 主题唯一标识，与文件夹名称一致 */
     public string $id = 'my-test';
 
-    /** @var string 主题名称，显示在管理界面中 */
+    /** @var string 主题名称，显示在管理后台中 */
     public string $name = '测试主题';
 
     /** @var string|null 主题描述 */
@@ -91,164 +105,41 @@ class MyTestTheme extends ThemeAbstract
     public ?string $url = '';
 
     /**
-     * 主题路由配置
-     * 在这里定义你的主题路由，例如首页、详情页等
+     * 主题路由
      */
     public function routes(): void
     {
         Route::get('/', fn () => view("{$this->id}::pages.index"));
-
-        // ...
     }
 
     /**
-     * 主题配置表单
-     * 返回 Filament 表单组件数组，用于在管理后台配置主题
-     * 
-     * @return array Filament 表单组件数组
+     * 后台配置表单
      */
     public function configurable(): array
     {
         return [
             Section::make('基础设置')->schema([
-                Grid::make()->columns(2)->schema([
-                    $this->getSiteTitleField(),
-                    $this->getSiteSubtitleField(),
-                ]),
-                $this->getSiteDescriptionField(),
-                $this->getSiteKeywordsField(),
-            ]),
-            
-            Section::make('首页设置')->schema([
-                $this->getWelcomeMessageField(),
-                $this->getFooterTextField(),
+                TextInput::make('payload.site_title')
+                    ->label('网站标题')
+                    ->maxLength(100)
+                    ->required(),
+                Textarea::make('payload.site_description')
+                    ->label('网站描述')
+                    ->maxLength(500)
+                    ->rows(3),
             ]),
         ];
     }
 
     /**
-     * 数据转换器配置
-     * 定义如何处理配置数据，例如将相对路径转换为完整URL
-     * 
-     * @return array 转换器配置
+     * 配置值转换
      */
     public function casts(): array
     {
-        return [
-            // 示例：将图片路径转换为完整URL
-            // 'logo_path' => new Attribute(
-            //     get: fn($value) => $value ? Storage::url($value) : ''
-            // ),
-        ];
-    }
-
-    /**
-     * 网站标题配置字段
-     */
-    protected function getSiteTitleField(): TextInput
-    {
-        return TextInput::make('payload.site_title')
-            ->label('网站标题')
-            ->helperText('显示在浏览器标题栏和搜索结果中')
-            ->maxLength(100)
-            ->required()
-            ->placeholder('请输入网站标题');
-    }
-
-    /**
-     * 网站副标题配置字段
-     */
-    protected function getSiteSubtitleField(): TextInput
-    {
-        return TextInput::make('payload.site_subtitle')
-            ->label('网站副标题')
-            ->helperText('显示在网站标题下方的副标题')
-            ->maxLength(100)
-            ->placeholder('请输入网站副标题');
-    }
-
-    /**
-     * 网站描述配置字段
-     */
-    protected function getSiteDescriptionField(): Textarea
-    {
-        return Textarea::make('payload.site_description')
-            ->label('网站描述')
-            ->helperText('用于SEO优化，显示在搜索结果中')
-            ->maxLength(500)
-            ->rows(3)
-            ->placeholder('请输入网站描述');
-    }
-
-    /**
-     * 网站关键词配置字段
-     */
-    protected function getSiteKeywordsField(): TextInput
-    {
-        return TextInput::make('payload.site_keywords')
-            ->label('网站关键词')
-            ->helperText('用于SEO优化，多个关键词用英文逗号分隔')
-            ->maxLength(200)
-            ->placeholder('图床,图片托管,免费图床');
-    }
-
-    /**
-     * 欢迎消息配置字段
-     */
-    protected function getWelcomeMessageField(): Textarea
-    {
-        return Textarea::make('payload.welcome_message')
-            ->label('欢迎消息')
-            ->helperText('显示在首页的欢迎消息')
-            ->maxLength(500)
-            ->rows(4)
-            ->placeholder('欢迎使用我们的图片托管服务！');
-    }
-
-    /**
-     * 页脚文本配置字段
-     */
-    protected function getFooterTextField(): Textarea
-    {
-        return Textarea::make('payload.footer_text')
-            ->label('页脚文本')
-            ->helperText('显示在页面底部的版权信息或其他文本')
-            ->maxLength(300)
-            ->rows(2)
-            ->placeholder('© 2024 您的网站名称. All rights reserved.');
-    }
-
-    /**
-     * 获取配置值的辅助方法
-     * 
-     * @param string $key 配置键名
-     * @param mixed $default 默认值
-     * @return mixed 配置值
-     */
-    protected function getConfig(string $key, mixed $default = null): mixed
-    {
-        return $this->getSettings($key, $default);
-    }
-
-    /**
-     * 获取原始配置值的辅助方法（不经过转换器处理）
-     * 
-     * @param string $key 配置键名
-     * @param mixed $default 默认值
-     * @return mixed 原始配置值
-     */
-    protected function getRawConfig(string $key, mixed $default = null): mixed
-    {
-        return $this->getRawSettings($key, $default);
+        return [];
     }
 }
 ```
-
-在后台管理的主题管理中，系统会通过扫描主题文件夹，并实例化主题入口类获取主题基本配置与表单配置，`MyTestTheme.php` 示例：
-
-可以看到入口文件 `MyTestTheme.php` 中通过 PHP 的属性设置了主题的相关信息。并通过实现继承的抽象类中的 `routes`、`configurable`、`casts` 方法。
-
-通常情况下，一个完整的主题需要实现这三个方法才可以使主题正常使用。
 
 ### 生命周期 {#lifecycle}
 
@@ -257,100 +148,82 @@ flowchart LR
     A[获取系统设置的主题] --> B[检测主题是否存在]
     B -- 否 --> Z[结束]
     B -- 是 --> C[加载控制器文件]
-    C --> D[加载主题设置的视图]
-    D --> E[配置主题设置的路由]
+    C --> D[加载主题的视图]
+    D --> E[注册主题的路由]
     E --> F[路由回调]
     F --> Z[结束]
 ```
 
-系统成功加载主题后，主题保存的配置可以在 blade 视图文件中可以使用 `ThemeService` 服务类获取相关配置，例如：
+主题的配置可以在 Blade 视图中通过 `ThemeService` 读取，`getTheme()` 的参数是主题 id：
 
-- 获取配置项 title：`\App\Facades\ThemeService::getTheme('default')->getSettings('title')`
-- 获取全部配置：`\App\Facades\ThemeService::getTheme('default')->getSettings()`
+- 读取某一项：`\App\Facades\ThemeService::getTheme('my-test')->getSettings('site_title')`
+- 读取全部：`\App\Facades\ThemeService::getTheme('my-test')->getSettings()`
 
-如果您的主题是 spa 单页面模式，可以请求 `/api/v2/configs` 接口，返回的 json 中的 `data.site` 获取全部配置。
+单页应用主题可以请求 `GET /api/v2/configs` 接口，返回的 `data.site` 中是当前主题的全部配置。
 
 ### routes 方法 {#routes}
 
 ::: tip
-有关 Laravel 路由的详细文档请查阅 Laravel 官方文档：[https://laravel.com/docs/12.x/routing](https://laravel.com/docs/12.x/routing)
+Laravel 路由的详细用法见 [Laravel 官方文档](https://laravel.com/docs/12.x/routing)。
 :::
 
-主题通过实现 `routes` 方法来定义程序所需要的路由。例如：
+在 `routes` 方法中定义主题的路由：
 
 ```php
 <?php
 
-// ...省略部分代码
-
 use Illuminate\Support\Facades\Route;
 use Themes\MyTest\Controllers\YourController;
 
-// ...省略部分代码
-
 public function routes(): void
 {
-    // 定义一个访问首页的路由，直接返回视图
+    // 访问首页时直接返回视图
     Route::get('/', fn () => view("{$this->id}::pages.index"));
-    
-    // 也可以导入控制器文件
-    Route::get('/', [YourController::class, 'index']);
 
-    // 如果你的主题是单页应用（SPA），可以这样配置：
-    // 表示访问除了 /api 开头的所有路径都路由到 YourController 的 index 方法 
+    // 也可以交给控制器处理
+    Route::get('/about', [YourController::class, 'about']);
+
+    // 单页应用：除 /api 开头以外的所有路径都交给同一个入口
     // Route::any('/{any}', [YourController::class, 'index'])->where('any', '^(?!api).*');
 }
 ```
 
 ### casts 方法 {#casts}
 
-如果我们的主题中存在文件上传配置，比如 logo，我们在 `/configs` 接口中获取到的配置，文件不会返回完整的 url，而是文件名称+拓展名。
-
-我们可以通过定义 `casts` 来转换返回值：
+配置表单中有文件上传字段（例如 logo）时，保存的配置值只是文件路径，不是完整的网址。可以在 `casts` 中转换读取时的值：
 
 ```php
 <?php
 
-// ...省略部分代码
-
 use App\Support\Attribute;
 use Illuminate\Support\Facades\Storage;
-
-// ...省略部分代码
 
 public function casts(): array
 {
     return [
         'logo' => new Attribute(
-            // 我们可以使用 laravel 提供的 Storage 类获取程序文件的完整 url
-            get: fn(?$value) => $value ? Storage::url($value) : '',
-            // get 用于获取时转换数据，我们也可以定义 set 让其在储存主题配置前转换数据
-            // set: fn (?$value) => $value ? 'yes' : 'no',
+            // 读取时把文件路径转换为完整网址
+            get: fn ($value) => $value ? Storage::url($value) : '',
         ),
     ];
 }
 ```
 
+`getSettings()` 返回转换后的值；需要原始值时使用 `getRawSettings()`。
+
 ### configurable 方法 {#configurable}
 
-`configurable` 方法用于配置主题在后台管理中的「主题配置」表单，表单构建需要使用 [Filamentphp](https://filamentphp.com/docs/4.x)。
-Filament 是 Laravel 的服务器驱动 UI (SDUI) 框架。它允许您使用结构化配置对象（而非传统的模板）完全用 PHP 定义用户界面。您可能需要花费一些时间去了解此框架才能更好的去实现配置表单。
+`configurable` 返回后台「主题管理」中的配置表单，使用 [Filament](https://filamentphp.com/docs/4.x) 的组件构建，常用的是：
 
-大多数情况下，我们构建表单需要用到的有：
+- [Filament Forms](https://filamentphp.com/docs/4.x/forms/overview)：输入框、选择框、文件上传等表单字段
+- [Filament Schemas](https://filamentphp.com/docs/4.x/schemas/overview)：分组、栅格等布局组件
 
-- [Filamentphp Forms](https://filamentphp.com/docs/4.x/forms/overview)
-- [Filamentphp Schemas](https://filamentphp.com/docs/4.x/schemas/overview)
-
-注意，所有表单字段的 id，都必须以 `payload.` 开头，比如我们需要建立一个网站标题的配置项，名称必须是 `payload.title`。 一个最小化配置表单结构示例：
+所有表单字段的名称都必须以 `payload.` 开头，例如网站标题的配置项名称为 `payload.title`，读取时使用 `title`。最简单的配置表单：
 
 ```php
-<php
-
-// ...省略部分代码
+<?php
 
 use Filament\Forms\Components\TextInput;
-
-// ...省略部分代码
 
 public function configurable(): array
 {
@@ -359,28 +232,28 @@ public function configurable(): array
         TextInput::make('payload.title')
             ->label('网站标题')
             ->maxLength(60)
-            ->minLength(1)
-            ->required()
-            ->placeholder('请输入网站标题');
+            ->required(),
     ];
 }
 ```
 
-配置好以后我们在后台管理的主题管理中，选择您的主题，便会出现「网站标题」配置表单。
+在「主题管理」中选择这个主题后，就会出现「网站标题」配置项。
 
 ## 创建新的主题 {#create-theme}
 
-为了使开发者更方便的开发主题，我们在系统内部集成了生成主题模版的交互式命令：
+程序内置了生成主题模板的命令，在程序根目录执行：
 
 ```shell
 php artisan make:theme
 ```
 
-在程序根目录执行此命令，根据提示填写相关配置后即可在 `themes/` 目录中生成一个主题模版，您可以直接修改此模版以开发自己的主题。
+按提示填写主题 id（小写字母、数字和 `-`，3 到 30 个字符）、名称、作者、描述，选择是否创建 `assets`、`views`、`controllers` 目录和配置表单的模板类型，命令会在 `themes/` 目录中生成主题模板。在此基础上修改即可。
+
+开发完成后，可以提交到主题仓库，见[主题](../../themes#submit)页面。
 
 ## 修改默认主题 {#edit-default-theme}
 
-默认主题是典型的混合部署，利用 laravel 通配符路由（排除`/api`开头的路由）匹配所有 url 请求路由到主题入口，然后通过 blade 优先渲染 spa 单页的入口文件，spa 单页渲染完成后调用 `/api` 开头的相关接口获取数据，从而实现前后端不需要配合 nginx 伪静态即可实现混合部署，解决了 spa 单页在刷新网页时出现 404 的问题。生命周期图：
+默认主题是混合部署的单页应用：Laravel 用通配路由把除 `/api` 以外的所有请求都交给主题入口，返回单页应用的 `index.blade.php`；页面在浏览器中渲染后，再调用 `/api` 开头的接口获取数据。因此不需要额外的伪静态规则，刷新页面也不会出现 404。
 
 ```mermaid
 flowchart TD
@@ -395,50 +268,54 @@ flowchart TD
     H --> F[前端接收并更新页面]
 ```
 
-理解以上生命周期图，有利于您更好的开发 spa 单页主题。若要修改主题，您需要在您的设备上安装 [Nodejs](https://nodejs.org)。
+默认主题的源码在安装包的 `web` 目录中。Docker 镜像中没有这个目录，需要时请在授权中心下载与当前版本相同的安装包取得。修改前请在电脑上安装 [Node.js](https://nodejs.org) 22.13 或以上版本。
 
-使用终端进入根目录中的 `web` 文件夹，运行命令安装相关库：
+在 `web` 目录中安装依赖：
 
 ::: code-group
+
+```shell [npm]
+npm install
+```
 
 ```shell [Yarn]
 yarn
 ```
 
-```shell [Npm]
-npm install
-```
-
 :::
 
-运行调试命令启动开发服务器：
+启动开发服务器，修改代码后页面会自动刷新：
 
 ::: code-group
+
+```shell [npm]
+npm run dev
+```
 
 ```shell [Yarn]
 yarn dev
 ```
 
-```shell [Npm]
-npm run dev
-```
-
 :::
 
-然后就可以愉快的修改样式了。
+开发服务器默认请求 `http://127.0.0.1:8000/api/v2` 的接口，可以修改 `web/.env` 中的 `VITE_APP_API_URL` 指向您的站点。
 
-您还可以修改环境变量文件 `web/.env` 中的 `VITE_APP_API_URL` 参数值来调整接口地址。
-
-只需在您修改了前端工程文件后，执行构建命令：
+修改完成后执行构建：
 
 ::: code-group
+
+```shell [npm]
+npm run build
+```
 
 ```shell [Yarn]
 yarn build
 ```
 
-```shell [Npm]
-npm run build
-```
+:::
 
+构建结果会直接写入程序的 `app/Themes/Default` 目录（`assets`、`views/index.blade.php` 和 `DefaultTheme.php`），把这个目录上传到服务器覆盖即可。
+
+:::warning
+默认主题属于程序文件。升级时如果新版本修改了默认主题，您的修改会被覆盖；「修复安装」也会把它恢复为官方文件。请保留修改过的源码，升级后用新版本的 `web` 目录合并修改并重新构建。需要长期维护的修改，建议做成独立的主题放在 `themes` 目录中。
 :::
