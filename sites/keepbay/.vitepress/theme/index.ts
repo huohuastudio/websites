@@ -1,4 +1,11 @@
-import Theme from '@huohuastudio/theme'
+import type { Theme } from 'vitepress'
+import BaseTheme from '@huohuastudio/theme'
+import Mermaid from '@huohuastudio/theme/mermaid'
 import './brand.css'
 
-export default Theme
+export default {
+  extends: BaseTheme,
+  enhanceApp({ app }) {
+    app.component('Mermaid', Mermaid)
+  },
+} satisfies Theme

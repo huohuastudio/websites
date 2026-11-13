@@ -7,5 +7,5 @@ hero:
   actions:
     - theme: brand
       text: 查看文档
-      link: /docs/
+      link: /docs/introduce
 ---

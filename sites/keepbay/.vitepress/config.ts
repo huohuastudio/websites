@@ -7,8 +7,34 @@ export default defineSiteConfig({
   description: '自部署的私有网盘',
   dir: 'sites/keepbay',
   logo: '/logo.svg',
-  nav: [{ text: '文档', link: '/docs/', activeMatch: '^/docs/' }],
+  mermaid: true,
+  nav: [
+    { text: '文档', link: '/docs/introduce', activeMatch: '^/docs/' },
+    { text: '演示', link: 'https://demo.keepbay.app' },
+  ],
   sidebar: {
-    '/docs/': [{ text: '开始使用', items: [{ text: '文档整理中', link: '/docs/' }] }],
+    '/docs/': [
+      {
+        text: '开始使用',
+        collapsed: false,
+        items: [
+          { text: '介绍', link: '/docs/introduce' },
+          { text: '安装', link: '/docs/install' },
+          { text: '首次设置', link: '/docs/setup' },
+          { text: '升级', link: '/docs/upgrade' },
+          { text: '外网访问', link: '/docs/remote-access' },
+        ],
+      },
+      {
+        text: '参考',
+        collapsed: false,
+        items: [
+          { text: '命令行', link: '/docs/cli' },
+          { text: '技术架构', link: '/docs/architecture' },
+          { text: '隐私与安全', link: '/docs/privacy' },
+          { text: '常见问题', link: '/docs/faq' },
+        ],
+      },
+    ],
   },
 })
