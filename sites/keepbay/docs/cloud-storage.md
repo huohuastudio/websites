@@ -166,6 +166,7 @@ sudo rclone mount r2:photos /mnt/cloud/photos \
   --dir-cache-time 1000h \
   --vfs-cache-mode full \
   --vfs-cache-max-size 50G \
+  --vfs-cache-max-age 720h \
   --cache-dir /var/cache/rclone
 ```
 
@@ -178,6 +179,7 @@ sudo rclone mount r2:photos /mnt/cloud/photos \
 - `--dir-cache-time 1000h`：目录列表缓存很长时间。rclone 每次重新读取目录，都会给文件换一个 inode，Keepbay 会以为文件变了，再读一遍。缓存时间长，同一次挂载中 inode 就不会变
 - `--vfs-cache-mode full`：读过的内容缓存在本地硬盘上，Keepbay 再读同一个文件时不用重新下载
 - `--vfs-cache-max-size`：缓存的上限，按硬盘的剩余空间设。实际占用可能会略超过这个值
+- `--vfs-cache-max-age 720h`：缓存保留 30 天。默认只保留 1 小时，首次添加时文件要排队处理，同一个文件两次读取之间可能隔了不止 1 小时，缓存过期就得重新下载
 - `--cache-dir`：缓存放在哪里，请放在空间足够的硬盘上
 
 ### 云上的改动 {#cloud-changes}
@@ -206,7 +208,7 @@ ExecStart=/usr/bin/rclone mount r2:photos /mnt/cloud/photos \
   --config /root/.config/rclone/rclone.conf \
   --read-only --allow-other \
   --dir-cache-time 1000h \
-  --vfs-cache-mode full --vfs-cache-max-size 50G \
+  --vfs-cache-mode full --vfs-cache-max-size 50G --vfs-cache-max-age 720h \
   --cache-dir /var/cache/rclone
 ExecStop=/bin/fusermount -uz /mnt/cloud/photos
 Restart=on-failure
@@ -344,6 +346,11 @@ sudo mount -t nfs 192.168.1.20:/volume1/photos /mnt/nas/photos -o ro
 1 TB 的照片，大约要从云上下载 1 到 2 TB。实际的下载量还取决于文件的格式和 rclone 的缓存。
 
 可以只挂载需要的子文件夹，或者用[忽略规则](./folders#ignore)排除不需要的文件夹，减少读取量。
+
+Keepbay 目前没有"只建目录、不读内容"的省流量选项。缩略图、全文搜索、AI 整理都要读文件内容，这次读取省不掉。能做的是让每个文件只下载一次，并控制下载速度：
+
+- 加 `--vfs-cache-mode full`，把 `--vfs-cache-max-size` 设得够大，`--vfs-cache-max-age` 设得够长。同一个文件第一次处理时会被读好几次，缓存还在就不用重新下载
+- 加 `--bwlimit` 限速，比如 `--bwlimit 10M` 是每秒 10 MiB，免得触发网盘的限流
 
 **重新挂载后会再读一遍。** 每次重新挂载，rclone 给每个文件的 inode 都不一样，Keepbay 会把文件当成变了，重新读一遍，64 MB 以上的文件还会重新生成缩略图、重新提取文字。标签、分享链接不受影响。
 
