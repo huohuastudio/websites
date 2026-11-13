@@ -168,7 +168,7 @@ faq:
   - q: 有 Docker 镜像、Windows 版或手机 App 吗？
     a: 目前都没有。内测期只提供 Linux 安装包，Docker 镜像以后会考虑。家里只有 Windows 或 Mac 的，可以装在 NAS、软路由或一台小主机上。网页在手机浏览器上可以正常使用，上传、预览、分享都没问题。
   - q: 能管理 S3、百度网盘、阿里云盘上的文件吗？
-    a: Keepbay 不直接连接云存储，但可以先把它们变成服务器上的文件夹：用 rclone 同步到本地或者挂载，国内网盘再经 OpenList 转一下。详见<a href="/docs/cloud-storage">云盘和对象存储</a>。
+    a: Keepbay 不直接连接云存储，但可以先把它们变成服务器上的文件夹：用 rclone 同步到本地或者挂载，国内网盘再经 OpenList 转一下。详见<a href="/docs/cloud-storage">云盘</a>。
 ---
 
 ::: warning 内测阶段

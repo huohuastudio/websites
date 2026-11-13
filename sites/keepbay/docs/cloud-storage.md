@@ -1,4 +1,4 @@
-# 云盘和对象存储 {#cloud-storage}
+# 云盘 {#cloud-storage}
 
 Keepbay 只管理服务器上的本地文件夹，不直接连接 S3、WebDAV 或者各家网盘。
 

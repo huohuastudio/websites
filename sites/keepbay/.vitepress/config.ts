@@ -22,8 +22,17 @@ export default defineSiteConfig({
           { text: '隐私与安全', link: '/docs/privacy' },
           { text: '安装', link: '/docs/install' },
           { text: '首次设置', link: '/docs/setup' },
-          { text: '升级', link: '/docs/upgrade' },
           { text: '外网访问', link: '/docs/remote-access' },
+          { text: '升级', link: '/docs/upgrade' },
+        ],
+      },
+      {
+        text: '存储',
+        collapsed: false,
+        items: [
+          { text: '文件夹', link: '/docs/folders' },
+          { text: '云盘', link: '/docs/cloud-storage' },
+          { text: '备份和维护', link: '/docs/backup' },
         ],
       },
       {
@@ -32,25 +41,25 @@ export default defineSiteConfig({
         items: [
           { text: '浏览和预览', link: '/docs/files' },
           { text: '上传和下载', link: '/docs/upload' },
+          { text: '搜索', link: '/docs/search' },
           { text: '回收站和撤销', link: '/docs/trash' },
           { text: '离线下载', link: '/docs/offline-download' },
-          { text: '搜索和智能文件夹', link: '/docs/search' },
         ],
       },
       {
         text: 'AI 功能',
         collapsed: false,
         items: [
-          { text: 'AI 桌面', link: '/docs/ai-desk' },
-          { text: '语义搜索和以图搜图', link: '/docs/semantic-search' },
-          { text: 'AI 标签', link: '/docs/ai-tags' },
-          { text: '收件箱和自动整理', link: '/docs/inbox' },
-          { text: '重要日期提醒', link: '/docs/reminders' },
           { text: '模型设置', link: '/docs/ai-models' },
+          { text: 'AI 桌面', link: '/docs/ai-desk' },
+          { text: '语义搜索', link: '/docs/semantic-search' },
+          { text: 'AI 标签', link: '/docs/ai-tags' },
+          { text: '收件箱', link: '/docs/inbox' },
+          { text: '日期提醒', link: '/docs/reminders' },
         ],
       },
       {
-        text: '家庭成员与分享',
+        text: '成员与分享',
         collapsed: false,
         items: [
           { text: '成员和权限', link: '/docs/members' },
@@ -62,9 +71,6 @@ export default defineSiteConfig({
         text: '系统设置',
         collapsed: false,
         items: [
-          { text: '文件夹', link: '/docs/folders' },
-          { text: '云盘和对象存储', link: '/docs/cloud-storage' },
-          { text: '备份和维护', link: '/docs/backup' },
           { text: '通知', link: '/docs/notifications' },
           { text: '网络代理', link: '/docs/proxy' },
           { text: '访问记录', link: '/docs/access-log' },
@@ -76,8 +82,8 @@ export default defineSiteConfig({
         items: [
           { text: '专业版', link: '/docs/pro' },
           { text: '命令行', link: '/docs/cli' },
-          { text: '技术架构', link: '/docs/architecture' },
           { text: '常见问题', link: '/docs/faq' },
+          { text: '技术架构', link: '/docs/architecture' },
         ],
       },
     ],
