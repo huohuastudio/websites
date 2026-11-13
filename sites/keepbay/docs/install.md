@@ -46,7 +46,7 @@ keepbay_0.1.0-beta.3_linux_amd64/
 /var/lib/keepbay/                            # 数据目录，见下文
 ```
 
-看起来比"解压到一个目录"多绕了两层链接，这是为了在网页上更新：新版本解压到 `versions/` 中，再把 `current` 指过去；新版本起不来时指回去就是回滚。`/opt/keepbay/keepbay` 这个路径永远不变，服务文件也就不用改。更新的过程见[升级](./upgrade#online)。
+多了 `versions/` 和两个链接，是为了在网页上更新：新版本解压到 `versions/` 中，再把 `current` 指过去；新版本起不来时指回去就是回滚。`/opt/keepbay/keepbay` 这个路径永远不变，服务文件也就不用改。更新的过程见[升级](./upgrade#online)。
 
 ## 安装步骤 {#steps}
 
@@ -116,7 +116,7 @@ sudo firewall-cmd --reload
 
 ## 给文件夹权限 {#permissions}
 
-Keepbay 只能访问 `keepbay` 用户有权限的文件夹，这是好事，也是新手最常卡住的地方。在网页上添加文件夹前，先用 ACL 给它授权（Debian、Ubuntu 先 `sudo apt install acl`）：
+Keepbay 只能访问 `keepbay` 用户有权限的文件夹，这也是新手最容易卡住的地方。在网页上添加文件夹前，先用 ACL 给它授权（Debian、Ubuntu 先 `sudo apt install acl`）：
 
 ```bash
 # 读写；只读时把 rwX 改成 rX，添加文件夹时选"只读"
