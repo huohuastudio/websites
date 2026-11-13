@@ -59,19 +59,29 @@ provide('toggle-appearance', async ({ clientX: x, clientY: y }: MouseEvent) => {
     `circle(${Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))}px at ${x}px ${y}px)`,
   ]
 
-  await document.startViewTransition(async () => {
+  const transition = document.startViewTransition(async () => {
     isDark.value = !isDark.value
     await nextTick()
-  }).ready
+  })
+  try {
+    await transition.ready
+  } catch {
+    // 动画开始前又点了一次或页面被隐藏时过渡会被跳过：主题已经切好，不放动画
+    return
+  }
 
-  document.documentElement.animate(
+  const animation = document.documentElement.animate(
     { clipPath: isDark.value ? clipPath.reverse() : clipPath },
     {
       duration: 300,
       easing: 'ease-in',
+      // 动画结束到过渡收尾之间还会渲染一帧，不保持终点状态时上层快照会复原，闪一下旧主题
+      fill: 'forwards',
       pseudoElement: `::view-transition-${isDark.value ? 'old' : 'new'}(root)`,
     },
   )
+  // 保持终点状态的动画会留在 <html> 上，作用到下一次切换的同名伪元素，过渡结束后取消
+  transition.finished.finally(() => animation.cancel())
 })
 </script>
 
