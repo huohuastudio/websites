@@ -90,3 +90,8 @@ div.mermaid-diagram {
 div.mermaid-diagram:empty {
   min-height: 120px;
 }
+
+/* 正文中的按钮（首页模块用 VPButton）不加链接下划线 */
+.vp-doc a.VPButton {
+  text-decoration: none;
+}

@@ -1,5 +1,5 @@
 // 配置文件中的包名导入会被当作外部依赖交给 Node 直接加载（无法加载 .ts），所以用相对路径
-import { defineSiteConfig } from '../../../packages/theme/config'
+import { defineSiteConfig } from '../../../packages/theme/config.ts'
 
 const RELEASES = 'https://github.com/huohuastudio/novaix-releases'
 
@@ -9,6 +9,7 @@ export default defineSiteConfig({
   description: '面向中小型 VPS 服务商的 IDC 管理系统',
   dir: 'sites/novaix',
   logo: '/logo.svg',
+  ogImage: '/og.png',
   mermaid: true,
   nav: [
     { text: '文档', link: '/docs/introduce', activeMatch: '^/docs/' },

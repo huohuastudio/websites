@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { defineConfigWithTheme, type DefaultTheme, type HeadConfig } from 'vitepress'
-import { mermaidMarkdown } from './mermaid-markdown'
+import { mermaidMarkdown } from './mermaid-markdown.ts'
 
 const REPO = 'https://github.com/huohuastudio/websites'
 
@@ -41,6 +41,13 @@ export interface SiteOptions {
   versions?: Versions
   /** 把 ```mermaid 代码块渲染成图表；打开后站点主题还要注册 Mermaid 组件 */
   mermaid?: boolean
+}
+
+/** 分享标题，照搬 VitePress 生成 <title> 的规则（createTitle）：页面的 titleTemplate 优先，否则为"页面标题 | 站点名" */
+function shareTitle(pageTitle: string, template: string | boolean | undefined, siteTitle: string): string {
+  if (typeof template === 'string' && template.includes(':title')) return template.replace(/:title/g, () => pageTitle)
+  const suffix = template === false ? '' : template === true || template === undefined ? ` | ${siteTitle}` : siteTitle === template ? '' : ` | ${template}`
+  return pageTitle === suffix.slice(3) ? pageTitle : pageTitle + suffix
 }
 
 /** 页面在站点中的地址（cleanUrls）：index.md → /，docs/index.md → /docs/，docs/a.md → /docs/a */
@@ -92,7 +99,7 @@ export function defineSiteConfig(options: SiteOptions) {
     transformPageData(pageData) {
       const path = pagePath(pageData.relativePath)
       const url = hostname + path
-      const pageTitle = pageData.title ? `${pageData.title} | ${title}` : title
+      const pageTitle = shareTitle(pageData.title || title, pageData.titleTemplate ?? pageData.frontmatter.titleTemplate, title)
       const head: HeadConfig[] = (pageData.frontmatter.head ??= [])
       const has = (key: string) => head.some(([, attrs]) => attrs?.rel === key || attrs?.property === key)
       if (head.some(([, attrs]) => attrs?.name === 'robots' && /noindex/.test(attrs.content ?? ''))) noindex.add(path)

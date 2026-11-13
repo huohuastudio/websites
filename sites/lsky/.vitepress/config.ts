@@ -1,5 +1,5 @@
 // 配置文件中的包名导入会被当作外部依赖交给 Node 直接加载（无法加载 .ts），所以用相对路径
-import { defineSiteConfig } from '../../../packages/theme/config'
+import { defineSiteConfig } from '../../../packages/theme/config.ts'
 
 export default defineSiteConfig({
   hostname: 'https://www.lsky.pro',
