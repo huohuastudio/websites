@@ -129,6 +129,20 @@ W5 开工时用户定：本仓库不处理旧文档域名（docs.huohuastudio.co
 | W4c | Keepbay 文档：AI 功能（AI 桌面、语义搜索和以图搜图、AI 标签、收件箱和自动整理、重要日期提醒、模型设置）；专业版页补充试用规则 | 已完成 |
 | W4d | Keepbay 官网首页；按审查顺带改正介绍、常见问题、隐私、回收站、云盘页的几处说法 | 已完成 |
 | W5 | 上线：Cloudflare Workers 项目、CDN 回源切换（由用户操作） | 已上线（2026-11-13），待用户停掉旧官网部署 |
+| W6a | 首页改版：共用的首页版块组件 + Keepbay 首页（示意图做主视觉） | 已完成 |
+| W6b | 首页改版：Novaix 首页（主视觉用后台截图） | 进行中 |
+| W6c | 首页改版：Lsky 首页 | 待做 |
+
+## W6 首页改版（2026-11-13 用户定）
+
+用户觉得三个首页字太多太密、首屏没吸引力、各节长得一样。调研过 Laravel、Linear、Tailscale、Immich、Raycast、ente 的首页，做过四个布局原型，用户最后选定"细线框架版"：
+
+- **首页单独设计，文档页不动**：只改版式、留白、分节和主视觉，颜色、字体仍用 VitePress 默认主题的变量
+- **版式**：首屏标题居中、主视觉放在带光晕的浅底板上；版块之间、格子之间用 1px 细线分隔；版块和格子铺满整个浏览器宽度，两侧不画竖线；卖点"一大三小"（第一项占一整行）
+- **内容不删减**：原首页的内容全部保留（Keepbay：隐私 4 组、功能 5 组、常见问题 12 条，价格对比表直接展开、撑满整行）
+- **实现**：首页 `layout: home` + `markdownStyles: false`，frontmatter 不用 `hero`、`features` 键名（默认主题见到会渲染自带的首屏和卡片）；版块组件在共用主题 `components/home/`（HomeHero、HomeSection、HomeCells、HomeCell、HomePlans、HomeWindow、HomeFeatureList 的 cells 变体），共用样式在 `styles/home.css`（`.home-lines` 细线网格、`.home-card` 示意图卡片、`.home-pad`、`.home-note`、`.home-stage`）；示意图是站点自己的 Vue 组件，只在首页 `<script setup>` 中引入
+- **Keepbay**：内测期不放真实截图，示意图用 HTML/CSS 画（`sites/keepbay/.vitepress/theme/visuals/`）；联网清单示意图要与隐私文档的联网表一致
+- **Novaix、Lsky**：用同一套组件，主视觉用真实截图
 
 ## 已知局限
 

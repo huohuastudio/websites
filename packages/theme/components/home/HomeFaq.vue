@@ -58,9 +58,19 @@ defineProps<{ items: FaqItem[] }>()
   transform: translateY(-50%) rotate(45deg);
 }
 
-.vp-doc .faq-item p {
+/* 不依赖文档正文样式：首页不套 .vp-doc 时也能正常显示 */
+.faq .faq-item p {
   margin: 0 0 16px;
+  font-size: 15px;
+  line-height: 1.8;
   color: var(--vp-c-text-2);
+}
+
+.faq-item p :deep(a) {
+  color: var(--vp-c-brand-1);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

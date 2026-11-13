@@ -2,34 +2,17 @@
 layout: home
 title: Keepbay
 titleTemplate: 自部署的私有网盘
+# 首页不套文档正文样式，版式由共用主题的首页版块组件负责
+markdownStyles: false
 
-hero:
-  name: Keepbay
-  text: 自部署的私有网盘
-  tagline: 装在您自己的服务器或 NAS 上，给您和家人用。文件留在原来的文件夹里，AI 默认在您自己的设备上运行。
-  image:
-    src: /logo.svg
-    alt: Keepbay
-  actions:
-    - theme: brand
-      text: 下载安装
-      link: /docs/install
-    - theme: alt
-      text: 在线演示
-      link: https://demo.keepbay.app
-    - theme: alt
-      text: 阅读文档
-      link: /docs/introduce
-
-features:
-  - title: 文件留在原处
-    details: Keepbay 只建立索引，不搬动文件，也不改目录结构。NAS 的共享、Jellyfin、Syncthing 照常用，哪天卸载了，文件一个都不少。
-  - title: 数据不经过我们
-    details: 不用注册我们的帐号。程序里没有统计、遥测和崩溃上报，网页不加载任何第三方的脚本、字体或图片。
-  - title: AI 默认在本地
-    details: 语义搜索、按画面搜图、识别图片中的文字都有本地模型。用不用云端模型由您决定，照片从来不会发给云端。
-  - title: 一家人共用
-    details: 按文件夹给家人授权只读或读写。没有授权的文件夹，家人看不到，也不知道它们存在。
+# 不用 hero、features 这两个键名：默认主题见到它们会渲染自带的首屏和卡片
+heroActions:
+  - theme: brand
+    text: 下载安装
+    link: /docs/install
+  - theme: alt
+    text: 在线演示
+    link: https://demo.keepbay.app
 
 privacy:
   - title: 数据在哪里
@@ -113,21 +96,38 @@ featureGroups:
       - name: 命令行
         desc: 重置密码、解锁帐号、检查环境、备份和恢复数据库
 
+plans:
+  - name: 免费版
+    price: ¥0
+    note: 永久免费
+    items:
+      - 不限文件夹和文件数量
+      - 文件管理、预览、搜索、标签
+      - 分享链接、离线下载
+      - 两步验证、通行密钥、外部帐号登录
+      - 家庭成员最多 2 人（含所有者）
+    action:
+      text: 下载安装
+      link: /docs/install
+      theme: alt
+  - name: 专业版
+    price: ¥199
+    note: 永久使用，含 1 年更新
+    featured: true
+    items:
+      - 免费版的全部功能
+      - 家庭成员不限
+      - 语义搜索、以图搜图、识别图片中的文字
+      - AI 桌面、收件箱、AI 标签、日期提醒
+      - 证件照水印
+    action:
+      text: 了解专业版
+      link: /docs/pro
+
 pricing:
   plans:
     - name: 免费版
-      price: ¥0
-      note: 永久免费
-      action:
-        text: 下载安装
-        link: /docs/install
-        theme: alt
     - name: 专业版
-      price: ¥199
-      note: 永久使用，含 1 年更新
-      action:
-        text: 了解专业版
-        link: /docs/pro
   rows:
     - { name: 文件管理、预览、上传下载、回收站, values: [true, true] }
     - { name: 文件名和全文搜索, values: [true, true] }
@@ -171,53 +171,116 @@ faq:
     a: Keepbay 不直接连接云存储，但可以先把它们变成服务器上的文件夹：用 rclone 同步到本地或者挂载，国内网盘再经 OpenList 转一下。详见<a href="/docs/cloud-storage">云盘</a>。
 ---
 
-::: warning 内测阶段
-Keepbay 目前处于内测阶段（0.1.0-beta），功能和界面还会调整，暂时只提供 Linux 安装包。用于存放重要资料前，请先做好备份。
-:::
+<script setup>
+// 首页的示意图只在这一页引入，不进主题入口
+import KbFamily from './.vitepress/theme/visuals/KbFamily.vue'
+import KbFolders from './.vitepress/theme/visuals/KbFolders.vue'
+import KbHero from './.vitepress/theme/visuals/KbHero.vue'
+import KbInstall from './.vitepress/theme/visuals/KbInstall.vue'
+import KbOutbound from './.vitepress/theme/visuals/KbOutbound.vue'
+import KbSearch from './.vitepress/theme/visuals/KbSearch.vue'
+</script>
 
-## 先看看效果 {#demo}
+<HomeHero
+  title="自部署的私有网盘"
+  text="装在您自己的服务器或 NAS 上，给您和家人用。文件留在原来的文件夹里，AI 默认在您自己的设备上运行。"
+  :actions="$frontmatter.heroActions"
+>
 
-打开演示站 [demo.keepbay.app](https://demo.keepbay.app)，用帐号 `demo` 或 `family` 登录，密码 `keepbay-demo`。
+暂时只提供 Linux 安装包。存放重要资料前，请先做好备份。
 
-演示站每小时恢复一次，不用担心改坏了什么。
+<template #visual><KbHero /></template>
+</HomeHero>
 
-## 文件留在原来的文件夹里 {#folders-first}
+<HomeSection id="why">
+<HomeCells :columns="3">
+<HomeCell title="文件留在原来的文件夹里" wide :level="2">
 
-很多网盘会把文件导入自己的存储。程序出了问题，或者想换一个时，文件不容易取出来。
+很多网盘会把文件导入自己的存储，想换一个时，文件不容易取出来。
 
-Keepbay 不这么做。您的文件夹原样不动，名字和目录结构都不变，Keepbay 只是读一遍、建立索引。
-
-NAS 自带的文件管理、SMB 共享、Jellyfin、相册程序、Syncthing 照常工作，它们在外面做的改动，Keepbay 会发现并更新索引。
+Keepbay 不搬文件，也不改目录结构，只是读一遍、建立索引。NAS 的共享、Jellyfin、Syncthing 照常用，它们在外面做的改动，Keepbay 会跟上。
 
 AI 也遵守这个原则：它不会自己去整理您已有的文件夹，只给文件打标签。一家人共用的文件夹被 AI 擅自整理后，其他人就找不到东西了。
 
-Keepbay 替您移动文件，只有两种情况：您指定为收件箱的文件夹，其中的文件按您定的规则或 AI 的建议归档；或者您在 AI 桌面确认了它列出的计划。每一次移动都有记录，可以撤销。
+Keepbay 替您移动文件只有两种情况：收件箱里的文件按您定的规则或 AI 的建议归档；或者您在 AI 桌面确认了它列出的计划。每一次移动都有记录，可以撤销。
 
-## 隐私与安全 {#privacy}
+<template #visual><KbFolders /></template>
+</HomeCell>
+<HomeCell title="数据不经过我们" :level="2">
 
-照片、证件、合同、病历，家里最私密的东西都会放进网盘。所以隐私与安全是我们做 Keepbay 时最先考虑的事。
+不用注册我们的帐号。没有统计、遥测和崩溃上报，网页不加载第三方的资源。
 
-<HomeFeatureList :groups="$frontmatter.privacy" />
+主动联网的只有这几种情况，见[隐私与安全](./docs/privacy#outbound)。
 
-也要说清楚我们没做的：Keepbay 没有端到端加密，因为服务端要生成缩略图、提取文字、交给 AI 分析。服务器本身的安全，比如系统更新、防火墙、磁盘加密，仍然要靠您来照顾。
+<template #visual><KbOutbound /></template>
+</HomeCell>
+<HomeCell title="AI 默认在本地" :level="2">
+
+语义搜索、按画面搜图、识别图片中的文字，都有本地模型。照片从来不会发给云端。
+
+用不用云端模型由您决定。AI 功能属于[专业版](./docs/pro)。
+
+<template #visual><KbSearch /></template>
+</HomeCell>
+<HomeCell title="一家人共用" :level="2">
+
+按文件夹给家人授权只读或读写。没有授权的文件夹，家人看不到，也不知道它存在。
+
+存证件的文件夹只给自己，孩子的作业全家都能放。
+
+<template #visual><KbFamily /></template>
+</HomeCell>
+</HomeCells>
+</HomeSection>
+
+<HomeSection
+  id="privacy"
+  title="隐私与安全"
+  lead="照片、证件、合同、病历，家里最私密的东西都会放进网盘。所以隐私与安全是我们做 Keepbay 时最先考虑的事。"
+>
+<HomeFeatureList :groups="$frontmatter.privacy" variant="cells" :columns="2" />
+<div class="home-pad line">
+<div class="home-prose home-note">
+
+也说清楚我们没做的：Keepbay 没有端到端加密，因为服务端要生成缩略图、提取文字、交给 AI 分析。服务器本身的安全，比如系统更新、防火墙、磁盘加密，仍然要靠您来照顾。
 
 每种情况发送什么、密钥怎么保存、请求经过哪些检查，见[隐私与安全](./docs/privacy)。
 
-## 功能 {#features}
+</div>
+</div>
+</HomeSection>
 
-<HomeFeatureList :groups="$frontmatter.featureGroups" />
+<HomeSection id="features" title="功能">
+<HomeFeatureList :groups="$frontmatter.featureGroups" variant="cells">
 
-## 安装 {#install}
+每项功能怎么用、有哪些限制，见[文档](./docs/introduce)。
+
+</HomeFeatureList>
+</HomeSection>
+
+<HomeSection id="install">
+<HomeCells>
+<HomeCell title="十分钟装好" wide :level="2">
 
 Keepbay 是一个程序加一个 `lib/` 目录，解压就能运行，不用另装数据库、Web 服务器或运行环境。
 
 需要一台 Linux 服务器、NAS 或小主机：x86_64 或 arm64，glibc 2.28 及以上（Debian 10、Ubuntu 20.04、RHEL 8 起）。
 
-按[安装](./docs/install)一步步来，全程大约十分钟。
+按[安装](./docs/install)一步步来就行。
 
-## 价格 {#pricing}
+<template #visual><KbInstall /></template>
+</HomeCell>
+</HomeCells>
+</HomeSection>
 
-免费版是一个完整的私有网盘，不限文件夹和文件数量。专业版加上 AI 整理和搜索，成员不限。
+<HomeSection
+  id="pricing"
+  title="价格"
+  lead="免费版是一个完整的私有网盘，不限文件夹和文件数量。专业版加上 AI 整理和搜索，成员不限。"
+>
+<HomePlans :plans="$frontmatter.plans" />
+<div class="home-pad line">
+<div class="home-prose home-note">
 
 专业版一次购买、永久使用，含 1 年更新。之后想装新的功能版本，续一年更新 ¥79；不续也照常使用，安全修复始终免费。
 
@@ -225,14 +288,28 @@ Keepbay 是一个程序加一个 `lib/` 目录，解压就能运行，不用另�
 
 专业版将在 1.0.0 正式版发布时开始销售，价格以届时的购买页为准。正式版发布后 3 个月内首发价 ¥129。每个授权最多激活 3 台设备。
 
+</div>
 <HomePricing :plans="$frontmatter.pricing.plans" :rows="$frontmatter.pricing.rows" />
+</div>
+</HomeSection>
 
-## 常见问题 {#faq}
-
-<HomeFaq :items="$frontmatter.faq" />
+<HomeSection id="faq" title="常见问题" layout="side">
+<template #header>
 
 更多问题见[常见问题](./docs/faq)。没找到答案的，欢迎发邮件到 support@huohuastudio.com。
 
-## 开始使用 {#start}
+</template>
+<HomeFaq :items="$frontmatter.faq" />
+</HomeSection>
 
-<HomeActions :actions="$frontmatter.hero.actions" />
+<HomeSection
+  id="start"
+  title="先看看效果"
+  lead="打开演示站，用帐号 demo 或 family 登录，密码 keepbay-demo。演示站每小时恢复一次，随便点。"
+  layout="center"
+>
+<HomeActions :actions="[
+  { text: '打开演示站', link: 'https://demo.keepbay.app' },
+  { text: '下载安装', link: '/docs/install', theme: 'alt' },
+]" />
+</HomeSection>

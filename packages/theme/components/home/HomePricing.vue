@@ -4,8 +4,8 @@ import type { HomeAction } from './HomeActions.vue'
 
 export interface PricingPlan {
   name: string
-  /** 价格，如 ¥0、按年订阅 */
-  price: string
+  /** 价格，如 ¥0、按年订阅；表格放在价格卡片下方时可以省略 */
+  price?: string
   note?: string
   action?: HomeAction
 }
@@ -28,7 +28,7 @@ defineProps<{ plans: PricingPlan[]; rows: PricingRow[] }>()
           <td></td>
           <th v-for="plan in plans" :key="plan.name" scope="col">
             <div class="plan-name">{{ plan.name }}</div>
-            <div class="plan-price">{{ plan.price }}</div>
+            <div v-if="plan.price" class="plan-price">{{ plan.price }}</div>
             <div v-if="plan.note" class="plan-note">{{ plan.note }}</div>
             <VPButton
               v-if="plan.action"
@@ -56,29 +56,48 @@ defineProps<{ plans: PricingPlan[]; rows: PricingRow[] }>()
 </template>
 
 <style scoped>
-.vp-doc .pricing table {
+/* 表格样式写全，不依赖文档正文样式（首页不套 .vp-doc 时也能显示）；scoped 属性让这些选择器的优先级高于 .vp-doc table */
+.pricing table {
   display: table;
   width: 100%;
   margin: 0;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
-.vp-doc .pricing th,
-.vp-doc .pricing td {
+.pricing tr {
+  background: transparent;
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+.pricing tbody tr:nth-child(2n) {
+  background: var(--vp-c-bg-soft);
+}
+
+.pricing th,
+.pricing td {
+  padding: 10px 16px;
+  border: 1px solid var(--vp-c-divider);
   text-align: center;
+  color: var(--vp-c-text-2);
 }
 
-.vp-doc .pricing tbody th {
+.pricing tbody th {
   font-weight: 400;
   text-align: left;
+  color: var(--vp-c-text-1);
 }
 
-.vp-doc .pricing thead th {
+.pricing thead th {
   padding: 20px 12px;
   vertical-align: top;
+  background: var(--vp-c-bg);
 }
 
 .plan-name {
   font-size: 16px;
+  color: var(--vp-c-text-1);
 }
 
 .plan-price {
@@ -115,7 +134,7 @@ defineProps<{ plans: PricingPlan[]; rows: PricingRow[] }>()
     overflow-x: auto;
   }
 
-  .vp-doc .pricing table {
+  .pricing table {
     min-width: 480px;
   }
 }

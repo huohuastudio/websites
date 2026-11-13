@@ -23,11 +23,11 @@ export interface ThemeConfig extends DefaultTheme.Config {
 }
 
 export interface SiteOptions {
-  /** 站点地址，不带结尾斜杠，如 https://novaix.cc */
+  /** 站点地址，不带结尾斜杠，如 https://example.com */
   hostname: string
   title: string
   description: string
-  /** 仓库中的站点目录，如 sites/novaix，用于"编辑此页"链接 */
+  /** 仓库中的站点目录，如 sites/<产品>，用于"编辑此页"链接 */
   dir: string
   /** public 下的标识文件，如 /logo.svg */
   logo: string

@@ -1,0 +1,108 @@
+/*
+ * 首页版块（components/home/）共用的样式。
+ * 版式：版块和单元格铺满整个页面宽度，版块之间、单元格之间都用细线分隔。
+ * 首页用 markdownStyles: false，正文不套文档样式，版块里的 Markdown 段落、链接、行内代码由这里排版
+ */
+:root {
+  --home-pad-x: 24px;
+  --home-line: var(--vp-c-divider);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --home-pad-x: 32px;
+  }
+}
+
+@media (min-width: 960px) {
+  :root {
+    --home-pad-x: 40px;
+  }
+}
+
+/* 版块中不贴边的内容（文字说明、表格）用它留出与标题一致的边距；
+   紧跟在格子后面时加 line，上方补一条细线 */
+.home-pad {
+  padding: 40px var(--home-pad-x);
+}
+
+.home-pad.line {
+  border-top: 1px solid var(--home-line);
+}
+
+.home-pad > * + * {
+  margin-top: 32px;
+}
+
+/* 格子下方的补充说明 */
+.home-note {
+  max-width: 48em;
+  font-size: 15px;
+}
+
+/* 细线网格：格子之间的细线是网格底色透过 1px 间隙显出来的，格子要有自己的底色；
+   每一行要排满，否则空位会露出底色 */
+.home-lines {
+  display: grid;
+  gap: 1px;
+  border-top: 1px solid var(--home-line);
+  background: var(--home-line);
+}
+
+/* 示意图里的卡片：窗口、表格、清单共用的边框、圆角和阴影 */
+.home-card {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+  background: var(--vp-c-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 12px 32px rgba(0, 0, 0, 0.07);
+}
+
+/* 示意图的底板：浅色底，底部一点品牌色的光晕 */
+.home-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background:
+    radial-gradient(50% 45% at 50% 100%, var(--vp-c-brand-soft), transparent),
+    var(--vp-c-bg-alt);
+}
+
+.home-prose {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--vp-c-text-2);
+}
+
+.home-prose p {
+  margin: 0;
+}
+
+.home-prose p + p {
+  margin-top: 12px;
+}
+
+.home-prose a {
+  color: var(--vp-c-brand-1);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.25s;
+}
+
+.home-prose a:hover {
+  color: var(--vp-c-brand-2);
+}
+
+.home-prose strong {
+  color: var(--vp-c-text-1);
+  font-weight: 600;
+}
+
+.home-prose code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--vp-c-default-soft);
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.875em;
+  color: var(--vp-c-text-1);
+}

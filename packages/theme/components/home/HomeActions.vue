@@ -48,11 +48,11 @@ defineProps<{ actions: HomeAction[] }>()
   color: var(--vp-c-text-3);
 }
 
-.vp-doc .extra :deep(p) {
+.home-actions .extra :deep(p) {
   margin: 0;
 }
 
-.vp-doc .extra :deep(a) {
+.home-actions .extra :deep(a) {
   color: var(--vp-c-text-2);
   font-weight: 400;
 }
