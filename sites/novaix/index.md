@@ -141,7 +141,7 @@ pricing:
       note: 不限规模，解锁全部功能
       action:
         text: 购买授权
-        link: https://huohuastudio.com/products/novaix/buy
+        link: https://huohuastudio.com/products/novaix#plans
   rows:
     - { name: 节点数, values: [最多 2 个, 不限] }
     - { name: 实例管理, values: [true, true] }
