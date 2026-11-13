@@ -197,7 +197,7 @@ flowchart LR
 
 缩略图是 WebP。网格里用的小图短边 256px、长边最多 768px，扫描时生成；预览用的大图长边 2048px，第一次打开时才生成。它们按内容存放在数据目录的 `thumbs/` 中。
 
-文字来自纯文本、Office 文档（docx、xlsx、pptx）和 PDF 的文字层，单个文件最多取 1 MiB，PDF 最多 2000 页。没有文字层的扫描件和图片靠 OCR。
+文字来自纯文本、Office 文档（docx、xlsx、pptx）和 PDF 的文字层，单个文件最多取 1 MiB，PDF 最多 2000 页。图片中的文字靠 OCR；没有文字层的扫描版 PDF 目前不做 OCR。
 
 缺少依赖（比如没装 ffmpeg、没下载本地模型）时，对应的步骤记为跳过，装好后自动补做。
 
@@ -299,7 +299,7 @@ flowchart TD
 
 云端厂商预设了 OpenAI、DeepSeek、通义千问、豆包、Kimi、智谱、硅基流动、OpenRouter、Gemini、Ollama，也可以自定义，全部按 OpenAI 兼容接口调用。
 
-每次实际发出的调用都记在调用记录中，不记录内容本身，见[隐私与安全](./privacy#ai)。
+每次实际发出的调用都记在调用记录中，不保存内容本身，见[隐私与安全](./privacy#ai)。
 
 ## 媒体处理的隔离 {#sandbox}
 

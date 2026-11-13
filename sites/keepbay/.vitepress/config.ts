@@ -38,6 +38,18 @@ export default defineSiteConfig({
         ],
       },
       {
+        text: 'AI 功能',
+        collapsed: false,
+        items: [
+          { text: 'AI 桌面', link: '/docs/ai-desk' },
+          { text: '语义搜索和以图搜图', link: '/docs/semantic-search' },
+          { text: 'AI 标签', link: '/docs/ai-tags' },
+          { text: '收件箱和自动整理', link: '/docs/inbox' },
+          { text: '重要日期提醒', link: '/docs/reminders' },
+          { text: '模型设置', link: '/docs/ai-models' },
+        ],
+      },
+      {
         text: '家庭成员与分享',
         collapsed: false,
         items: [
