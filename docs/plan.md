@@ -72,7 +72,7 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 - **W3a 做法**：
   - 文档来源用 `lsky-docs/src/zh`（docs.lsky.pro 的仓库），不用 `huohuastudio-docs/docs/lsky-pro`：后者是从 Docusaurus 转回来的，标题的自定义锚点（`{#configure-queue}` 等）被去掉、`::: code-group` 被注释掉，正文其余部分相同
   - 路径：当前版 `docs/guide/*`、`docs/advanced/*`，旧版本 `docs/archive/{free/v1,free/v2,enterprise/v1}/*`，与旧站的子目录结构一致；`/docs/` 跳到 `/docs/guide/introduce`
-  - 开源版 V1.x 的文件名改为小写（对照见"旧地址跳转"），其他版本本来就是小写
+  - 开源版 V1.x 的文件名改为小写，其他版本本来就是小写
   - 图片放在各版本的 `images/` 目录（`docs/guide/images`、`docs/archive/<版本>/images`），旧版本之间不共用；外站图片 25 张下载到本地（box.kancloud.cn 要带 Referer 才能下载），开源版 V1.x 首页的标识用旧仓库的 `public/archive/logo.png`
   - 侧栏：当前版一个侧栏四组（简介、入门、核心功能、进阶）；每个旧版本一个侧栏；导航"文档""接口文档"（apifox）+ 版本下拉（标题 V2.x）
   - 旧版本页面只在 frontmatter 写了 title 的，补了一级标题；正文、锚点保持原样（旧链接中的中文锚点仍然有效）
@@ -127,7 +127,7 @@ W5 开工时用户定：本仓库不处理旧文档域名（docs.huohuastudio.co
 | W4b | Keepbay 文档：文件管理、家庭成员与分享、系统设置（含云盘和对象存储）、专业版；介绍页扩写隐私，W4a 各页改成短段落 | 已完成 |
 | W4c | Keepbay 文档：AI 功能（AI 桌面、语义搜索和以图搜图、AI 标签、收件箱和自动整理、重要日期提醒、模型设置）；专业版页补充试用规则 | 已完成 |
 | W4d | Keepbay 官网首页；按审查顺带改正介绍、常见问题、隐私、回收站、云盘页的几处说法 | 已完成 |
-| W5 | 上线：Cloudflare 项目、域名、旧地址跳转、停掉旧部署（DNS 和旧部署由用户操作，这里写好步骤） | 未开始 |
+| W5 | 上线：Cloudflare Workers 项目、CDN 回源切换（由用户操作） | 未开始 |
 
 ## 已知局限
 
