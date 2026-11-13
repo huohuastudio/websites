@@ -1,4 +1,0 @@
-# 旧文档站 docs.lsky.pro 的地址（整域名跳到本站或源站指向本站后）落到 /docs/ 下
-/guide/* /docs/guide/:splat 301
-/advanced/* /docs/advanced/:splat 301
-/archive/* /docs/archive/:splat 301

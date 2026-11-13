@@ -112,11 +112,7 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 
 ## 旧地址跳转
 
-W5 开工时用户定：只要旧域名整体转到新站即可，不逐页对照、不逐条验证。各站点的 `_redirects` 只写几条前缀规则：
-
-- **docs.huohuastudio.com**：CDN 源站指向 Novaix 的 Worker（不做整域名跳转）。`/novaix/*` 在同一域名内跳到 `/docs/*`：已发布的 Novaix 后台用 iframe 内嵌 `docs.huohuastudio.com/novaix/xxx?embed=1`，CSP 的 `frame-src` 只允许 docs.huohuastudio.com，跨域跳转会被拦下；`/lsky-pro/*` 跳到 `www.lsky.pro/docs/*`；根路径显示 Novaix 首页
-- **docs.lsky.pro**：CDN 整域名跳到 www.lsky.pro（保留路径）或源站指向 Lsky 的 Worker；`/guide/*`、`/advanced/*`、`/archive/*` 跳到 `/docs/` 下同名路径。开源版 V1 改了名的页面和已删除的自定义储存页不做对照，会落到 404
-- Novaix 以后的版本把帮助地址（`ui/src/components/help-doc.tsx`）和 CSP（`internal/server/middleware/security.go`）改成 novaix.cc 后，docs.huohuastudio.com 才能改成整域名跳转（由用户在 Novaix 仓库处理）
+W5 开工时用户定：本仓库不处理旧文档域名（docs.huohuastudio.com、docs.lsky.pro）的访问，站点中不加跳转规则，旧域名由用户另行处理。
 
 ## 批次
 
