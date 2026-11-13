@@ -17,9 +17,9 @@ withDefaults(defineProps<{ columns?: 1 | 2 | 3 }>(), { columns: 2 })
   }
 }
 
-/* 三列的在分列之前是单列，格子很宽：改成文字在左、示意图在右 */
+/* 三列的在分列之前是单列，格子很宽：带示意图的改成文字在左、示意图在右 */
 @media (min-width: 768px) and (max-width: 1099px) {
-  .cols-3 > :deep(.home-cell:not(.wide)) {
+  .cols-3 > :deep(.home-cell:not(.wide):not(.plain)) {
     grid-row: auto;
     grid-template-rows: none;
     grid-template-columns: 2fr 3fr;
@@ -27,7 +27,7 @@ withDefaults(defineProps<{ columns?: 1 | 2 | 3 }>(), { columns: 2 })
     align-items: start;
   }
 
-  .cols-3 > :deep(.home-cell:not(.wide)) .visual {
+  .cols-3 > :deep(.home-cell:not(.wide):not(.plain)) .visual {
     max-width: none;
   }
 }

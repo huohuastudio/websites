@@ -2,34 +2,20 @@
 layout: home
 title: Lsky Pro+
 titleTemplate: 图床和云端相册程序
+# 首页不套文档正文样式，版式由共用主题的首页版块组件负责
+markdownStyles: false
 
-hero:
-  name: Lsky Pro+
-  text: 自己搭建的图床和云端相册
-  tagline: 基于 Laravel 开发。图片可以存到本地或各家对象储存，带多用户、角色组、图片处理、内容审核、套餐和在线支付。
-  image:
-    src: /logo.png
-    alt: Lsky Pro+
-  actions:
-    - theme: brand
-      text: 购买授权
-      link: https://huohuastudio.com/products/lsky-pro#plans
-    - theme: alt
-      text: 在线演示
-      link: https://v2.lskypro.com
-    - theme: alt
-      text: 阅读文档
-      link: /docs/guide/introduce
-
-features:
-  - title: 多种储存
-    details: 本地、AWS S3、阿里云 OSS、腾讯云 COS、七牛云、又拍云、多吉云、SFTP、FTP、WebDAV，兼容 S3 接口的 MinIO、Backblaze B2 也能接入。
-  - title: 角色组
-    details: 按角色组分配可用的储存、容量、上传频率和各项功能，不同用户使用不同的规则。
-  - title: 图片处理
-    details: 上传时缩放、裁剪、加水印、转换格式；云处理通过地址参数取得同一张图片的不同尺寸和效果。
-  - title: 运营功能
-    details: 套餐、订单、优惠券、在线支付、工单、公告和举报管理，可以直接对外提供图床服务。
+# 不用 hero、features 这两个键名：默认主题见到它们会渲染自带的首屏和卡片
+heroActions:
+  - theme: brand
+    text: 购买授权
+    link: https://huohuastudio.com/products/lsky-pro#plans
+  - theme: alt
+    text: 在线演示
+    link: https://v2.lskypro.com
+  - theme: alt
+    text: 阅读文档
+    link: /docs/guide/introduce
 
 screenshots:
   - src: /screenshots/upload.webp
@@ -102,21 +88,38 @@ featureGroups:
       - name: 开放接口
         desc: 100 多个接口，可以开发客户端或对接其他系统
 
+plans:
+  - name: 开源版
+    price: ¥0
+    note: 已停止更新
+    items:
+      - 多用户、角色组和多种储存
+      - 相册和接口
+      - 批量、拖拽、粘贴上传
+    action:
+      text: 获取开源版
+      link: https://github.com/lsky-org/lsky-pro
+      theme: alt
+  - name: 付费版
+    price: ¥299.99
+    note: 一次付费，永久使用，后续更新免费
+    featured: true
+    items:
+      - 开源版的全部功能
+      - 图片和相册分享
+      - 套餐、订单、优惠券和在线支付
+      - 工单、公告、举报和独立页面
+      - 图片处理驱动和云处理
+      - 短信、社会化登录和 AI 功能
+      - 主题
+    action:
+      text: 购买授权
+      link: https://huohuastudio.com/products/lsky-pro#plans
+
 pricing:
   plans:
     - name: 开源版
-      price: ¥0
-      note: 已停止更新
-      action:
-        text: 获取开源版
-        link: https://github.com/lsky-org/lsky-pro
-        theme: alt
     - name: 付费版
-      price: ¥299.99
-      note: 一次付费，永久使用，后续更新免费
-      action:
-        text: 购买授权
-        link: https://huohuastudio.com/products/lsky-pro#plans
   rows:
     - { name: 多用户、角色组和多种储存, values: [true, true] }
     - { name: 相册和接口, values: [true, true] }
@@ -149,30 +152,87 @@ faq:
     a: 开源版已经停止更新和支持，现有站点可以继续使用。付费版内置的数据导入只适用于付费版 1.7.x，详见<a href="/docs/guide/import">从旧版本导入</a>。
 ---
 
-## 界面一览 {#screenshots}
+<HomeHero
+  title="自己搭建的图床和云端相册"
+  text="基于 Laravel 开发。图片可以存到本地或各家对象储存，带多用户、角色组、图片处理、内容审核、套餐和在线支付。"
+  :actions="$frontmatter.heroActions"
+>
+<template #visual>
+<HomeWindow>
+  <img src="/screenshots/photos.webp" alt="Lsky Pro+ 的图片管理页" width="1600" height="1000" fetchpriority="high" />
+</HomeWindow>
+</template>
+</HomeHero>
 
+<HomeSection id="why">
+<HomeCells :columns="3">
+<HomeCell title="多种储存" wide :level="2">
+
+本地、AWS S3、阿里云 OSS、腾讯云 COS、七牛云、又拍云、多吉云、SFTP、FTP、WebDAV，兼容 S3 接口的 MinIO、Backblaze B2 也能接入。
+
+<template #visual>
+<HomeWindow>
+  <img src="/screenshots/storage.webp" alt="后台的储存管理页" width="1600" height="1000" loading="lazy" />
+</HomeWindow>
+</template>
+</HomeCell>
+<HomeCell title="角色组" :level="2">
+
+按角色组分配可用的储存、容量、上传频率和各项功能，不同用户使用不同的规则。
+
+</HomeCell>
+<HomeCell title="图片处理" :level="2">
+
+上传时缩放、裁剪、加水印、转换格式；云处理通过地址参数取得同一张图片的不同尺寸和效果。
+
+</HomeCell>
+<HomeCell title="运营功能" :level="2">
+
+套餐、订单、优惠券、在线支付、工单、公告和举报管理，可以直接对外提供图床服务。
+
+</HomeCell>
+</HomeCells>
+</HomeSection>
+
+<HomeSection id="screenshots" title="界面一览">
+<div class="home-pad">
 <HomeShowcase :items="$frontmatter.screenshots" />
+</div>
+</HomeSection>
 
-## 功能 {#features}
+<HomeSection id="features" title="功能">
+<HomeFeatureList :groups="$frontmatter.featureGroups" variant="cells" :columns="2" />
+</HomeSection>
 
-<HomeFeatureList :groups="$frontmatter.featureGroups" />
-
-## 主题 {#themes}
+<HomeSection id="themes" title="主题">
+<template #header>
 
 付费版从 V 2.3.0 起支持主题，可以替换前台界面，也可以自己开发。已收录的主题见[主题列表](./themes)，开发方法见[主题](./docs/advanced/theme)。
 
-## 价格 {#pricing}
+</template>
+</HomeSection>
 
-开源版已经停止更新；付费版一次付费、永久使用，购买后可以免费升级到之后的所有版本。
-
+<HomeSection
+  id="pricing"
+  title="价格"
+  lead="开源版已经停止更新；付费版一次付费、永久使用，购买后可以免费升级到之后的所有版本。"
+>
+<HomePlans :plans="$frontmatter.plans" />
+<div class="home-pad line">
 <HomePricing :plans="$frontmatter.pricing.plans" :rows="$frontmatter.pricing.rows" />
+</div>
+</HomeSection>
 
-## 常见问题 {#faq}
+<HomeSection id="faq" title="常见问题" layout="side">
+<template #header>
 
+更多问题见[常见问题](./docs/guide/faq)。
+
+</template>
 <HomeFaq :items="$frontmatter.faq" />
+</HomeSection>
 
-## 开始使用 {#start}
-
+<HomeSection id="start" title="开始使用" layout="center">
 <HomeActions :actions="[
   { text: '购买授权', link: 'https://huohuastudio.com/products/lsky-pro#plans' },
   { text: '阅读文档', link: '/docs/guide/introduce', theme: 'alt' },
@@ -181,3 +241,4 @@ faq:
 [许可与免责声明](./docs/guide/declaration) · [正版查询](https://huohuastudio.com/verify) · [授权中心](https://huohuastudio.com/dashboard)
 
 </HomeActions>
+</HomeSection>

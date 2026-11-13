@@ -1,12 +1,13 @@
 <script setup lang="ts">
 // HomeCells 中的一个格子：标题和说明在上，visual 插槽（示意图）在下。
 // wide 时占满整行，作为重点：标题更大，示意图放在带光晕的底板上，宽屏下文字在左、示意图在右。
+// 不放 visual 时只显示文字（plain）。
 // 所在版块没有标题时 level 设为 2，保持标题层级连贯
 withDefaults(defineProps<{ title: string; wide?: boolean; level?: 2 | 3 }>(), { level: 3 })
 </script>
 
 <template>
-  <div class="home-cell" :class="{ wide }">
+  <div class="home-cell" :class="{ wide, plain: !$slots.visual }">
     <div class="text">
       <component :is="`h${level}`" class="title">{{ title }}</component>
       <div class="content home-prose">
@@ -87,8 +88,12 @@ withDefaults(defineProps<{ title: string; wide?: boolean; level?: 2 | 3 }>(), { 
 @media (min-width: 768px) {
   /* 每格占网格的两行（文字、示意图），同一排各格的文字区和示意图分别等高 */
   .home-cell:not(.wide) {
-    display: grid;
     grid-row: span 2;
+  }
+
+  /* 没有示意图的格子只有文字，不按 subgrid 对齐，免得底下多出一截空白 */
+  .home-cell:not(.wide):not(.plain) {
+    display: grid;
     grid-template-rows: subgrid;
     row-gap: 32px;
   }
