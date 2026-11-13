@@ -1,0 +1,96 @@
+# 升级 {#upgrade}
+
+Novaix 支持在线更新和手动更新两种方式。数据库迁移会在启动时自动执行，无需手动操作。
+
+## 在线更新（推荐） {#online-update}
+
+在管理面板「关于」页面中点击「检查更新」，如果有新版本可用，点击「立即更新」即可自动完成下载、校验、替换和重启。
+
+更新过程会作为一个系统任务执行，您可以在任务面板中实时查看进度日志。
+
+下图展示了在线更新的完整流程和安全机制：
+
+```mermaid
+flowchart TD
+    check["检查更新"] --> hasNew{"有新版本？"}
+    hasNew -->|否| uptodate["已是最新版本"]
+    hasNew -->|是| download["下载新版本<br/>校验 SHA256"]
+    download --> backup["备份当前二进制<br/>SQLite 自动备份数据库"]
+    backup --> stop["停止当前服务"]
+    stop --> migrate["执行数据库迁移"]
+    migrate --> migOk{"迁移成功？"}
+    migOk -->|失败（SQLite）| rollbackDB["恢复数据库备份<br/>恢复旧二进制"]
+    rollbackDB --> restart1["启动旧版本"]
+    migOk -->|失败（MySQL/PG）| manualFix["停机保留现场<br/>等待人工处理"]
+    migOk -->|成功| replace["替换为新二进制"]
+    replace --> start["启动新版本"]
+    start --> startOk{"启动成功？"}
+    startOk -->|成功| done["更新完成 ✓"]
+    startOk -->|连续失败 3 次<br/>SQLite/迁移前| rollbackBin["自动回滚旧二进制"]
+    rollbackBin --> restart2["启动旧版本"]
+    startOk -->|连续失败 3 次<br/>MySQL/PG 已迁移| manualFix2["停机保留现场<br/>需人工处理"]
+
+    style done fill:#ecfdf5,stroke:#10b981
+    style rollbackDB fill:#fef2f2,stroke:#ef4444
+    style rollbackBin fill:#fef2f2,stroke:#ef4444
+    style manualFix fill:#fef2f2,stroke:#ef4444
+    style manualFix2 fill:#fef2f2,stroke:#ef4444
+```
+
+### 更新安全机制 {#safety}
+
+在线更新过程中，系统会自动处理数据库迁移，并内置了多重保护机制：
+
+- **SQLite 自动备份与回滚**：执行数据库迁移前，系统会自动备份 SQLite 数据库文件。如果迁移失败，自动恢复数据库并回滚到旧版本
+- **MySQL / PostgreSQL 停机保护**：DDL 操作会隐式提交，无法通过事务回滚。迁移失败后系统会停机保留现场，不会用旧二进制跑新 schema，需人工恢复备份后重试
+- **Crash Recovery**：如果更新过程中程序意外崩溃（如断电），下次启动时系统会检测到未完成的更新并自动恢复
+- **启动失败回滚**：如果新版本连续启动失败超过 3 次，SQLite 环境或迁移前阶段会自动回滚到旧版本；MySQL/PostgreSQL 在迁移已完成后不会自动回滚（避免旧代码跑新 schema），会停机保留现场等待人工处理
+
+::: warning
+MySQL 和 PostgreSQL 的 DDL 操作（如添加列、修改表结构）会隐式提交，无法通过事务回滚。如果使用 MySQL 或 PostgreSQL 且即将进行重大版本更新，建议在更新前手动备份数据库。详见[备份与恢复](./backup)。
+:::
+
+### 下载加速 {#mirror}
+
+如果服务器位于中国大陆，直接从 GitHub 下载可能较慢或无法连接。可以在管理面板「系统设置 → 高级设置」中配置**更新镜像地址**，例如：
+
+```
+https://ghfast.top
+```
+
+配置后，更新文件将通过镜像加速下载。
+
+## 手动更新 {#manual-update}
+
+```bash
+# 1. 下载新版本（以 linux/amd64 为例）
+wget https://github.com/huohuastudio/novaix-releases/releases/latest/download/novaix_linux_amd64.tar.gz
+tar -xzf novaix_linux_amd64.tar.gz
+
+# 2. 备份并替换
+cp /usr/local/bin/novaix /usr/local/bin/novaix.bak
+mv novaix_linux_amd64/novaix /usr/local/bin/novaix
+chmod +x /usr/local/bin/novaix
+
+# 3. 重启服务
+supervisorctl restart novaix
+# 或
+systemctl restart novaix
+```
+
+::: warning
+升级前建议先[备份](./backup)数据库，以便出现问题时可以回滚。虽然 Novaix 的升级过程设计为向前兼容，但备份永远是好习惯。
+:::
+
+## 查看版本 {#check-version}
+
+您可以通过以下方式查看当前运行的版本：
+
+- 管理面板的「关于」页面
+- 终端运行 `novaix system:info`
+
+## 注意事项 {#notes}
+
+- 升级是**不可逆**的，数据库迁移会在启动时自动执行，回退到旧版本可能导致不兼容
+- 如果跨多个版本升级，建议查看 [更新日志](https://github.com/huohuastudio/novaix-releases/releases) 了解每个版本的变更内容
+- 升级过程中服务会短暂中断（通常只需几秒），如果您对可用性要求较高，建议在低峰期操作

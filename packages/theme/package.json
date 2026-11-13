@@ -3,10 +3,12 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./mermaid": "./components/Mermaid.vue"
   },
   "dependencies": {
-    "medium-zoom": "1.1.2"
+    "medium-zoom": "1.1.2",
+    "mermaid": "12.2.0"
   },
   "peerDependencies": {
     "vitepress": "2.0.0-alpha.21",

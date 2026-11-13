@@ -1,6 +1,7 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { defineConfigWithTheme, type DefaultTheme, type HeadConfig } from 'vitepress'
+import { mermaidMarkdown } from './mermaid-markdown'
 
 const REPO = 'https://github.com/huohuastudio/websites'
 
@@ -35,8 +36,11 @@ export interface SiteOptions {
   /** Cloudflare Web Analytics 的令牌，留空时不加载统计脚本 */
   analyticsToken?: string
   nav?: DefaultTheme.NavItem[]
+  socialLinks?: DefaultTheme.SocialLink[]
   sidebar?: DefaultTheme.Sidebar
   versions?: Versions
+  /** 把 ```mermaid 代码块渲染成图表；打开后站点主题还要注册 Mermaid 组件 */
+  mermaid?: boolean
 }
 
 /** 页面在站点中的地址（cleanUrls）：index.md → /，docs/index.md → /docs/，docs/a.md → /docs/a */
@@ -45,8 +49,11 @@ function pagePath(relativePath: string): string {
 }
 
 export function defineSiteConfig(options: SiteOptions) {
-  const { hostname, title, description, dir, logo, ogImage, analyticsToken, versions } = options
+  const { hostname, title, description, dir, logo, ogImage, analyticsToken, versions, mermaid } = options
   const year = new Date().getFullYear()
+  // head 中写了 robots noindex 的页面（如跳转页），不进 sitemap。
+  // 由 transformPageData 收集，生成 sitemap 时读取：构建时所有页面先渲染完才生成 sitemap
+  const noindex = new Set<string>()
 
   const nav = [...(options.nav ?? [])]
   if (versions) {
@@ -59,7 +66,12 @@ export function defineSiteConfig(options: SiteOptions) {
     description,
     cleanUrls: true,
     lastUpdated: true,
-    sitemap: { hostname },
+    sitemap: {
+      hostname,
+      transformItems: (items) => items.filter((item) => !noindex.has('/' + item.url)),
+    },
+
+    markdown: mermaid ? { config: mermaidMarkdown } : undefined,
 
     head: [
       ['link', { rel: 'icon', href: logo }],
@@ -78,10 +90,12 @@ export function defineSiteConfig(options: SiteOptions) {
     // 每页的规范地址和分享信息写进 frontmatter.head：站内跳转时客户端会随页面更新。
     // 页面在 frontmatter 中自己写了同名标签时以页面的为准
     transformPageData(pageData) {
-      const url = hostname + pagePath(pageData.relativePath)
+      const path = pagePath(pageData.relativePath)
+      const url = hostname + path
       const pageTitle = pageData.title ? `${pageData.title} | ${title}` : title
       const head: HeadConfig[] = (pageData.frontmatter.head ??= [])
       const has = (key: string) => head.some(([, attrs]) => attrs?.rel === key || attrs?.property === key)
+      if (head.some(([, attrs]) => attrs?.name === 'robots' && /noindex/.test(attrs.content ?? ''))) noindex.add(path)
       const tags: HeadConfig[] = [
         ['link', { rel: 'canonical', href: url }],
         ['meta', { property: 'og:title', content: pageTitle }],
@@ -108,6 +122,7 @@ export function defineSiteConfig(options: SiteOptions) {
     themeConfig: {
       logo,
       nav,
+      socialLinks: options.socialLinks,
       sidebar: options.sidebar,
       versions,
 

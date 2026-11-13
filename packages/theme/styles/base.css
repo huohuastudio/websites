@@ -76,3 +76,17 @@
   max-width: 100% !important;
   padding: 0 !important;
 }
+
+/* mermaid 图表：居中，过宽时横向滚动 */
+.mermaid-diagram {
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+div.mermaid-diagram {
+  text-align: center;
+}
+
+div.mermaid-diagram:empty {
+  min-height: 120px;
+}
