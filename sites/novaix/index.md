@@ -2,34 +2,20 @@
 layout: home
 title: Novaix
 titleTemplate: 面向中小型 VPS 服务商的 IDC 管理系统
+# 首页不套文档正文样式，版式由共用主题的首页版块组件负责
+markdownStyles: false
 
-hero:
-  name: Novaix
-  text: 面向中小型 VPS 服务商的 IDC 管理系统
-  tagline: 单个可执行文件部署，内置数据库，开箱即用。容器和虚拟机统一管理，自带计费、工单和内容管理。
-  image:
-    src: /logo.svg
-    alt: Novaix
-  actions:
-    - theme: brand
-      text: 下载安装
-      link: https://github.com/huohuastudio/novaix-releases/releases/latest
-    - theme: alt
-      text: 在线演示
-      link: https://novaix.huohuastudio.com
-    - theme: alt
-      text: 阅读文档
-      link: /docs/introduce
-
-features:
-  - title: 单文件部署
-    details: 前端、接口和命令行工具编译在一个可执行文件里，默认使用内置的 SQLite，也支持 MySQL 和 PostgreSQL。
-  - title: 容器和虚拟机
-    details: 同时管理 LXC 容器和 QEMU/KVM 虚拟机，支持 Windows 虚拟机的 TPM、双 ISO 挂载和密码重置。
-  - title: 完整的业务流程
-    details: 套餐、订单、计费、支付、工单、实名认证和发票，覆盖从用户下单到售后的全过程。
-  - title: 插件和主题
-    details: 支付、登录、短信、通知、人机验证都可以用插件扩展；前端源码开放，可以自己做主题。
+# 不用 hero、features 这两个键名：默认主题见到它们会渲染自带的首屏和卡片
+heroActions:
+  - theme: brand
+    text: 下载安装
+    link: https://github.com/huohuastudio/novaix-releases/releases/latest
+  - theme: alt
+    text: 在线演示
+    link: https://novaix.huohuastudio.com
+  - theme: alt
+    text: 阅读文档
+    link: /docs/introduce
 
 screenshots:
   - src: /screenshots/dashboard.webp
@@ -127,21 +113,39 @@ featureGroups:
       - name: 邮件
         desc: 支持 SMTP、Mailgun 和 Resend 三种发送方式
 
+plans:
+  - name: 免费版
+    price: ¥0
+    note: 永久免费，无需注册
+    items:
+      - 最多 2 个节点
+      - 实例管理
+      - 套餐、订单、计费和在线支付
+      - 工单和内容管理
+      - 主题和在线更新
+    action:
+      text: 免费下载
+      link: https://github.com/huohuastudio/novaix-releases/releases/latest
+      theme: alt
+  - name: 授权版
+    price: 订阅制
+    note: 不限规模，解锁全部功能
+    featured: true
+    items:
+      - 免费版的全部功能
+      - 节点数不限
+      - 高可用（自动疏散）、告警通知
+      - 私有网络（VPC）、共享 IP 和 NAT
+      - 代理商系统、供应商转售
+      - 插件、开放接口、品牌定制
+    action:
+      text: 购买授权
+      link: https://huohuastudio.com/products/novaix#plans
+
 pricing:
   plans:
     - name: 免费版
-      price: ¥0
-      note: 永久免费，无需注册
-      action:
-        text: 免费下载
-        link: https://github.com/huohuastudio/novaix-releases/releases/latest
-        theme: alt
     - name: 授权版
-      price: 订阅制
-      note: 不限规模，解锁全部功能
-      action:
-        text: 购买授权
-        link: https://huohuastudio.com/products/novaix#plans
   rows:
     - { name: 节点数, values: [最多 2 个, 不限] }
     - { name: 实例管理, values: [true, true] }
@@ -187,53 +191,121 @@ faq:
 ---
 
 <script setup>
+// 首页的示意图只在这一页引入，不进主题入口
 import Market from './.vitepress/theme/Market.vue'
+import NxInstall from './.vitepress/theme/visuals/NxInstall.vue'
 import { data as market } from './.vitepress/theme/market.data'
 </script>
 
-## 界面一览 {#screenshots}
+<HomeHero
+  title="开箱即用的 IDC 管理系统"
+  text="面向中小型 VPS 服务商。单个可执行文件部署，内置数据库。容器和虚拟机统一管理，自带计费、工单和内容管理。"
+  :actions="$frontmatter.heroActions"
+>
+<template #visual>
+<HomeWindow>
+  <img src="/screenshots/dashboard.webp" alt="Novaix 管理面板的仪表盘" width="2048" height="1280" fetchpriority="high" />
+</HomeWindow>
+</template>
+</HomeHero>
 
+<HomeSection id="why">
+<HomeCells :columns="3">
+<HomeCell id="deploy" title="一个文件完成部署" wide :level="2">
+
+前端、接口和命令行工具编译在一个可执行文件里，不需要另外安装 Docker、Node.js 或数据库。下载、解压、运行即可。
+
+默认使用内置的 SQLite，也支持 MySQL 和 PostgreSQL。首次运行会在当前目录生成默认的 `config.yaml`，并在终端输出初始管理员密码。生产环境的守护进程和反向代理配置见[安装](./docs/install)。
+
+之后可以在管理面板中一键在线更新。使用 SQLite 时更新前自动备份；使用 MySQL 或 PostgreSQL 时，请在大版本更新前自行备份数据库。
+
+<template #visual><NxInstall /></template>
+</HomeCell>
+<HomeCell title="容器和虚拟机" :level="2">
+
+同时管理 LXC 容器和 QEMU/KVM 虚拟机，支持 Windows 虚拟机的 TPM、双 ISO 挂载和密码重置。
+
+<template #visual>
+<HomeWindow>
+  <img src="/screenshots/instance.webp" alt="实例详情页" width="2048" height="1280" loading="lazy" />
+</HomeWindow>
+</template>
+</HomeCell>
+<HomeCell title="完整的业务流程" :level="2">
+
+套餐、订单、计费、支付、工单、实名认证和发票，覆盖从用户下单到售后的全过程。
+
+<template #visual>
+<HomeWindow>
+  <img src="/screenshots/orders.webp" alt="订单列表页" width="2048" height="1280" loading="lazy" />
+</HomeWindow>
+</template>
+</HomeCell>
+<HomeCell title="插件和主题" :level="2">
+
+支付、登录、短信、通知、人机验证都可以用插件扩展；前端源码开放，可以自己做主题。
+
+<template #visual>
+<HomeWindow>
+  <img src="/screenshots/plugins.webp" alt="插件管理页" width="2048" height="1280" loading="lazy" />
+</HomeWindow>
+</template>
+</HomeCell>
+</HomeCells>
+</HomeSection>
+
+<HomeSection id="screenshots" title="界面一览">
+<div class="home-pad">
 <HomeShowcase :items="$frontmatter.screenshots" />
+</div>
+</HomeSection>
 
-## 一个文件完成部署 {#deploy}
+<HomeSection id="features" title="功能">
+<HomeFeatureList :groups="$frontmatter.featureGroups" variant="cells" :columns="2" />
+</HomeSection>
 
-Novaix 编译为单个可执行文件，不需要另外安装 Docker、Node.js 或数据库。下载、解压、运行即可，生产环境的守护进程和反向代理配置见[安装](./docs/install)。
-
-```bash
-# ARM 服务器把 amd64 换成 arm64
-wget https://github.com/huohuastudio/novaix-releases/releases/latest/download/novaix_linux_amd64.tar.gz
-tar -xzf novaix_linux_amd64.tar.gz
-./novaix_linux_amd64/novaix
-```
-
-首次运行会在当前目录生成默认的 `config.yaml`，并在终端输出初始管理员密码。之后可以在管理面板中一键在线更新，使用 SQLite 时更新前自动备份，使用 MySQL 或 PostgreSQL 时请在大版本更新前自行备份数据库。
-
-## 功能 {#features}
-
-<HomeFeatureList :groups="$frontmatter.featureGroups" />
-
-<div v-if="market.plugins.length || market.themes.length">
-
-## 插件和主题 {#market}
+<HomeSection v-if="market.plugins.length || market.themes.length" id="market" title="插件和主题">
+<template #header>
 
 在管理面板的「插件管理」和「主题管理」页面切换到市场，点击「安装」即可。开发者可以向 [novaix-releases](https://github.com/huohuastudio/novaix-releases) 提交自己的插件和主题。
 
+</template>
+<div class="home-pad">
 <Market />
+</div>
+</HomeSection>
+
+<HomeSection
+  id="pricing"
+  title="价格"
+  lead="免费版部署即可使用，适合小规模运营；授权版按订阅计费，不限节点数，解锁全部功能。"
+>
+<HomePlans :plans="$frontmatter.plans" />
+<div class="home-pad line">
+<div class="home-prose home-note">
+
+免费版升级为授权版不用重新部署，在管理面板中输入激活码即可，详见[免费版与授权版](./docs/getting-started#editions)。
 
 </div>
-
-## 价格 {#pricing}
-
-免费版部署即可使用，适合小规模运营；授权版按订阅计费，不限节点数，解锁全部功能。
-
 <HomePricing :plans="$frontmatter.pricing.plans" :rows="$frontmatter.pricing.rows" />
+</div>
+</HomeSection>
 
-## 常见问题 {#faq}
+<HomeSection id="faq" title="常见问题" layout="side">
+<template #header>
 
+更多问题见[常见问题](./docs/faq)。
+
+</template>
 <HomeFaq :items="$frontmatter.faq" />
+</HomeSection>
 
-## 开始使用 {#start}
-
+<HomeSection
+  id="start"
+  title="开始使用"
+  lead="免费版部署即可使用，无需注册。"
+  layout="center"
+>
 <HomeActions :actions="[
   { text: '下载安装', link: 'https://github.com/huohuastudio/novaix-releases/releases/latest' },
   { text: '阅读文档', link: '/docs/introduce', theme: 'alt' },
@@ -242,3 +314,4 @@ tar -xzf novaix_linux_amd64.tar.gz
 [许可协议](./license) · [服务条款](./terms) · [隐私政策](./privacy)
 
 </HomeActions>
+</HomeSection>

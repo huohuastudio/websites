@@ -130,8 +130,9 @@ W5 开工时用户定：本仓库不处理旧文档域名（docs.huohuastudio.co
 | W4d | Keepbay 官网首页；按审查顺带改正介绍、常见问题、隐私、回收站、云盘页的几处说法 | 已完成 |
 | W5 | 上线：Cloudflare Workers 项目、CDN 回源切换（由用户操作） | 已上线（2026-11-13），待用户停掉旧官网部署 |
 | W6a | 首页改版：共用的首页版块组件 + Keepbay 首页（示意图做主视觉） | 已完成 |
-| W6b | 首页改版：Novaix 首页（主视觉用后台截图） | 进行中 |
-| W6c | 首页改版：Lsky 首页 | 待做 |
+| W6b | 首页改版：Novaix 首页（主视觉用后台截图） | 已完成 |
+| W6c | 首页改版：Lsky 首页 | 进行中 |
+| W7 | Keepbay 文档：云盘页按新版更新；给文件夹授权改成 `keepbay mount:grant` 一条命令（安装、文件夹、云盘页） | 待做 |
 
 ## W6 首页改版（2026-11-13 用户定）
 
@@ -143,6 +144,7 @@ W5 开工时用户定：本仓库不处理旧文档域名（docs.huohuastudio.co
 - **实现**：首页 `layout: home` + `markdownStyles: false`，frontmatter 不用 `hero`、`features` 键名（默认主题见到会渲染自带的首屏和卡片）；版块组件在共用主题 `components/home/`（HomeHero、HomeSection、HomeCells、HomeCell、HomePlans、HomeWindow、HomeFeatureList 的 cells 变体），共用样式在 `styles/home.css`（`.home-lines` 细线网格、`.home-card` 示意图卡片、`.home-pad`、`.home-note`、`.home-stage`）；示意图是站点自己的 Vue 组件，只在首页 `<script setup>` 中引入
 - **Keepbay**：内测期不放真实截图，示意图用 HTML/CSS 画（`sites/keepbay/.vitepress/theme/visuals/`）；联网清单示意图要与隐私文档的联网表一致
 - **Novaix、Lsky**：用同一套组件，主视觉用真实截图
+- **以后再看**：首页截图都是 2048 宽的原图，格子里只显示 500px 左右，可以生成小尺寸副本加 `srcset`（点击放大时仍用原图）
 
 ## 已知局限
 

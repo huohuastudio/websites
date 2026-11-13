@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// 示意图用的浏览器窗口外框：顶部三个圆点和地址栏，内容放在默认插槽
+// 示意图用的浏览器窗口外框：顶部三个圆点和地址栏，内容（示意图或截图）放在默认插槽
 defineProps<{ address?: string }>()
 </script>
 
@@ -54,5 +54,12 @@ defineProps<{ address?: string }>()
   color: var(--vp-c-text-3);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 放截图时图片撑满窗口宽度，按原比例缩放 */
+.content :deep(img) {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 </style>

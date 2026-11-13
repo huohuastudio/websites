@@ -66,9 +66,16 @@ function onKeydown(event: KeyboardEvent) {
 </template>
 
 <style scoped>
+/* 页面很宽时截图不跟着放大，居中 */
+.showcase {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
 .showcase-tabs {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
 }
 

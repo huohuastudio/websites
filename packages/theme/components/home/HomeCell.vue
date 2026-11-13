@@ -27,6 +27,8 @@ withDefaults(defineProps<{ title: string; wide?: boolean; level?: 2 | 3 }>(), { 
   min-width: 0;
   padding: 40px var(--home-pad-x);
   background: var(--vp-c-bg);
+  /* 带 id 的格子可以作为锚点，跳转时不被导航栏挡住 */
+  scroll-margin-top: var(--vp-nav-height);
 }
 
 .title {

@@ -18,8 +18,11 @@ import HomeWindow from './components/home/HomeWindow.vue'
 import './styles/base.css'
 import './styles/home.css'
 
-// 文档中的图片点击放大；放在链接里的图片和加了 no-zoom 的图片除外
-const ZOOM_SELECTOR = '.vp-doc img:not(a img):not(.no-zoom)'
+// 文档中的图片点击放大；放在链接里的图片和加了 no-zoom 的图片除外。
+// 首页不套 .vp-doc，窗口框里的截图和界面一览的截图另外列出
+const ZOOM_SELECTOR = ['.vp-doc', '.home-window', '.showcase-panel']
+  .map((scope) => `${scope} img:not(a img):not(.no-zoom)`)
+  .join(', ')
 
 export default {
   extends: DefaultTheme,
