@@ -9,7 +9,7 @@
   - Keepbay：`keepbay.app`、`keepbay.app/docs/`
   - Novaix：`novaix.cc`、`novaix.cc/docs/`
   - Lsky Pro+：`www.lsky.pro`、`www.lsky.pro/docs/`
-- **托管**：Cloudflare，每个站点一个项目，都连这个仓库，各自设根目录和构建监听路径（站点目录或共用主题变了才构建）；不用 GitHub Actions
+- **托管**：Cloudflare Workers 静态资源（W5 开工时改定，不用 Pages：控制台已把 Pages 列为旧版工作流），每个站点一个 Worker，都连这个仓库，各自设根目录和构建监听路径（站点目录或共用主题变了才构建）；不用 GitHub Actions
 - **按 VitePress 的惯例做**：不再有"产品切换"（每个产品一个站点）；版本切换做成顶部导航中的下拉菜单，每个版本有自己的路径和侧栏
 - **外观沿用 VitePress 默认主题**（2026-11-13 用户定）：不按工作室设计规范改颜色、字体、阴影，只设各站点的品牌色和标识
 - **保留**旧文档站右上角切换浅色/深色的圆形扩散动效（View Transitions，减少动态效果时直接切换）

@@ -1,0 +1,14 @@
+// Cloudflare Workers 静态资源的部署配置：Workers Builds 在本目录执行 pnpm build 后运行 npx wrangler deploy
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // 须与 Cloudflare 后台的 Worker 名称一致
+  "name": "keepbay",
+  "compatibility_date": "2026-10-29",
+  "assets": {
+    "directory": ".vitepress/dist",
+    // 找不到的地址返回 404.html（状态码 404）
+    "not_found_handling": "404-page",
+    // 与 cleanUrls 对应：/docs/install 返回 install.html，/docs/install.html 跳到 /docs/install
+    "html_handling": "auto-trailing-slash"
+  }
+}

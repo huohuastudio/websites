@@ -7,3 +7,7 @@ minimumReleaseAge: 20160
 
 onlyBuiltDependencies:
   - esbuild
+
+# wrangler 依赖的 workerd 只在本地运行 Worker 时需要，部署静态资源用不到
+ignoredBuiltDependencies:
+  - workerd
