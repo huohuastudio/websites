@@ -1,131 +1,129 @@
 # 迁移 {#migrate}
 
-本文将指导您如何将兰空图床从 A 服务器迁移到 B 服务器。
+把普通安装的兰空图床从一台服务器（下称旧服务器）迁移到另一台服务器（下称新服务器）时，需要转移站点文件和数据库，然后在新服务器上重建符号链接、配置运行环境。Docker 安装的迁移见[本页末尾](#docker)。
+
+::: warning
+授权绑定的是域名。迁移后如果更换了域名，请先在[授权中心](https://huohuastudio.com/dashboard)更换授权域名，并在后台修改「应用网址」。
+:::
 
 ## 创建新站点 {#create-new-website}
 
-要将兰空图床迁移到另一台服务器上，需要先在目标服务器上创建新的站点，同样的，目标服务器的运行环境需要达到安装要求，具体请查看[环境要求](./requirement)章节。
+在新服务器上按[环境要求](./requirement)准备好运行环境，并创建一个新站点。
 
 ## 移除符号链接 {#delete-symbolic}
 
-::: warning 注意
-以下命令都需要在旧版本的根目录执行。
-:::
+本节和下一节的命令都在旧服务器的站点根目录中执行。
 
-创建好新站点后，我们需要登录终端，进入要迁移的服务器站点根目录，第一步我们需要移除 `public` 目录下的[符号链接](https://baike.baidu.com/item/%E7%AC%A6%E5%8F%B7%E9%93%BE%E6%8E%A5/7177630)。
+`public` 目录中有程序生成的符号链接（指向本地储存的目录和主题资源）。打包前请先删除它们，原因是：
 
-执行命令查看符号链接：
+- 打包工具可能会把符号链接指向的文件一起打包，压缩包会变得很大
+- 新服务器的目录结构与旧服务器不同时，迁过去的符号链接会失效
 
 ```shell
+# 查看符号链接（可选）
 find public -type l
-```
 
-执行后会输出所有符号链接，将符号链接删除：
-
-```shell
+# 删除符号链接
 find public -type l -exec rm -f {} +
 ```
 
-::: tip 为什么需要删除符号链接？
-
-1. 符号链接解引用，工具将符号链接指向的实际文件内容也打包进去，相当于复制目标文件到压缩包。
-2. 如果目标服务器的站点目录与旧服务器的目录结构不同，可能会造成符号链接存在但是为失效的状态。
-
-:::
-
-## 打包文件 {#packaging-files}
-
-如果您使用 sqlite3，数据库文件默认位置为 `storage/app/database.sqlite`。
-
-执行打包命令，压缩根目录中所有文件，并命名为 `lsky-pro.tar.gz`：
-
-```shell
-tar -czvf lsky-pro.tar.gz ./
-```
-
-打包完成后，将 `lsky-pro.tar.gz` 文件以任何方式上传到目标服务器的站点根目录。
-
-此外，如果您使用了本地储存，并且在储存配置中，您将储存根目录设置为程序运行目录以外的文件夹；举例：假如您的站点目录为 `/www/wwwroot/app.com`，而您的储存设置的根目录为 `/mnt/data`，那么您还需要将目录 `/mnt/data` 压缩并转移到目标服务器。
-
-## 迁移数据库 {#migrate-database}
-
-如果您使用的是 sqlite3，数据库文件默认位置为 `storage/app/database.sqlite`，只要您没有调整这个文件的位置，那么在上一步「打包文件」中就已经一同打包进 `lsky-pro.tar.gz` 中了，不需要额外处理。
-
-相反，如果您修改了该文件位置，您只需将该文件转移到目标服务器的指定位置，然后修改 `.env` 配置：
-
-```ini
-DB_DATABASE=laravel # 将 laravel 替换成您的 sqlite 文件所在路径，例如：storage/app/database.sqlite
-```
-
-如果您使用的是 mysql 或其他数据库，并且数据库是和站点是在同一个服务器中安装的，那么您可以登录数据库管理软件或使用终端的方式，导出数据库文件，并将文件转移至目标服务器中的数据库或其他远程数据库。
-
-::: warning 注意
-兰空图床的数据库使用了[外键约束](https://baike.baidu.com/item/%E7%BA%A6%E6%9D%9F/12001448)，使用第三方软件备份时需要额外注意，有可能会因为外键约束这个特性造成了部分数据表丢失的情况。推荐使用 navicat 或 phpmyadmin 导出 sql 文件。
-:::
-
-## 恢复安装 {#restoring-installation}
-
-::: warning 注意
-以下命令都需要在目标服务器站点的根目录执行。
-:::
-
-确保数据库、相关文件都转移到目标服务器后，我们需要使用终端进入目标服务器的站点根目录，执行解压命令：
-
-```shell
-tar -xzvf lsky-pro.tar.gz
-```
-
-如果您使用的是 sqlite3，并且没有更改 sqlite3 数据库的文件位置。那么您可以不做任何改动。
-
-如果您使用的是 sqlite3 以外的数据库，您需要解压后，使用 `vi` 或 `vim` 命令打开 `.env` 文件：
-
-```shell
-vim ./.env
-```
-
-执行后按下键盘 `i` 键进入编辑模式，将数据配置更新为您的新站点需要的数据库(需提前导入)：
-
-```ini
-...
-
-DB_CONNECTION=mysql # 数据库连接类型 // [!code focus]  
-DB_HOST=127.0.0.1 # 数据库连接地址 // [!code focus]
-DB_PORT=3306 # 数据库连接端口 // [!code focus]
-DB_DATABASE=lsky_pro # 数据库名称 // [!code focus]
-DB_USERNAME=root # 数据库连接账号 // [!code focus]
-DB_PASSWORD=root # 数据库连接密码 // [!code focus]
-
-...
-```
-
-编辑完毕后，按 `esc` 退出编辑模式，然后按住键盘 `shift` + `:` 输入 `wq` 以保存并退出。
-
-::: tip
-如果您使用了服务器控制面板，您完全可以使用控制面板更方便快捷的的文件管理来编辑该文件。
-:::
-
-接下来执行命令生成符号链接：
+删除后旧站点的图片会暂时无法访问。如果旧站点在迁移期间还要继续使用，可以在打包后执行以下命令恢复：
 
 ```shell
 php artisan storage:link --force --relative && php artisan symlinks:rebuild
 ```
 
-别急，还没完，我们还需要像教程[安装](./install)章节中那样，[配置站点运行目录以及伪静态](./install#configure-rewrite)。
+## 打包文件 {#packaging-files}
 
-另外我们的新站点，记得确保根目录以及子目录的文件夹、文件的用户组都是 web 服务器运行的用户，即 `www` 或 `www-data`。
+打包站点根目录中的所有文件：
+
+```shell
+tar -czvf lsky-pro.tar.gz ./
+```
+
+然后把 `lsky-pro.tar.gz` 上传到新服务器的站点根目录。
+
+如果本地储存的储存目录不在站点目录中（例如站点目录是 `/www/wwwroot/app.com`，储存目录是 `/mnt/data`），还需要把储存目录单独打包，转移到新服务器上。
+
+## 迁移数据库 {#migrate-database}
+
+- **SQLite**：数据库文件默认是 `storage/app/database.sqlite`，已经包含在上一步的压缩包中。如果改过文件位置，请把文件单独转移到新服务器
+- **MySQL、PostgreSQL 等**：从旧数据库导出 SQL 文件，导入到新服务器的数据库（或其他远程数据库）
+
+::: warning
+数据库使用了外键约束。用第三方工具备份时，部分工具可能因为外键约束导致数据表导出不全，建议使用 `mysqldump`、`pg_dump`、Navicat 或 phpMyAdmin 导出。
+:::
+
+## 恢复安装 {#restoring-installation}
+
+本节的命令都在新服务器的站点根目录中执行。
+
+解压文件：
+
+```shell
+tar -xzvf lsky-pro.tar.gz
+```
+
+使用 SQLite 时，`.env` 中的 `DB_DATABASE` 是数据库文件的绝对路径。新站点的目录与旧站点不同时（即使没有改过文件位置），请把它改为新的路径，例如 `DB_DATABASE=/www/wwwroot/new.com/storage/app/database.sqlite`。
+
+使用其他数据库时，编辑 `.env`，把数据库配置改为新服务器的数据库：
+
+```ini
+DB_CONNECTION=mysql   # 数据库类型
+DB_HOST=127.0.0.1     # 数据库地址
+DB_PORT=3306          # 端口
+DB_DATABASE=lsky_pro  # 数据库名称
+DB_USERNAME=root      # 用户名
+DB_PASSWORD=root      # 密码
+```
+
+重新生成符号链接：
+
+```shell
+php artisan storage:link --force --relative && php artisan symlinks:rebuild
+```
+
+然后按[安装](./install)中的步骤[配置站点运行目录和伪静态](./install#configure-rewrite)，并把站点目录中所有文件的所有者改为 Web 服务器的运行用户（如 `www` 或 `www-data`）：
+
+```shell
+chown -R www:www /www/wwwroot/app.com
+```
 
 ## 更改配置 {#change-configuration}
 
-如果您使用了本地储存，本地储存的**储存目录**配置也许会在您迁移了新的服务器后路径发生了变化，这个时候需要您去登录程序后台，将储存配置的**储存目录**路径，修改成现在所在服务器的储存根路径。
+登录管理后台，检查以下配置：
 
-即使路径没有发生变化，您也需要编辑所有的储存，重新保存一下以生成符号链接。
-
-除此之外：
-- 所有「云处理」驱动器需要去确认一下**云处理缓存目录**配置路径是否正确。
-- 所有「图片安全」驱动器需要去确认一下**违规图片转移目录**配置路径是否正确。(如果有设置)
+- **本地储存的储存目录**：如果新服务器上的路径变了，请修改为新的路径。路径没变也请编辑每个本地储存并重新保存一次，以生成符号链接
+- **云处理驱动的「云处理缓存目录」**：确认路径正确
+- **图片安全驱动的「违规图片转移目录」**：设置过的，确认路径正确
 
 ## 配置消息队列和计划任务 <Badge type="danger" text="重要" /> {#configure-queue-and-schedule}
 
-最后一步，**请不要忽略了这一步**。我们需要像教程[安装](./install)章节中那样，[配置消息队列](./install#configure-queue) 和 [配置计划任务](./install#configure-schedule)。
+请不要跳过这一步：按[安装](./install)中的步骤[配置消息队列](./install#configure-queue)和[配置计划任务](./install#configure-schedule)。没有配置时，缩略图、邮件、图片删除等功能都不能正常工作。
 
-配置完毕后，通过新站点的域名访问前端，测试功能是否正常。
+完成后，通过新站点的域名访问并测试上传、浏览等功能。
+
+## Docker 安装的迁移 {#docker}
+
+Docker 安装需要迁移的数据有：映射到 `/app/storage/app` 的数据目录（包括 `.env` 和 SQLite 数据库）、映射到 `/app/themes` 的主题目录（如果有），以及 MySQL 等数据库。
+
+使用宿主机目录映射时（如 `~/data`、`./data`）：
+
+1. 停止旧服务器上的容器
+2. 打包数据目录、主题目录和 `docker-compose.yml`；使用 MySQL 等数据库的，同时导出数据库，见[备份和恢复](./install#backup-restore)
+3. 在新服务器上解压到相同的位置，导入数据库，用原来的命令启动容器
+
+使用 Docker 卷时（如编排文件中的 `storage`、`themes` 卷），数据不在普通目录中：
+
+1. 在旧服务器上用临时容器分别打包 `storage` 和 `themes` 卷，方法见[备份和恢复](./install#backup-restore)
+2. 在新服务器上先执行 `docker compose -p lsky-pro create` 创建容器和空卷（不会启动），再用临时容器把压缩包解压到对应的卷中，例如：
+
+```bash
+docker run --rm -v lsky-pro_storage:/data -v "$(pwd)":/backup alpine \
+    tar -xzf /backup/lsky-storage-20261113.tar.gz -C /data
+```
+
+3. 使用 MySQL 等数据库的，先只启动数据库服务（如 `docker compose -p lsky-pro up -d mysql`），等数据库可以连接后导入 SQL 文件
+4. 执行 `docker compose -p lsky-pro up -d` 启动全部服务
+
+容器启动时会自动重建符号链接，队列和计划任务也已内置。之后同样需要按[更改配置](#change-configuration)检查后台的目录配置。
