@@ -156,9 +156,11 @@ Keepbay 不会按邮箱自动把外部帐号和已有帐号对上，否则有人
 
 Keepbay 以 `keepbay` 用户运行，只能访问这个用户有权限的文件夹。
 
-给文件夹授权时别漏了上级目录：比如文件夹在 `/home/alice/photos`，`/home` 和 `/home/alice` 都要让 `keepbay` 用户能进入（`x` 权限）。命令见[安装](./install#permissions)。
+页面提示没有权限时，下面会显示一条填好路径的授权命令，复制到服务器上用 root 运行，再点一次添加就好。上级目录的进入权限它也会一起加上，说明见[安装](./install#permissions)。
 
-后来用 `cp -p`、`rsync -a` 复制进去的文件会带着原来的权限，Keepbay 可能又读不了了，复制完再授权一次。
+后来用 `cp -p`、`rsync -a` 复制进去的文件会带着原来的权限，Keepbay 可能又读不了了，复制完再运行一次这条命令。
+
+文件夹在 FAT、exFAT、NTFS 格式的 U 盘或移动硬盘上的，授权命令设不了权限，要在挂载时把所有者设为 `keepbay`。网络盘和云盘的情况见[安装](./install#permissions)。
 
 ### 能管理 S3、百度网盘、阿里云盘上的文件吗？ {#cloud}
 

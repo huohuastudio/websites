@@ -118,6 +118,7 @@ flowchart TD
 | 命令 | 说明 |
 |---|---|
 | `mount:list` | 列出文件夹、在线状态和文件数 |
+| `mount:grant` | 给运行 Keepbay 的用户访问文件夹的权限 |
 | `index:rescan` | 重新扫描文件夹 |
 | `index:status` | 查看后台任务各阶段的进度 |
 
@@ -380,6 +381,24 @@ sudo systemctl start keepbay
 列出已添加的文件夹：ID、名称、路径、状态、文件数、上次扫描。
 
 状态是在线、正在扫描或离线（附原因：目录不存在、磁盘没有连接、目录突然变空等）。服务没运行时，显示的是停止前记录的状态。
+
+### mount:grant {#mount-grant}
+
+给运行 Keepbay 的用户访问一个文件夹的权限，添加文件夹之前运行。只支持 Linux，要以 root 运行。
+
+```bash
+sudo /opt/keepbay/keepbay mount:grant /srv/photos
+sudo /opt/keepbay/keepbay mount:grant --read-only /srv/photos
+```
+
+| 选项 | 说明 |
+|---|---|
+| `--read-only` | 只给读取的权限，添加文件夹时选了只读的用它 |
+| `--user` | 给哪个系统用户，默认是数据目录的所有者，也就是运行服务的用户 |
+
+它会设好文件夹及其中全部文件的权限、以后新建文件的默认权限，上级目录缺进入权限的也加上。不用另装 acl，不改动文件的所有者和原有权限。
+
+这个命令不碰数据库，服务运行时也能用。中途按 Ctrl + C 停下了，再运行一次就会接着设置。其他说明见[安装](./install#permissions)。
 
 ### index:rescan {#index-rescan}
 

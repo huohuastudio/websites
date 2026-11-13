@@ -163,7 +163,6 @@ sudo mkdir -p /mnt/cloud/photos
 sudo rclone mount r2:photos /mnt/cloud/photos \
   --read-only \
   --allow-other \
-  --dir-cache-time 1000h \
   --vfs-cache-mode full \
   --vfs-cache-max-size 50G \
   --vfs-cache-max-age 720h \
@@ -176,21 +175,24 @@ sudo rclone mount r2:photos /mnt/cloud/photos \
 
 - `--read-only`：只读挂载。Keepbay 以只读方式添加时用不到写入，挂成只读更放心
 - `--allow-other`：让 `keepbay` 用户也能读取。不加的话，只有运行 rclone 的用户能看到文件
-- `--dir-cache-time 1000h`：目录列表缓存很长时间。rclone 每次重新读取目录，都会给文件换一个 inode，Keepbay 会以为文件变了，再读一遍。缓存时间长，同一次挂载中 inode 就不会变
-- `--vfs-cache-mode full`：读过的内容缓存在本地硬盘上，Keepbay 再读同一个文件时不用重新下载
+- `--vfs-cache-mode full`：读过的内容缓存在本地硬盘上，同一个文件只用下载一次
 - `--vfs-cache-max-size`：缓存的上限，按硬盘的剩余空间设。实际占用可能会略超过这个值
 - `--vfs-cache-max-age 720h`：缓存保留 30 天。默认只保留 1 小时，首次添加时文件要排队处理，同一个文件两次读取之间可能隔了不止 1 小时，缓存过期就得重新下载
 - `--cache-dir`：缓存放在哪里，请放在空间足够的硬盘上
 
 ### 云上的改动 {#cloud-changes}
 
-`--dir-cache-time` 设得很长，云上的改动（比如在手机 App 里新传的照片）就要等缓存过期才能看到。
+云上新增、删除的文件（比如在手机 App 里新传的照片），不会实时通知到 Keepbay。
 
-Google Drive、OneDrive、Dropbox、Box、pCloud 支持变化通知，rclone 默认每分钟检查一次，云上的改动一分钟左右就能看到。
+Keepbay 按文件夹的"补扫间隔"把整个目录完整读一遍，这时才发现变化。补扫间隔最短 15 分钟。
 
-其他服务，比如 S3、WebDAV，没有变化通知。云上的改动要等重新挂载后才能看到。
+rclone 自己还有一层目录缓存，`--dir-cache-time` 默认 5 分钟，过期之前列出来的还是旧目录。所以云上的改动，要等 rclone 的缓存刷新后，下一次补扫才能发现。
 
-所以挂载更适合内容不常变的资料，比如历年的照片和文档归档。经常变的，建议同步到本地。
+补扫间隔从上一次扫描结束时算起。文件很多或者服务限速的，一次扫描本身也要花不少时间。
+
+补扫读的是目录列表，大小和修改时间都没变的文件，不会重新下载。
+
+挂载更适合内容不常变的资料，比如历年的照片和文档归档。经常变、又想马上看到的，建议同步到本地。
 
 ### 开机自动挂载 {#mount-systemd}
 
@@ -207,7 +209,6 @@ Type=notify
 ExecStart=/usr/bin/rclone mount r2:photos /mnt/cloud/photos \
   --config /root/.config/rclone/rclone.conf \
   --read-only --allow-other \
-  --dir-cache-time 1000h \
   --vfs-cache-mode full --vfs-cache-max-size 50G --vfs-cache-max-age 720h \
   --cache-dir /var/cache/rclone
 ExecStop=/bin/fusermount -uz /mnt/cloud/photos
@@ -231,7 +232,7 @@ sudo systemctl enable --now rclone-photos.service
 
 ### 让 Keepbay 在挂载之后启动 {#mount-order}
 
-Keepbay 比挂载先启动时，看到的是一个空目录，会把文件夹标记为离线。所以要让 Keepbay 等挂载完成再启动：
+Keepbay 比挂载先启动时，看到的是一个空目录，会把文件夹标记为离线，等挂载好、检查通过后再恢复。开机时不想看到这段离线，可以让 Keepbay 等挂载完成再启动：
 
 ```bash
 sudo systemctl edit keepbay
@@ -328,10 +329,10 @@ sudo mount -t nfs 192.168.1.20:/volume1/photos /mnt/nas/photos -o ro
 
 同步或挂载好以后，在「系统设置 › 存储」中添加这个文件夹，见[文件夹](./folders#add)。
 
-- **访问方式选只读**。同步的文件夹，在 Keepbay 中改了也会被下一次同步覆盖或删掉；挂载的文件夹，Keepbay 改名时要求文件系统支持"不覆盖的改名"或者硬链接，rclone 挂载不一定支持，移动、改名、删除可能失败
+- **访问方式选只读**。同步的文件夹，在 Keepbay 中改了也会被下一次同步覆盖或删掉。挂载的文件夹，读写方式下大部分操作会失败，见[注意事项](#caveats)。Keepbay 发现路径在 rclone 挂载上时，会自动选好只读
 - **路径**：添加时 Keepbay 会解析符号链接，保存真实路径。之后这个路径被换成了符号链接（比如改了挂载的位置，再用链接指过去），文件夹会显示"路径指向了别处"
-- **定期补扫间隔**：同步的，设得和同步的频率差不多；挂载的，保持默认的 360 分钟即可，云上的改动反正要等缓存刷新才能看到
-- 请先确认 `keepbay` 用户能读取这个文件夹：`sudo -u keepbay ls /mnt/cloud/photos`
+- **定期补扫间隔**：同步的，设得和同步的频率差不多。挂载的，想早点看到云上的改动就调短，最短 15 分钟。每次补扫都要向云端列一遍目录，按请求次数收费或限制请求次数的服务（比如坚果云），别设得太短
+- **权限**：rclone 挂载的文件夹不支持 `mount:grant` 那样的授权，靠挂载命令中的 `--allow-other` 让 `keepbay` 用户能读取。请先确认一下：`sudo -u keepbay ls /mnt/cloud/photos`
 
 数据目录（数据库、缩略图）请一定放在本地硬盘上，不要放在挂载的云盘或网络磁盘上。SQLite 数据库放在网络文件系统上会出错。
 
@@ -349,15 +350,29 @@ sudo mount -t nfs 192.168.1.20:/volume1/photos /mnt/nas/photos -o ro
 
 Keepbay 目前没有"只建目录、不读内容"的省流量选项。缩略图、全文搜索、AI 整理都要读文件内容，这次读取省不掉。能做的是让每个文件只下载一次，并控制下载速度：
 
-- 加 `--vfs-cache-mode full`，把 `--vfs-cache-max-size` 设得够大，`--vfs-cache-max-age` 设得够长。同一个文件第一次处理时会被读好几次，缓存还在就不用重新下载
+- 加 `--vfs-cache-mode full`，把 `--vfs-cache-max-size` 设得够大，`--vfs-cache-max-age` 设得够长。第一次处理一个文件时的几次读取，合并成一次下载
 - 加 `--bwlimit` 限速，比如 `--bwlimit 10M` 是每秒 10 MiB，免得触发网盘的限流
 
-**重新挂载后会再读一遍。** 每次重新挂载，rclone 给每个文件的 inode 都不一样，Keepbay 会把文件当成变了，重新读一遍，64 MB 以上的文件还会重新生成缩略图、重新提取文字。标签、分享链接不受影响。
+这笔流量只花一次。之后重新挂载、重启服务器，Keepbay 按文件的大小和修改时间认文件，没变的不会再读。
 
-`--vfs-cache-mode full` 的缓存在重新挂载后还在，缓存中有的内容不用重新下载。但请尽量让挂载一直运行，不要频繁重启。
+**建议以只读方式添加。** rclone 挂载不支持"不覆盖的改名"，也不支持硬链接。Keepbay 改名、移动时靠它们保证不会盖掉别的文件，没有就不动手。
 
-**重新挂载后，文件夹可能显示离线。** Keepbay 按设备号认磁盘，重新挂载后设备号可能会变，文件夹会显示"离线：磁盘换了"。确认挂载正常后，在「系统设置 › 存储」中点「确认恢复」。
+所以读写方式下，上传、改名、移动、移入回收站都会失败，提示"这个磁盘不支持安全改名"。能用的只有新建文件和文件夹，意义不大。
 
-**挂载断开时，文件夹显示离线。** rclone 停了、挂载点被卸载，或者读不了目录时，Keepbay 会把文件夹标记为离线，不会清空索引，标签、AI 结果都保留。挂载恢复后，按上一条处理。
+**挂载断开时，文件夹显示离线。** rclone 停了、挂载点被卸载，或者读不了目录时，Keepbay 会把文件夹标记为离线，不会清空索引，标签、AI 结果都保留。
+
+重新挂载同一个云盘后，Keepbay 抽查里面的文件，和索引对得上就自动恢复在线，不用手动确认，设备号变了也一样。
+
+前提是添加给 Keepbay 的就是挂载点本身，比如上文的 `/mnt/cloud/photos`。添加的是挂载里面的子文件夹，重新挂载后设备号又变了的，Keepbay 分不清是不是同一块盘，要手动确认。
+
+离线期间云上的文件大半改过或删过的，抽查也对不上，同样要手动确认。
+
+需要手动确认的，在「系统设置 › 存储」中点「确认恢复」。
 
 只是网络断了、rclone 还在运行的，目录列表有缓存，文件夹不一定显示离线。这时打开没有缓存的文件会失败，网络恢复后就好了。
+
+**Keepbay 运行时可以卸载。** Keepbay 不会一直占着挂载点，`fusermount -u` 卸载、重启 rclone 服务都不用先停 Keepbay。
+
+**S3 上的空文件夹。** S3 没有真正的文件夹，挂载后新建的空文件夹，重新挂载就消失了。需要保留空文件夹的，rclone 挂载时加 `--s3-directory-markers`。
+
+**WebDAV 的修改时间。** 经 OpenList 等 WebDAV 挂载的，可能不保留文件原来的修改时间，Keepbay 中显示的是上传到网盘的时间。

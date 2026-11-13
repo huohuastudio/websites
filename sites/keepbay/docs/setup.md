@@ -83,7 +83,7 @@ sudo /opt/keepbay/keepbay setup --user keepbay
 
 文件原样留在原处，Keepbay 只建立索引，不会移动或改动它们。
 
-添加前请先给 `keepbay` 用户这个文件夹的权限，见[安装](./install#permissions)。没有权限时会提示"Keepbay 没有权限读取这个文件夹或它的上级目录"。
+添加前请先给 `keepbay` 用户这个文件夹的权限：`sudo /opt/keepbay/keepbay mount:grant /srv/photos`，见[安装](./install#permissions)。忘了也没关系，没有权限时页面会显示填好路径的这条命令，可以直接复制。
 
 ::: tip 先用只读方式试用
 不确定时可以先以只读方式添加，看过浏览、搜索的效果后，再在这个文件夹的「修改设置」中改为读写。

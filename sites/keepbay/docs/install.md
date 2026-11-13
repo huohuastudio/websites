@@ -139,20 +139,28 @@ sudo firewall-cmd --reload
 
 Keepbay 只能访问 `keepbay` 用户有权限的文件夹，这也是新手最容易卡住的地方。
 
-在网页上添加文件夹前，先用 ACL 给它授权（Debian、Ubuntu 先 `sudo apt install acl`）：
+所以我们把授权做成了一条命令，在网页上添加文件夹前运行：
 
 ```bash
-# 读写；只读时把 rwX 改成 rX，添加文件夹时选"只读"
-sudo setfacl -R -m u:keepbay:rwX /srv/photos
-
-# 以后新建的文件也有同样的权限
-sudo setfacl -R -d -m u:keepbay:rwX /srv/photos
-
-# 每一级上级目录都要能进入，比如文件夹在 /home/alice 下
-sudo setfacl -m u:keepbay:x /home/alice
+sudo /opt/keepbay/keepbay mount:grant /srv/photos               # 读写
+sudo /opt/keepbay/keepbay mount:grant --read-only /srv/photos   # 只读，添加时选"只读"
 ```
 
-用 `tar`、`cp -p`、`rsync -a` 复制进来的文件会保留原来的权限，复制完再运行一次第一条命令。
+它会设好文件夹中全部文件的权限，以后新建的文件也自动有权限。
+
+文件夹在 `/home/alice` 这样的目录下面，每一级上级目录缺进入权限的，它也一并加上。
+
+不用另装 acl，也不改动文件的所有者和原有的权限，您自己和其他程序照常使用。
+
+忘了这一步也没关系。在「系统设置 › 存储」添加文件夹时提示没有权限，会显示填好路径的这条命令，复制到服务器上运行就行。
+
+几点说明：
+
+- 默认给数据目录的所有者授权，也就是运行 Keepbay 的用户。要给别的用户，加 `--user`
+- 只支持 Linux，要以 root 运行。根目录和 `/etc`、`/usr` 这些系统目录不能授权
+- 文件夹中另外挂载的磁盘不会一起设置，要用的话对它单独运行一次
+- 用 `tar`、`cp -p`、`rsync -a` 复制进来的文件会保留原来的权限，复制完再运行一次
+- FAT、exFAT、NTFS 磁盘不支持这种权限，要在挂载时把所有者设为 `keepbay`（挂载参数 `uid=`、`gid=`）。SMB、NFS 等网络盘用它们自己的权限设置；rclone 挂载的云盘见[云盘](./cloud-storage#add-to-keepbay)
 
 ## 数据目录 {#data-dir}
 
