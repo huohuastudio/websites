@@ -26,7 +26,7 @@
 - **公测提示**：放在介绍、快速开始、安装三页的概述之后（`:::warning`），不做全站横条
 - **Incus**：常见问题中排查用的 `incus` 命令和套餐管理中的一处说明保持旧文档原样（其余地方仍不写 Incus）
 - **截图**：用 `novaix/_testing/site-shots-060/out/` 中 v0.6.0 的 8 张官网截图
-- **价格**：沿用旧官网写法，授权版不写金额，写"订阅制，不限规模"，按钮链到 huohuastudio.com/products/novaix/buy
+- **价格**：沿用旧官网写法，授权版不写金额，写"订阅制，不限规模"，按钮链到 huohuastudio.com/products/novaix#plans（原写的 `/products/novaix/buy` 在工作室网站上不存在，W3 改正）
 - **隐私政策**：统计相关段落改成 Cloudflare Web Analytics（不用 Cookie），生效日期改为 2026 年 11 月 13 日，其余条款不动
 - **旧官网文案**：去掉首屏数字条、"~30MB"体积和 FAQ 中其他产品安全漏洞的说法；竞品问题只写 Novaix 自身特点并链到文档的竞品对比页
 - **法律三页入口**：首页最后的行动按钮区下方放一行小字链接，页脚仍只有版权
@@ -69,6 +69,14 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 - 文档：当前版（guide 15 页、advanced 6 页）迁到 `/docs/`；旧版本（free v1、free v2、enterprise v1）放到 `/docs/archive/...`，导航中用版本下拉切换；文件名统一为小写（旧版本中有大小写混用），修好已经失效的链接；约 25 张挂在外站（box.kancloud.cn 等）的图片下载到本地
 - 官网首页：介绍、功能、价格（免费版已停更，付费版）、FAQ、行动按钮；主题列表页 `/themes`（构建时取 lsky-pro-themes 的 index.json）；去掉过期活动横条、36 MB 视频（换成截图或压缩过的短视频）、`useDomainCheck`
 - 导航保留演示、社区、正版查询、授权中心等外链
+- **W3a 做法**：
+  - 文档来源用 `lsky-docs/src/zh`（docs.lsky.pro 的仓库），不用 `huohuastudio-docs/docs/lsky-pro`：后者是从 Docusaurus 转回来的，标题的自定义锚点（`{#configure-queue}` 等）被去掉、`::: code-group` 被注释掉，正文其余部分相同
+  - 路径：当前版 `docs/guide/*`、`docs/advanced/*`，旧版本 `docs/archive/{free/v1,free/v2,enterprise/v1}/*`，与旧站的子目录结构一致；`/docs/` 跳到 `/docs/guide/introduce`
+  - 开源版 V1.x 的文件名改为小写（对照见"旧地址跳转"），其他版本本来就是小写
+  - 图片放在各版本的 `images/` 目录（`docs/guide/images`、`docs/archive/<版本>/images`），旧版本之间不共用；外站图片 25 张下载到本地（box.kancloud.cn 要带 Referer 才能下载），开源版 V1.x 首页的标识用旧仓库的 `public/archive/logo.png`
+  - 侧栏：当前版一个侧栏四组（简介、入门、核心功能、进阶）；每个旧版本一个侧栏；导航"文档""接口文档"（apifox）+ 版本下拉（标题 V2.x）
+  - 旧版本页面只在 frontmatter 写了 title 的，补了一级标题；正文、锚点保持原样（旧链接中的中文锚点仍然有效）
+  - 当前版：缺锚点的标题补了锚点；修好失效链接（`/guide/requirement`、`/advanced/theme#create-theme`、`./install#第四步-配置消息队列` 等）；"购买"链到 huohuastudio.com/products/lsky-pro#plans；"遇到问题"一段原来让读者到已经 404 的 www.lsky.pro/serves 找 QQ 群号，改为直接写 QQ 交流群 731983303（工作室网站产品页上的群号）、Telegram 群组和论坛；开源版 V1.x 中失效的 0xxb/lsky-pro 仓库链接改到 lsky-org/lsky-pro（v1.6.4 标签）；删掉云处理页中机器翻译遗留的一句
 
 ### Keepbay（keepbay.app）
 - 官网首页：介绍（平实文案）、截图、演示站入口（demo.keepbay.app）、主要功能、隐私承诺、下载（链到授权中心）、价格、FAQ
@@ -85,8 +93,23 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 
 - `docs.huohuastudio.com/novaix/*` → `novaix.cc/docs/*`（参数原样带上，Novaix 后台的内嵌帮助跟着跳转）
 - `docs.huohuastudio.com/lsky-pro/*` → `www.lsky.pro/docs/*`（旧版本路径另做对照表）
-- `docs.lsky.pro/*` → `www.lsky.pro/docs/*`（开工时先确认它现在指向哪里）
+- `docs.lsky.pro/*` → `www.lsky.pro/docs/*`：2026-11-13 确认，docs.lsky.pro 是 `lsky-docs` 仓库发布到 GitHub Pages 的独立文档站（CNAME 在其工作流中写入），路径为 `/guide/xxx`、`/advanced/xxx`、`/archive/...`（没有 `/lsky-pro` 前缀），页面顶部有横幅提示迁到 docs.huohuastudio.com/lsky-pro
 - `docs.huohuastudio.com/` → 工作室主页
+- **Lsky 对照**（docs.huohuastudio.com 去掉 `/lsky-pro` 前缀后与 docs.lsky.pro 相同）：
+  - `/lsky-pro/`、docs.lsky.pro 的 `/` → `/docs/guide/introduce`
+  - `guide/*`、`advanced/*`、`archive/free/v2/*`、`archive/enterprise/v1/*` → `/docs/` 下同名路径
+  - `archive/free/v1/` 下改了名的页面（其余同名）：
+
+    | 旧路径 | 新路径 |
+    |---|---|
+    | `Install` | `install` |
+    | `StorageStrategy` | `storage/` |
+    | `SS/Local`、`SS/AliyunOSS`、`SS/TencentCloudCOS`、`SS/UpyunUSS`、`SS/KODO`、`SS/FTP` | `storage/local`、`storage/aliyun-oss`、`storage/tencent-cos`、`storage/upyun-uss`、`storage/qiniu-kodo`、`storage/ftp` |
+    | `SystemParameters` | `settings/` |
+    | `SP/BasicConf`、`SP/UploadConf`、`SP/UserConf`、`SP/MailConf`、`SP/OtherConf`、`SP/ImgSex` | `settings/basic`、`settings/upload`、`settings/user`、`settings/mail`、`settings/other`、`settings/image-audit` |
+    | `Watermark`、`SystemUpdate`、`CommonQ`、`UpdateLog` | `watermark`、`upgrade`、`faq`、`changelog` |
+
+  - 锚点：当前版沿用 docs.lsky.pro 的自定义锚点；docs.huohuastudio.com 上的版本没有自定义锚点，从那里复制的带中文锚点的链接跳过来后停在页面顶部
 - 用 Cloudflare 的批量跳转或各站点的 `_redirects` 实现；从旧站生成一份新旧地址对照表，上线前逐条验证
 
 ## 批次
@@ -95,13 +118,15 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 |---|---|---|
 | W1 | 仓库骨架、共用主题（主题切换动效、中文搜索、版本下拉、嵌入模式、页脚、SEO）、仓库规范 | 已完成 |
 | W2 | Novaix 文档迁移 + 官网 | 已完成 |
-| W3 | Lsky Pro+ 文档迁移（含旧版本）+ 官网 + 主题页 | 未开始 |
+| W3 | Lsky Pro+ 文档迁移（含旧版本）+ 官网 + 主题页 | 进行中 |
 | W4 | Keepbay 官网 + 文档菜单（在 Keepbay 演示站上线之后，要用演示站的入口和截图） | 未开始 |
 | W5 | 上线：Cloudflare 项目、域名、旧地址跳转、停掉旧部署（DNS 和旧部署由用户操作，这里写好步骤） | 未开始 |
 
 ## 已知局限
 
 - 首页 FAQ 的回答是 frontmatter 中的 HTML（`HomeFaq` 用 v-html 输出），其中的站内链接不经过 markdown，构建时的坏链检查查不到；文档页改名或删除时，要同时搜一遍各站点 `index.md` 中的 `href="/docs/`
+
+- Lsky 开源版 V1.x 腾讯云 COS 页中的一张补充截图（img.cdn.chs.pub）已失效，删掉图片，改成一句文字说明
 
 ## 待确认
 
@@ -110,3 +135,7 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
   - 隐私政策 6.3 写"本软件本身不使用 Cookie"，但主题故障恢复（`?_fallback`，见文档"主题系统"）会设置一个 30 分钟的功能性 Cookie
 - 先后顺序——按推荐项暂定：先完成 Keepbay 20b2，再做 W1–W3，W4 在 Keepbay 演示站上线之后
 - 上线时机：先在 Cloudflare 的预览地址上验收，用户确认后由用户切 DNS、停旧部署（Lsky 官网的 Deployer 部署、Novaix 官网和旧文档站的 GitHub Pages）
+- **Lsky 文档（W3a，按推荐项暂定，待用户确认）**：
+  - 当前版文档按原文迁移，只修了链接、锚点和明显的遗留文字，语气（如"帅气站长""虚心请教"）没有按写作规范改写；是否需要另做一批改写
+  - 文档与产品现状不一致（迁移时照搬原文，未改）：快速开始写"购买后您将获得未加密的完整源码"，工作室产品页写"从 V 2.3.0 起后端核心代码加密"；快速开始写"一个授权支持一个主域名和三个子域名"，产品页写"1 domain included"；AI 一页列了 6 家供应商，2.5.0 更新日志写的是 19 家；支付一页没有 2.5.0 新增的 Stripe。是否另做一批按 2.5.x 更新文档
+  - 版本下拉的标题用"V2.x"，菜单项为"付费版 V2.x（当前）""付费版 V1.x""开源版 V2.x""开源版 V1.x"
