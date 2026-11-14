@@ -2,7 +2,7 @@
 
 Keepbay 不直接连接各家网盘。存放在网盘上的文件，需要先成为服务器上的一个文件夹，再添加给 Keepbay。本页介绍两种方式：同步到本地，或者挂载成本地文件夹。
 
-S3 兼容的对象存储和 WebDAV，专业版可以直接添加为[远程文件夹](./remote-folders)，不需要 rclone。国内网盘也可以先添加到 OpenList，再将它的 WebDAV 添加为远程文件夹，见[经 OpenList 接入国内网盘](#openlist)。使用免费版，或者存储不在远程文件夹的支持范围内时，可以按本页的办法接入。
+S3 兼容的对象存储、WebDAV 和 SFTP，专业版可以直接添加为[远程文件夹](./remote-folders)，不需要 rclone。国内网盘也可以先添加到 OpenList，再将它的 WebDAV 添加为远程文件夹，见[经 OpenList 接入国内网盘](#openlist)。使用免费版，或者存储不在远程文件夹的支持范围内时，可以按本页的办法接入。
 
 ## 两种方式 {#approaches}
 
@@ -57,7 +57,7 @@ OpenList 支持的网盘见它的[文档](https://doc.oplist.org)。
 ### 协议 {#protocols}
 
 - WebDAV：坚果云、Nextcloud、群晖和威联通的 WebDAV 服务等，用 rclone 的 WebDAV 后端。专业版可以直接添加为[远程文件夹](./remote-folders)
-- SFTP、FTP：用 rclone 对应的后端
+- SFTP、FTP：用 rclone 对应的后端。SFTP 专业版可以直接添加为[远程文件夹](./remote-folders#add-sftp)
 - SMB、NFS：NAS 上的共享文件夹，直接用系统的 `mount` 挂载，不需要 rclone，见 [NAS 的共享文件夹](#smb-nfs)
 
 ## 安装 rclone {#install-rclone}

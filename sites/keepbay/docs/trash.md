@@ -40,7 +40,7 @@
 
 回收站和文件在同一块磁盘上，删除只是一次改名，几十 GB 的文件夹也能立即完成，不占用额外空间。
 
-[远程文件夹](./remote-folders#cost)的回收站在存储上的 `.keepbay-trash/` 中，删除在后台进行。S3 上是复制再删除，大文件夹较慢；WebDAV 上是一次改名。
+[远程文件夹](./remote-folders#cost)的回收站在存储上的 `.keepbay-trash/` 中，删除在后台进行。S3 上是复制再删除，大文件夹较慢；WebDAV、SFTP 上是一次改名。
 
 `.keepbay-trash/` 不会出现在 Keepbay 的文件列表里。在 NAS 的文件管理或终端中能看到它，请不要手动改动里面的内容。
 
