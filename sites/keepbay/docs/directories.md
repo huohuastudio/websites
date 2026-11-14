@@ -11,11 +11,11 @@ Keepbay 创建的内容集中在以下位置：安装目录、数据目录、系
 ```
 /opt/keepbay/
 ├── versions/                                  # 各个版本的程序
-│   ├── keepbay_0.1.0-beta.2_linux_amd64/      # 上一个版本，用于回滚
-│   ├── keepbay_0.1.0-beta.3_linux_amd64/      # 正在用的版本
+│   ├── keepbay_0.1.0-beta.4_linux_amd64/      # 上一个版本，用于回滚
+│   ├── keepbay_0.1.0-beta.5_linux_amd64/      # 正在用的版本
 │   ├── .download-<版本>                        # 在线更新：下载中的安装包
 │   └── .staging-<版本>/                        # 在线更新：解压中的新版本
-├── current -> versions/keepbay_0.1.0-beta.3_linux_amd64
+├── current -> versions/keepbay_0.1.0-beta.5_linux_amd64
 ├── .current-new                               # 在线更新：切换 current 时的临时链接
 └── keepbay -> current/keepbay                 # 命令行使用这个路径
 ```

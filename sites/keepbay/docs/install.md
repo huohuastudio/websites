@@ -35,7 +35,7 @@ Keepbay 由一个程序和一个 `lib/` 目录组成，解压即可运行，无�
 解压后是一个同名目录：
 
 ```
-keepbay_0.1.0-beta.3_linux_amd64/
+keepbay_0.1.0-beta.5_linux_amd64/
 ├── keepbay        # 主程序，前端页面已经编译在里面
 ├── lib/           # libvips 等动态库和字体配置
 ├── INSTALL.md     # 安装说明
@@ -51,9 +51,9 @@ keepbay_0.1.0-beta.3_linux_amd64/
 ```
 /opt/keepbay/
 ├── versions/
-│   ├── keepbay_0.1.0-beta.2_linux_amd64/   # 上一个版本
-│   └── keepbay_0.1.0-beta.3_linux_amd64/   # 正在用的版本
-├── current -> versions/keepbay_0.1.0-beta.3_linux_amd64
+│   ├── keepbay_0.1.0-beta.4_linux_amd64/   # 上一个版本
+│   └── keepbay_0.1.0-beta.5_linux_amd64/   # 正在用的版本
+├── current -> versions/keepbay_0.1.0-beta.5_linux_amd64
 └── keepbay -> current/keepbay               # 命令行使用这个路径
 
 /var/lib/keepbay/                            # 数据目录，见下文
