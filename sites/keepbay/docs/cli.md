@@ -1,8 +1,8 @@
 # 命令行 {#cli}
 
-Keepbay 程序自带一套管理命令。首次设置、装系统服务、看状态、查环境、更新、重设密码、备份和恢复数据库、重新扫描文件夹，都能在终端里完成。
+Keepbay 程序自带一套管理命令。首次设置、安装系统服务、查看状态、检查环境、更新、重设密码、备份和恢复数据库、重新扫描文件夹，都可以在终端中完成。
 
-网页进不去的时候（忘了密码、两步验证的手机丢了、帐号被锁定），也可以用命令行处理。
+无法登录网页时（忘记密码、两步验证所用的手机丢失、帐号被锁定），也可以用命令行处理。
 
 ## 基本用法 {#usage}
 
@@ -20,9 +20,9 @@ sudo -u keepbay /opt/keepbay/keepbay status
 
 建议都用这个用户运行。服务在运行时，root 也能通过控制通道执行在线命令。
 
-但服务没运行、命令要自己打开数据库，而数据目录又属于别的用户时，root 会被拒绝。因为命令新建的文件会属于 root，之后服务自己反而读写不了，所以 Keepbay 会提示您换成数据目录所属的用户。
+但服务没有运行、命令需要直接打开数据库，而数据目录又属于其他用户时，root 会被拒绝。因为命令新建的文件会属于 root，之后服务将无法读写这些文件，所以 Keepbay 会提示您换成数据目录所属的用户。
 
-安装、卸载系统级服务（`setup` 最后一步、`service:install`、`service:uninstall`）要以 root 运行；用普通用户运行时，装的是这个用户自己的服务。
+安装、卸载系统级服务（`setup` 最后一步、`service:install`、`service:uninstall`）要以 root 运行；用普通用户运行时，安装的是这个用户自己的服务。
 
 ### 通用选项 {#common-options}
 
@@ -47,13 +47,13 @@ sudo -u keepbay /opt/keepbay/keepbay status
 
 ## 在线命令和离线命令 {#online-offline}
 
-数据库同一时间只能由一个进程写入，命令行不能趁服务运行时自己去改数据库。
+数据库同一时间只能由一个进程写入，服务运行时，命令行不能直接修改数据库。
 
-所以命令行先试着连数据目录中的控制通道 `keepbay.sock`，连上了就请服务代劳，连不上再自己动手。按命令的性质分三类：
+因此命令行会先尝试连接数据目录中的控制通道 `keepbay.sock`：连接成功时交给服务执行，连接失败时由命令行自己执行。按命令的性质分三类：
 
 ```mermaid
 flowchart TD
-    cmd["运行命令"] --> sock{"连得上<br/>keepbay.sock？"}
+    cmd["运行命令"] --> sock{"能连接<br/>keepbay.sock？"}
     sock -->|是| kind1{"命令类型"}
     sock -->|否| kind2{"命令类型"}
     kind1 -->|在线命令| svc["交给运行中的服务执行"]
@@ -70,7 +70,7 @@ flowchart TD
 
 | 类型 | 命令 |
 |---|---|
-| 在线命令：服务在运行时由服务执行，没运行时命令行自己执行 | `status`、`doctor`、`user:list`、`user:unlock`、`user:2fa-off`、`db:backup`、`db:check`、`mount:list`、`index:status`、`update:check` |
+| 在线命令：服务在运行时由服务执行，未运行时由命令行执行 | `status`、`doctor`、`user:list`、`user:unlock`、`user:2fa-off`、`db:backup`、`db:check`、`mount:list`、`index:status`、`update:check` |
 | 离线命令：要独占数据库，必须先停止服务 | `user:reset-password`、`db:restore`、`db:vacuum` |
 | 只能由运行中的服务执行 | `index:rescan`、`setup:token`、`update` |
 
@@ -187,7 +187,7 @@ echo "$PASSWORD" | sudo /opt/keepbay/keepbay setup --username admin --password-s
 
 ### setup:token {#setup-token}
 
-显示设置向导的令牌。令牌在服务启动时生成，只保存在服务的内存中，所以服务要在运行。
+显示设置向导的令牌。令牌在服务启动时生成，只保存在服务的内存中，因此服务需要处于运行状态。
 
 已经完成设置时，输出"已经完成首次设置"。
 
@@ -233,9 +233,9 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 ```
 
-服务文件中没有 `ProtectHome`、`ProtectSystem=strict`。您的文件夹可能在 `/home`、`/mnt`、`/media` 等任何地方，加了这两项，服务就读不到它们了。
+服务文件中没有 `ProtectHome`、`ProtectSystem=strict`。您的文件夹可能在 `/home`、`/mnt`、`/media` 等任何地方，加上这两项会导致服务无法读取这些文件夹。
 
-系统没有使用 systemd 时（如部分 NAS）不能安装，会提示按安装文档自己配置开机启动，见[安装](./install#nas)。
+系统没有使用 systemd 时（如部分 NAS）不能安装，会提示按安装文档手动配置开机启动，见[安装](./install#nas)。
 
 ### service:uninstall {#service-uninstall}
 
@@ -254,7 +254,7 @@ WantedBy=multi-user.target
 | 部分 | 检查内容 |
 |---|---|
 | 目录 | 数据目录、`logs/`、`backups/` 是否存在、能否写入；权限比 `0700` 宽时提示其他用户能读到数据库 |
-| 端口 | 服务在运行时确认正在监听；没运行时试着监听 `--listen` 指定的地址，报告是否被占用、是否没有权限（1024 以下的端口要 root） |
+| 端口 | 服务在运行时确认正在监听；未运行时尝试监听 `--listen` 指定的地址，报告是否被占用、是否没有权限（1024 以下的端口要 root） |
 | 依赖 | libvips、ffmpeg、沙箱、ONNX Runtime、yt-dlp |
 
 依赖各项的结果：
@@ -285,7 +285,7 @@ WantedBy=multi-user.target
 
 `update` 先检查新版本，确认后由运行中的服务下载、核对、切换到新版本并重新启动，与网页上「系统设置 › 维护」中的「立即更新」相同。
 
-服务要在运行；加 `--force` 不再确认。过程和不能自动更新的情况见[升级](./upgrade)。
+服务需要处于运行状态；加 `--force` 不再确认。过程和不能自动更新的情况见[升级](./upgrade)。
 
 ## 帐号 {#user}
 
@@ -309,18 +309,18 @@ sudo systemctl start keepbay
 
 ### user:unlock {#user-unlock}
 
-登录失败次数太多被锁定时使用：解除锁定，之前的失败不再计数。服务在运行时也可以执行。
+登录失败次数过多导致帐号被锁定时使用：解除锁定，之前的失败不再计数。服务在运行时也可以执行。
 
 ### user:2fa-off {#user-2fa-off}
 
-手机丢了、恢复码也找不到时使用：关闭两步验证，之后只用密码就能登录。
+手机丢失、恢复码也找不到时使用：关闭两步验证，之后只需密码即可登录。
 
 不会退出已有的登录。服务在运行时也可以执行。
 
 ::: tip 所有者无法登录时
-- 忘了密码：停止服务，运行 `user:reset-password`（同时关闭两步验证）
-- 密码记得，两步验证用不了：运行 `user:2fa-off`，不用停止服务
-- 被锁定：运行 `user:unlock`，或者等锁定时间过去
+- 忘记密码：停止服务，运行 `user:reset-password`（同时关闭两步验证）
+- 记得密码，但无法完成两步验证：运行 `user:2fa-off`，无需停止服务
+- 被锁定：运行 `user:unlock`，或者等待锁定时间结束
 :::
 
 ## 数据库 {#db}
@@ -342,7 +342,7 @@ sudo systemctl start keepbay
 
 ### db:restore {#db-restore}
 
-用备份恢复数据库，要先停止服务。不写文件时在终端里列出所有备份供选择。
+用备份恢复数据库，要先停止服务。不指定备份文件时，在终端中列出所有备份供选择。
 
 ```bash
 sudo systemctl stop keepbay
@@ -354,17 +354,17 @@ sudo systemctl start keepbay
 
 1. 把备份复制到临时文件并检查：数据库完整、确实是 Keepbay 的数据库、版本不比当前程序新（比程序新时先升级 Keepbay）
 2. 把现在的数据库保存为 `backups/before-restore-<时间>.db`
-3. 用一次改名换成新数据库：中途中断时，数据库要么是原来的，要么是恢复后的，不会是半成品
+3. 通过一次改名替换为新数据库：中途中断时，数据库要么是原来的，要么是恢复后的，不会处于不完整的状态
 
 备份文件本身不会被改动。旧版本的备份在下次启动时自动升级到当前版本。
 
 ::: warning secret.key 不在备份中
-恢复到另一台设备时，请把数据目录中的 `secret.key` 一起复制过去，否则 AI 厂商的 API Key 等配置要重新填写，开了两步验证的帐号要用恢复码登录。详见[备份和维护](./backup#secret-key)。
+恢复到另一台设备时，请把数据目录中的 `secret.key` 一并复制过去，否则 AI 厂商的 API Key 等配置要重新填写，开了两步验证的帐号要用恢复码登录。详见[备份和维护](./backup#secret-key)。
 :::
 
 ### db:check {#db-check}
 
-逐页核对数据库的结构和索引，数据库很大时要几分钟。
+逐页核对数据库的结构和索引，数据库较大时需要几分钟。
 
 发现问题时列出问题（最多 100 个），退出码为 1，可以用 `db:restore` 从备份恢复。
 
@@ -372,7 +372,7 @@ sudo systemctl start keepbay
 
 回收删除数据后留下的空间，要先停止服务。
 
-平时用不着它，SQLite 会自己复用这些空间。删除了大量文件、换过向量模型之后，想把数据库文件缩小一些时再用。
+通常不需要运行，SQLite 会自动复用这些空间。删除了大量文件或更换过向量模型后，如需缩小数据库文件，可以运行这个命令。
 
 ## 索引与文件夹 {#index}
 
@@ -380,7 +380,7 @@ sudo systemctl start keepbay
 
 列出已添加的文件夹：ID、名称、路径、状态、文件数、上次扫描。
 
-状态是在线、正在扫描或离线（附原因：目录不存在、磁盘没有连接、目录突然变空等）。服务没运行时，显示的是停止前记录的状态。
+状态是在线、正在扫描或离线（附原因：目录不存在、磁盘没有连接、目录突然变空等）。服务未运行时，显示的是停止前记录的状态。
 
 ### mount:grant {#mount-grant}
 
@@ -393,12 +393,12 @@ sudo /opt/keepbay/keepbay mount:grant --read-only /srv/photos
 
 | 选项 | 说明 |
 |---|---|
-| `--read-only` | 只给读取的权限，添加文件夹时选了只读的用它 |
-| `--user` | 给哪个系统用户，默认是数据目录的所有者，也就是运行服务的用户 |
+| `--read-only` | 只授予读取权限，添加文件夹时选择只读方式的使用这个选项 |
+| `--user` | 授权给哪个系统用户，默认是数据目录的所有者，也就是运行服务的用户 |
 
-它会设好文件夹及其中全部文件的权限、以后新建文件的默认权限，上级目录缺进入权限的也加上。不用另装 acl，不改动文件的所有者和原有权限。
+它会设好文件夹及其中全部文件的权限、以后新建文件的默认权限，上级目录缺少进入权限的也会补上。无需另外安装 acl，不改动文件的所有者和原有权限。
 
-这个命令不碰数据库，服务运行时也能用。中途按 Ctrl + C 停下了，再运行一次就会接着设置。其他说明见[安装](./install#permissions)。
+这个命令不访问数据库，服务运行时也可以使用。中途按 Ctrl + C 中断后，再运行一次会继续设置。其他说明见[安装](./install#permissions)。
 
 ### index:rescan {#index-rescan}
 
@@ -411,12 +411,12 @@ sudo -u keepbay /opt/keepbay/keepbay index:rescan 照片 文档
 sudo -u keepbay /opt/keepbay/keepbay index:rescan --all
 ```
 
-一般用不着手动扫描：本地磁盘上的改动实时监听，另有定期补扫，见[技术架构](./architecture#scan)。
+一般不需要手动扫描：本地磁盘上的改动会实时监听，另有定期补扫，见[技术架构](./architecture#scan)。
 
-在 SMB 共享上一次改了一大批文件、又不想等补扫时，再手动扫描。
+在 SMB 共享上一次修改了大量文件、需要立即更新索引时，可以手动扫描。
 
 ### index:status {#index-status}
 
 查看后台任务各阶段的进度（已完成 / 总数、失败数）。
 
-阶段包括扫描、识别内容、生成缩略图、提取文字、识别图片中的文字、生成向量、打 AI 标签。服务没运行时显示停止时的进度，启动后继续。
+阶段包括扫描、识别内容、生成缩略图、提取文字、识别图片中的文字、生成向量、打 AI 标签。服务未运行时显示停止时的进度，启动后继续。

@@ -1,6 +1,9 @@
 // 配置文件中的包名导入会被当作外部依赖交给 Node 直接加载（无法加载 .ts），所以用相对路径
 import { defineSiteConfig } from '../../../packages/theme/config.ts'
 
+// 侧栏中专业版功能的标记（侧栏文字按 HTML 渲染，不能用 Badge 组件）
+const pro = '<span class="VPBadge tip">专业版</span>'
+
 export default defineSiteConfig({
   hostname: 'https://keepbay.app',
   title: 'Keepbay',
@@ -31,7 +34,7 @@ export default defineSiteConfig({
         collapsed: false,
         items: [
           { text: '文件夹', link: '/docs/folders' },
-          { text: '远程文件夹', link: '/docs/remote-folders' },
+          { text: `远程文件夹 ${pro}`, link: '/docs/remote-folders' },
           { text: '云盘', link: '/docs/cloud-storage' },
           { text: '备份和维护', link: '/docs/backup' },
         ],
@@ -51,12 +54,12 @@ export default defineSiteConfig({
         text: 'AI 功能',
         collapsed: false,
         items: [
-          { text: '模型设置', link: '/docs/ai-models' },
-          { text: 'AI 桌面', link: '/docs/ai-desk' },
-          { text: '语义搜索', link: '/docs/semantic-search' },
-          { text: 'AI 标签', link: '/docs/ai-tags' },
+          { text: `模型设置 ${pro}`, link: '/docs/ai-models' },
+          { text: `AI 桌面 ${pro}`, link: '/docs/ai-desk' },
+          { text: `语义搜索 ${pro}`, link: '/docs/semantic-search' },
+          { text: `AI 标签 ${pro}`, link: '/docs/ai-tags' },
           { text: '收件箱', link: '/docs/inbox' },
-          { text: '日期提醒', link: '/docs/reminders' },
+          { text: `日期提醒 ${pro}`, link: '/docs/reminders' },
         ],
       },
       {
@@ -83,6 +86,7 @@ export default defineSiteConfig({
         items: [
           { text: '专业版', link: '/docs/pro' },
           { text: '命令行', link: '/docs/cli' },
+          { text: '目录和文件', link: '/docs/directories' },
           { text: '常见问题', link: '/docs/faq' },
           { text: '技术架构', link: '/docs/architecture' },
         ],

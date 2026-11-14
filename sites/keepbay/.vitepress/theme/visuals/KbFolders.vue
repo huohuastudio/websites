@@ -2,7 +2,7 @@
 // "文件留在原处"的示意图：磁盘上的文件夹是主体，Keepbay 和其他程序都连到这同一份文件；
 // Keepbay 用品牌色的实线和面板突出，其他程序做成陪衬
 const others = [
-  { name: 'SMB 共享', desc: '电脑上直接打开' },
+  { name: 'SMB 共享', desc: '在电脑上直接打开' },
   { name: 'Jellyfin', desc: '在电视上看视频' },
   { name: 'Syncthing', desc: '同步手机相册' },
 ]
@@ -12,7 +12,7 @@ const others = [
   <div
     class="kb-folders"
     role="img"
-    aria-label="示意图：磁盘上的照片文件夹保持原来的目录结构，Keepbay 只读一遍、建立索引，SMB 共享、Jellyfin、Syncthing 同时照常使用这同一份文件"
+    aria-label="示意图：磁盘上的照片文件夹保持原来的目录结构，Keepbay 只读取文件、建立索引，SMB 共享、Jellyfin、Syncthing 同时使用这同一份文件"
   >
     <div class="layout">
       <div class="home-card disk">
@@ -29,7 +29,7 @@ const others = [
       <div class="users">
         <div class="user keepbay">
           <span class="name">Keepbay</span>
-          <span class="desc">读一遍，建立索引，不搬动文件</span>
+          <span class="desc">读取文件，建立索引，不移动文件</span>
         </div>
         <div v-for="app in others" :key="app.name" class="user">
           <span class="name">{{ app.name }}</span>
