@@ -164,9 +164,9 @@ Keepbay 以 `keepbay` 用户运行，只能访问这个用户有权限的文件�
 
 ### 能管理 S3、百度网盘、阿里云盘上的文件吗？ {#cloud}
 
-Keepbay 不直接连接云存储，但可以先把它们变成服务器上的文件夹：用 rclone 同步到本地或者挂载，国内网盘再经 OpenList 转一下。
+S3 兼容的对象存储（Amazon S3、Cloudflare R2、阿里云 OSS、腾讯云 COS、MinIO 等），专业版可以直接添加，见[远程文件夹](./remote-folders)。
 
-能接入的服务和具体做法，见[云盘](./cloud-storage)。
+网盘不直接连接，但可以先把它们变成服务器上的文件夹：用 rclone 同步到本地或者挂载，国内网盘再经 OpenList 转一下。能接入的服务和具体做法，见[云盘](./cloud-storage)。
 
 ### Keepbay 会改动我文件夹里的东西吗？ {#modify-files}
 

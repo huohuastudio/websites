@@ -31,6 +31,7 @@ export default defineSiteConfig({
         collapsed: false,
         items: [
           { text: '文件夹', link: '/docs/folders' },
+          { text: '远程文件夹', link: '/docs/remote-folders' },
           { text: '云盘', link: '/docs/cloud-storage' },
           { text: '备份和维护', link: '/docs/backup' },
         ],

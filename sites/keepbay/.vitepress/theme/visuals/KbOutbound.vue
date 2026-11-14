@@ -4,7 +4,7 @@ const outbound = [
   { name: '检查和安装更新', dest: '授权中心', send: '产品名称、是否接收测试版；安装时加上安装 ID' },
   { name: '激活和续期专业版', dest: '授权中心', send: '授权码、安装 ID、产品名称' },
   { name: '下载本地模型', dest: 'ModelScope、Hugging Face、GitHub', send: '普通的下载请求' },
-  { name: '您自己配置的服务', dest: 'AI 厂商、外部登录、通知、离线下载等', send: '每种发送什么，见隐私文档' },
+  { name: '您自己配置的服务', dest: 'AI 厂商、远程存储、外部登录、通知、离线下载等', send: '每种发送什么，见隐私文档' },
 ]
 const never = ['统计', '遥测', '崩溃上报', '第三方脚本、字体、图片']
 </script>
