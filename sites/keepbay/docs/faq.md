@@ -162,11 +162,11 @@ Keepbay 以 `keepbay` 用户运行，只能访问这个用户有权限的文件�
 
 如果文件夹位于 FAT、exFAT、NTFS 格式的 U 盘或移动硬盘上，授权命令无法设置权限，需要在挂载时把所有者设为 `keepbay`。网络盘和云盘的情况见[安装](./install#permissions)。
 
-### 能管理 S3、百度网盘、阿里云盘上的文件吗？ {#cloud}
+### 能管理 S3、WebDAV、百度网盘、阿里云盘上的文件吗？ {#cloud}
 
-S3 兼容的对象存储（Amazon S3、Cloudflare R2、阿里云 OSS、腾讯云 COS、MinIO 等），专业版可以直接添加，见[远程文件夹](./remote-folders)。
+S3 兼容的对象存储（Amazon S3、Cloudflare R2、阿里云 OSS、腾讯云 COS、MinIO 等）和 WebDAV（坚果云、Nextcloud、群晖 NAS 等），专业版可以直接添加，见[远程文件夹](./remote-folders)。
 
-网盘不能直接连接，但可以先将其接入为服务器上的文件夹：用 rclone 同步到本地或挂载，国内网盘还需要经过 OpenList 中转。能接入的服务和具体做法，见[云盘](./cloud-storage)。
+国内网盘不能直接连接，要先添加到 OpenList。专业版可以将 OpenList 的 WebDAV 添加为远程文件夹；也可以用 rclone 把它同步到本地或挂载，接入为服务器上的文件夹。能接入的服务和具体做法，见[云盘](./cloud-storage)。
 
 ### Keepbay 会改动我文件夹里的东西吗？ {#modify-files}
 
@@ -408,7 +408,7 @@ Keepbay 要连授权中心 `huohuastudio.com` 查询新版本。
 
 只复制了数据库，没有带上数据目录中的 `secret.key`。这些配置是用它加密的，密钥不同就无法解密。
 
-将原来的 `secret.key` 复制过来并重启即可。如果原来的密钥已丢失，请重新填写这些配置，开启了两步验证的帐号用恢复码登录，远程文件夹重新填写访问密钥，见[远程文件夹](./remote-folders#offline)。
+将原来的 `secret.key` 复制过来并重启即可。如果原来的密钥已丢失，请重新填写这些配置，开启了两步验证的帐号用恢复码登录，远程文件夹重新填写访问密钥或 WebDAV 的用户名和密码，见[远程文件夹](./remote-folders#offline)。
 
 因此建议迁移时将整个数据目录一起复制，见[安装](./install#data-dir)。
 

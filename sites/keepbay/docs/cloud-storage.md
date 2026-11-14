@@ -1,8 +1,8 @@
 # 云盘 {#cloud-storage}
 
-Keepbay 不直接连接 WebDAV 或者各家网盘。存放在这些位置的文件，需要先成为服务器上的一个文件夹，再添加给 Keepbay。本页介绍两种方式：同步到本地，或者挂载成本地文件夹。
+Keepbay 不直接连接各家网盘。存放在网盘上的文件，需要先成为服务器上的一个文件夹，再添加给 Keepbay。本页介绍两种方式：同步到本地，或者挂载成本地文件夹。
 
-S3 兼容的对象存储，专业版可以直接添加为[远程文件夹](./remote-folders)，不需要 rclone。使用免费版，或者存储不在远程文件夹的支持范围内时，也可以按本页的办法接入。
+S3 兼容的对象存储和 WebDAV，专业版可以直接添加为[远程文件夹](./remote-folders)，不需要 rclone。国内网盘也可以先添加到 OpenList，再将它的 WebDAV 添加为远程文件夹，见[经 OpenList 接入国内网盘](#openlist)。使用免费版，或者存储不在远程文件夹的支持范围内时，可以按本页的办法接入。
 
 ## 两种方式 {#approaches}
 
@@ -56,7 +56,7 @@ OpenList 支持的网盘见它的[文档](https://doc.oplist.org)。
 
 ### 协议 {#protocols}
 
-- WebDAV：坚果云、Nextcloud、群晖和威联通的 WebDAV 服务等，用 rclone 的 WebDAV 后端
+- WebDAV：坚果云、Nextcloud、群晖和威联通的 WebDAV 服务等，用 rclone 的 WebDAV 后端。专业版可以直接添加为[远程文件夹](./remote-folders)
 - SFTP、FTP：用 rclone 对应的后端
 - SMB、NFS：NAS 上的共享文件夹，直接用系统的 `mount` 挂载，不需要 rclone，见 [NAS 的共享文件夹](#smb-nfs)
 
@@ -254,6 +254,8 @@ OpenList 是一个开源的网盘聚合程序，从 AList 分叉而来，支持�
 
 接入的过程是：在 OpenList 中添加网盘，OpenList 对外提供 WebDAV，rclone 再把 WebDAV 同步或挂载到本地。
 
+使用专业版的，也可以不用 rclone，把 OpenList 的 WebDAV 直接添加为[远程文件夹](./remote-folders#add-webdav)。这时下面第 4 步起不用做，OpenList 用户的权限要求见远程文件夹页。
+
 ```mermaid
 graph LR
     drive["百度网盘、阿里云盘<br/>115、夸克等"] --> ol["OpenList"]
@@ -284,14 +286,14 @@ OpenList 的 WebDAV 不提供文件哈希。
 ::: warning 网盘的限速和风控
 国内网盘大多限制第三方客户端：可能限速，频繁访问可能被暂时封禁，甚至封禁帐号。
 
-Keepbay 首次添加时会读取每个文件，对网盘而言相当于一次大量下载。建议先用不重要的帐号和少量文件测试，并降低并发（rclone 加 `--transfers 2 --tpslimit 2`）。
+经 rclone 同步或挂载时，Keepbay 首次添加会读取每个文件，对网盘而言相当于一次大量下载。作为远程文件夹直接添加的，默认只列出文件，打开[处理内容](./remote-folders#process)后才会下载。建议先用不重要的帐号和少量文件测试，并降低并发（rclone 加 `--transfers 2 --tpslimit 2`）。
 
 这些限制由网盘服务自行规定，Keepbay 和 OpenList 都无法控制。
 :::
 
 ## 坚果云 {#jianguoyun}
 
-坚果云提供 WebDAV，用 rclone 的 WebDAV 后端接入，`vendor` 填 `other`。密码要用坚果云网页上「安全选项 › 第三方应用管理」中生成的应用密码，不是登录密码。
+坚果云提供 WebDAV。专业版可以直接添加为[远程文件夹](./remote-folders#add-webdav)；免费版用 rclone 的 WebDAV 后端接入，`vendor` 填 `other`。密码要用坚果云网页上「安全选项 › 第三方应用管理」中生成的应用密码，不是登录密码。
 
 坚果云限制了 WebDAV 的请求次数：免费版每 30 分钟 600 次，付费版 1500 次。挂载后由 Keepbay 扫描很容易超出限制，建议定时同步到本地，并加上 `--tpslimit 1`。
 

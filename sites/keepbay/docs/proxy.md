@@ -46,7 +46,7 @@ Environment=NO_PROXY=localhost,127.0.0.1
 - 外部帐号登录：连接 Google、Microsoft、GitHub 等提供方
 - 离线下载
 - Bark 通知
-- 远程文件夹：Keepbay 连接对象存储。浏览器直连存储时由浏览器直接连接，不经过这里的代理
+- 远程文件夹：Keepbay 连接对象存储或 WebDAV。S3 兼容存储用浏览器直连时由浏览器直接连接，不经过这里的代理
 
 以下连接不经过代理：
 
