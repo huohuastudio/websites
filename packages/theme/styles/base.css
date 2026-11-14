@@ -95,3 +95,14 @@ div.mermaid-diagram:empty {
 .vp-doc a.VPButton {
   text-decoration: none;
 }
+
+/* 对照表：用 <div class="matrix-table"> 包住表格。除第一列外不换行，窄屏时横向滚动 */
+.vp-doc .matrix-table th:not(:first-child),
+.vp-doc .matrix-table td:not(:first-child) {
+  white-space: nowrap;
+}
+
+.vp-doc .matrix-table th:first-child,
+.vp-doc .matrix-table td:first-child {
+  min-width: 10em;
+}
