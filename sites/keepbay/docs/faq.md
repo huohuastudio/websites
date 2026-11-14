@@ -6,6 +6,8 @@
 
 这里按主题收集了常见的问题。如果没有找到答案，请在 [GitHub](https://github.com/huohuastudio/keepbay-releases/issues) 上提交 Issue，不便公开的内容请发邮件到 support@huohuastudio.com。我们会把常见的问题补充到这里。
 
+在 Keepbay 的「系统设置 › 关于」中点「提交问题」，也可以打开这个页面。提交时请附上同一页中「复制版本信息」复制的内容。
+
 ## 安装与运行 {#install}
 
 ### 运行 keepbay 提示 GLIBC_2.28 not found 或 cannot execute binary file？ {#glibc}
