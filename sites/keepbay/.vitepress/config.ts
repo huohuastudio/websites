@@ -15,6 +15,7 @@ export default defineSiteConfig({
     { text: '文档', link: '/docs/introduce', activeMatch: '^/docs/' },
     { text: '演示', link: 'https://demo.keepbay.app' },
   ],
+  socialLinks: [{ icon: 'github', link: 'https://github.com/huohuastudio/keepbay-releases' }],
   sidebar: {
     '/docs/': [
       {

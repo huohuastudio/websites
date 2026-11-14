@@ -296,7 +296,7 @@ Keepbay 是一个程序加一个 `lib/` 目录，解压即可运行，不用另�
 <HomeSection id="faq" title="常见问题" layout="side">
 <template #header>
 
-更多问题见[常见问题](./docs/faq)。如果没有找到答案，请发邮件到 support@huohuastudio.com。
+更多问题见[常见问题](./docs/faq)。如果没有找到答案，请在 [GitHub](https://github.com/huohuastudio/keepbay-releases/issues) 上提交 Issue，或发邮件到 support@huohuastudio.com。
 
 </template>
 <HomeFaq :items="$frontmatter.faq" />

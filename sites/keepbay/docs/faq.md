@@ -4,7 +4,7 @@
 
 大部分问题在这两处都能看到原因。
 
-这里按主题收集了常见的问题。如果没有找到答案，请发邮件到 support@huohuastudio.com，我们会把常见的问题补充到这里。
+这里按主题收集了常见的问题。如果没有找到答案，请在 [GitHub](https://github.com/huohuastudio/keepbay-releases/issues) 上提交 Issue，不便公开的内容请发邮件到 support@huohuastudio.com。我们会把常见的问题补充到这里。
 
 ## 安装与运行 {#install}
 

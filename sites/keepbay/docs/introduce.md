@@ -8,6 +8,8 @@ Keepbay 是一个自部署的私有网盘，装在您自己的服务器或 NAS �
 
 ::: warning 内测阶段
 Keepbay 目前处于内测阶段（0.1.0-beta），功能和界面还会调整，暂时只提供 Linux 安装包。用于存放重要资料前，请先做好备份。
+
+遇到问题或有建议，请在 [GitHub](https://github.com/huohuastudio/keepbay-releases/issues) 上提交 Issue。
 :::
 
 <div class="tip custom-block" style="padding-top: 8px">
