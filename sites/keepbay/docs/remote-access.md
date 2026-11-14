@@ -81,7 +81,7 @@ server {
 
     client_max_body_size 0;            # 不限制上传大小
 
-    location / {
+    location ^~ / {                    # ^~：不再检查正则规则，见下文
         proxy_pass http://127.0.0.1:8899;
         proxy_http_version 1.1;
         proxy_set_header Connection "";
@@ -98,6 +98,10 @@ server {
 ```
 
 `Host` 用 `$http_host` 而不是 `$host`：后者会丢失端口号，代理不在 443 端口时，会导致 Keepbay 计算出的来源与浏览器的不一致。
+
+`location` 要写成 `^~ /`，不要只写 `/`。宝塔等面板生成的站点配置中有按正则匹配的规则，如禁止访问 `LICENSE`、`.env` 等敏感文件，以及图片、js、css 的缓存规则。
+
+nginx 中正则规则优先于普通的 `location /`。只写 `/` 时，`/api/v1/license` 这类请求会被这些规则拦下，授权信息无法读取；图片、脚本等请求也可能不经过 Keepbay。加上 `^~` 后，匹配到这个 `location` 的请求不再检查正则规则，全部转发给 Keepbay。
 
 ## 可信代理 {#trusted-proxies}
 
@@ -153,7 +157,7 @@ Environment=KEEPBAY_BASE_PATH=/keepbay/
 nginx 中 `proxy_pass` 的地址后面不带路径时，转发会保留前缀：
 
 ```nginx
-location /keepbay/ {
+location ^~ /keepbay/ {
     proxy_pass http://127.0.0.1:8899;
     # 其余同上
 }
