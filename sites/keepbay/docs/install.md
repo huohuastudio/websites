@@ -39,6 +39,7 @@ keepbay_0.1.0-beta.5_linux_amd64/
 ├── keepbay        # 主程序，前端页面已经编译在里面
 ├── lib/           # libvips 等动态库和字体配置
 ├── INSTALL.md     # 安装说明
+├── CHANGELOG.md   # 更新日志（0.1.0-beta.6 起）
 ├── LICENSE
 ├── NOTICE
 └── licenses/      # 第三方组件的许可证
