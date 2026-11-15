@@ -196,6 +196,8 @@ sudo /opt/keepbay/keepbay mount:grant --read-only /srv/photos   # 只读，添�
 
 视频缩略图、视频时长、HEIC 照片都依赖 ffmpeg，用系统的包管理器安装即可。HEIC 需要 7.1 及以上、带 HEVC 解码器的版本。
 
+浏览器不能播放的实况照片视频（多为 HEVC），服务器会在第一次播放时转成 H.264，需要 ffmpeg 带 HEVC 解码器和 H.264 编码器（libx264 或 libopenh264）。Debian、Ubuntu 和 Homebrew 的 ffmpeg 都带，见[实况照片](./files#live)。
+
 HEVC 解码涉及专利授权，因此 Keepbay 不附带 ffmpeg。未安装时 HEIC 文件显示为普通文件，仍可下载。安装后在「系统设置 › 媒体处理」中点击「重新检测」，无需重启。
 
 yt-dlp 用于离线下载视频网站的视频。Keepbay 在 PATH 中查找它，也可以在「系统设置 › 离线下载」中填写路径。

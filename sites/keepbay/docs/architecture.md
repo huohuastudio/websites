@@ -61,7 +61,7 @@ graph TB
 | 搜索 | SQLite FTS5（文件名、全文），sqlite-vec（向量） |
 | 前端 | React、TanStack Router、TanStack Query、Zustand、Tailwind CSS、Base UI |
 | 图片 | libvips（带 libraw、librsvg），在受限子进程中运行 |
-| 视频、HEIC | 系统中的 ffmpeg（不随程序附带），同样在受限环境中运行 |
+| 视频、HEIC、实况照片视频的转换 | 系统中的 ffmpeg（不随程序附带），同样在受限环境中运行 |
 | PDF | PDFium 的 WebAssembly 版本，在内存安全的沙箱中运行 |
 | 本地 AI | ONNX Runtime |
 | 云端 AI | 按 OpenAI 兼容接口调用 |

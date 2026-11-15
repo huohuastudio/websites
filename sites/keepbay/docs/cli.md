@@ -262,7 +262,7 @@ WantedBy=multi-user.target
 | 依赖 | 说明 |
 |---|---|
 | libvips | 处理照片，随安装包提供。缺 libraw 时相机 RAW 照片只用内嵌预览，缺 librsvg 时 SVG 没有缩略图 |
-| ffmpeg | 可选，系统中自行安装。没有时视频没有缩略图、HEIC 照片不能显示，版本要求见[安装](./install#optional) |
+| ffmpeg | 可选，系统中自行安装。没有时视频没有缩略图、HEIC 照片不能显示，版本要求见[安装](./install#optional)。不检查实况照片视频的转码，是否可用见「系统设置 › 媒体处理」 |
 | 沙箱 | 处理不可信文件的子进程所用的系统调用过滤和 Landlock，见[隐私与安全](./privacy#sandbox) |
 | ONNX Runtime | 本地 AI 模型的运行库，不在安装包中，在网页的「系统设置 › AI 模型」中下载 |
 | yt-dlp | 可选。没有时不能从视频网站离线下载 |
