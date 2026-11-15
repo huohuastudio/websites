@@ -4,28 +4,19 @@
 //
 // 用法：pnpm --filter ./sites/keepbay shots [名称...]
 // 需要：Playwright 的 Chromium（pnpm exec playwright install chromium）、cwebp（brew install webp）
-// 环境变量：KEEPBAY_DEMO_URL（默认 https://demo.keepbay.app）、KEEPBAY_DEMO_USER、KEEPBAY_DEMO_PASSWORD（默认演示帐号）
+// 环境变量见 keepbay.mjs
 //
 // 标了 local 的截图（语义搜索）要在本机实例上截：语义搜索会加载本地模型，演示站的内存不够。
 // 本机实例用演示站快照的数据（Keepbay 仓库 scripts/demo/README.md），以非演示模式启动，KEEPBAY_DEMO_URL 指向它。
 // 不写名称时，演示站上截其余的，本机实例上只截 local 的（成员页等会显示本机的文件夹路径）
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { chromium } from 'playwright'
+import { folderId, newContext, onDemo, open, site } from './keepbay.mjs'
 
-const site = join(dirname(fileURLToPath(import.meta.url)), '..')
 const out = join(site, 'public/screenshots')
 const manifestFile = join(site, '.vitepress/theme/screenshots.json')
-const demo = 'https://demo.keepbay.app'
-const base = process.env.KEEPBAY_DEMO_URL ?? demo
-const onDemo = new URL(base).origin === demo
-// 演示帐号（公开写在演示站的登录页上）
-const account = {
-  username: process.env.KEEPBAY_DEMO_USER ?? 'demo',
-  password: process.env.KEEPBAY_DEMO_PASSWORD ?? 'keepbay-demo',
-}
 
 // 截图的尺寸：
 // - wide：1280 × 800 按 1.6 倍截，得到 2048 × 1280（与 Novaix 首页的截图一致）
@@ -94,21 +85,6 @@ const shots = [
   },
 ]
 
-/** 按名称路径找到文件夹的 ID。 */
-async function folderId(request, names) {
-  const mounts = await (await request.get('/api/v1/mounts')).json()
-  const mount = mounts.find((m) => m.name === names[0])
-  if (!mount) throw new Error(`没有文件夹 ${names[0]}`)
-  let id = mount.rootFolder
-  for (const name of names.slice(1)) {
-    const { items } = await (await request.get(`/api/v1/folders/${id}/items`)).json()
-    const item = items.find((it) => it.dir && it.name === name)
-    if (!item) throw new Error(`没有文件夹 ${names.join('/')}`)
-    id = item.id
-  }
-  return id
-}
-
 /** 按文件名找到文件夹中文件的 ID。 */
 async function fileId(request, folder, name) {
   const { items } = await (await request.get(`/api/v1/folders/${folder}/items`)).json()
@@ -134,51 +110,16 @@ async function userId(request, username) {
 }
 
 async function shoot(browser, shot, size, scheme) {
-  const context = await browser.newContext({
-    baseURL: base,
-    viewport: size.viewport,
-    deviceScaleFactor: size.scale,
-    colorScheme: scheme,
-    locale: 'zh-CN',
-  })
+  const context = await newContext(browser, { viewport: size.viewport, scale: size.scale, scheme, view: shot.view })
   try {
-    const login = await context.request.post('/api/v1/auth/login', { headers: { 'X-Keepbay-Request': '1' }, data: account })
-    if (!login.ok()) throw new Error(`登录失败：${login.status()}`)
     const path = await shot.path(context.request)
-    if (shot.view) {
-      const me = await (await context.request.get('/api/v1/auth/me')).json()
-      await context.addInitScript(
-        ([key, value]) => localStorage.setItem(key, value),
-        [`keepbay.views.${me.id}`, JSON.stringify({ base: shot.view, folders: [] })],
-      )
-    }
     if (shot.session) {
       await context.addInitScript((items) => {
         for (const [key, value] of Object.entries(items)) sessionStorage.setItem(key, value)
       }, await shot.session(context.request))
     }
-    // 演示帐号是共用的，访客可能存了固定的浅色或深色：读偏好时去掉外观设置，按 colorScheme 显示（不改帐号上存的）
-    await context.route('**/api/v1/me/prefs', async (route) => {
-      if (route.request().method() !== 'GET') return route.continue()
-      const response = await route.fetch()
-      const prefs = await response.json()
-      delete prefs.appearance
-      await route.fulfill({ response, json: prefs })
-    })
     const page = await context.newPage()
-    // 缩略图加载失败时 Keepbay 换成文件类型图标，页面上看不出来，要从请求判断
-    const failed = []
-    page.on('response', (r) => {
-      if (r.url().includes('/thumb') && !r.ok()) failed.push(r.url())
-    })
-    page.on('requestfailed', (r) => {
-      if (r.url().includes('/thumb')) failed.push(r.url())
-    })
-    await page.goto(path)
-    await page.waitForLoadState('networkidle')
-    await page.waitForFunction((theme) => document.documentElement.dataset.theme === theme, scheme)
-    await page.waitForFunction(() => [...document.images].every((img) => img.complete && img.naturalWidth > 0))
-    if (failed.length) throw new Error(`${failed.length} 张缩略图没有加载：${failed[0]}`)
+    await open(page, path, scheme)
     // 演示站的提示条不进截图
     await page.evaluate(() => document.querySelector('p[role="note"]')?.remove())
     await shot.prepare?.(page)

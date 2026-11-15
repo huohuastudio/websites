@@ -177,7 +177,7 @@ faq:
 
 <script setup>
 // 首页的示意图和截图只在这一页引入，不进主题入口
-import KbFolders from './.vitepress/theme/visuals/KbFolders.vue'
+import KbClip from './.vitepress/theme/visuals/KbClip.vue'
 import KbHero from './.vitepress/theme/visuals/KbHero.vue'
 import KbInstall from './.vitepress/theme/visuals/KbInstall.vue'
 import KbOutbound from './.vitepress/theme/visuals/KbOutbound.vue'
@@ -207,7 +207,9 @@ AI 功能同样遵循这一原则：不会主动整理您已有的文件夹，�
 
 Keepbay 只在两种情况下替您移动文件：收件箱里的文件按您定的规则或 AI 的建议归档；或者您在 AI 桌面确认了它列出的计划。每一次移动都有记录，可以撤销。
 
-<template #visual><KbFolders /></template>
+<template #visual>
+<KbClip name="folders" alt="录屏：在终端中执行 mv ~/手机相册/*.jpg .，把三张照片移进家庭相册的「2025-07 海边」文件夹，几秒后 Keepbay 的文件页面中出现这三张照片，没有刷新页面" />
+</template>
 </HomeCell>
 <HomeCell title="数据不经过我们" :level="2">
 
