@@ -7,10 +7,15 @@
 
   --vp-button-brand-hover-bg: #185c58;
   --vp-button-brand-active-bg: #144f4b;
+
+  /* 首屏标题中突出的一段：品牌色渐变（浅的一端对白底约 3.3:1，用于 40px 以上的大字） */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(115deg, #1d6b66 20%, #3fa59c);
 }
 
 .dark {
   --vp-c-brand-1: #6cc5bc;
   --vp-c-brand-2: #8fd6ce;
   --vp-c-brand-soft: color-mix(in srgb, #6cc5bc 16%, transparent);
+  --vp-home-hero-name-background: linear-gradient(115deg, #6cc5bc 20%, #a9e4dd);
 }

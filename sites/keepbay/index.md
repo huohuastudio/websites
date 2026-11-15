@@ -186,12 +186,12 @@ import KbShot from './.vitepress/theme/visuals/KbShot.vue'
 
 <HomeHero
   title="自部署的私有网盘"
+  highlight="私有网盘"
+  animate
+  badge="内测中"
   text="装在您自己的服务器或 NAS 上，供您和家人使用。文件留在原来的文件夹里，AI 默认在您自己的设备上运行。"
   :actions="$frontmatter.heroActions"
 >
-
-暂时只提供 Linux 安装包。存放重要资料前，请先做好备份。
-
 <template #visual><KbHero /></template>
 </HomeHero>
 
@@ -273,9 +273,9 @@ Keepbay 只在两种情况下替您移动文件：收件箱里的文件按您定
 
 Keepbay 是一个程序加一个 `lib/` 目录，解压即可运行，不用另装数据库、Web 服务器或运行环境。
 
-需要一台 Linux 服务器、NAS 或小主机：x86_64 或 arm64，glibc 2.28 及以上（Debian 10、Ubuntu 20.04、RHEL 8 起）。
+需要一台 Linux 服务器、NAS 或小主机：x86_64 或 arm64，glibc 2.28 及以上（Debian 10、Ubuntu 20.04、RHEL 8 起）。内测期间只提供 Linux 安装包。
 
-安装步骤见[安装](./docs/install)。
+安装步骤见[安装](./docs/install)。Keepbay 还在内测，存放重要资料前，请先做好备份。
 
 <template #visual><KbInstall /></template>
 </HomeCell>

@@ -30,7 +30,7 @@ const sizes = {
 
 /**
  * 要截的页面。path：按接口查到 ID 后返回页面地址；sizes：截哪几种尺寸；prepare：页面加载完、截图前的操作；
- * view：文件夹的视图（Keepbay 存在浏览器本地，键为 keepbay.views.<用户 ID>）；session：按接口查到后写进 sessionStorage 的项；
+ * view：文件夹的视图（Keepbay 存在浏览器本地，键为 keepbay.views.<用户 ID>）；storage：写进 localStorage 的项；session：按接口查到后写进 sessionStorage 的项；
  * local：只在本机实例上截。
  */
 const shots = [
@@ -38,7 +38,11 @@ const shots = [
     name: 'files',
     sizes: ['wide', 'mobile'],
     path: async (request) => `/files/${await folderId(request, ['家庭相册', '2025', '日常'])}`,
-    view: { view: 'grid', sort: 'taken', desc: true, dirsFirst: true, iconSize: 160, square: false },
+    // 按名称倒序（照片名 IMG_ 后面就是拍摄时间，视频 VID_ 排在照片前面）：演示数据每天只有一两张，按时间排序会按天分组、照片挤在左边，
+    // 不分组时按原比例排满每一行
+    view: { view: 'grid', sort: 'name', desc: true, dirsFirst: true, iconSize: 160, square: false },
+    // 宽屏右侧的信息栏关掉（开关记在浏览器本地），照片占满宽度
+    storage: { 'keepbay.infoPanel': 'false' },
   },
   {
     // 查看器中的照片（京都伏见稻荷的鸟居）
@@ -109,15 +113,22 @@ async function userId(request, username) {
   return user.id
 }
 
+/** 页面加载前把 items 写进 localStorage 或 sessionStorage（kind）。 */
+function seed(context, kind, items) {
+  return context.addInitScript(
+    ([kind, items]) => {
+      for (const [key, value] of Object.entries(items)) window[kind].setItem(key, value)
+    },
+    [kind, items],
+  )
+}
+
 async function shoot(browser, shot, size, scheme) {
   const context = await newContext(browser, { viewport: size.viewport, scale: size.scale, scheme, view: shot.view })
   try {
     const path = await shot.path(context.request)
-    if (shot.session) {
-      await context.addInitScript((items) => {
-        for (const [key, value] of Object.entries(items)) sessionStorage.setItem(key, value)
-      }, await shot.session(context.request))
-    }
+    if (shot.storage) await seed(context, 'localStorage', shot.storage)
+    if (shot.session) await seed(context, 'sessionStorage', await shot.session(context.request))
     const page = await context.newPage()
     await open(page, path, scheme)
     // 演示站的提示条不进截图

@@ -2,14 +2,15 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import KbShot from './KbShot.vue'
 
-// 首屏：几张演示站的截图（title 是切换圆点的名称）在窗口框中轮流淡入淡出，底部一行说明随截图切换（文件页面标出这个文件夹在磁盘上的位置）。
-// 每张停留 INTERVAL；标签页不可见、首屏离开视口、鼠标停在上面或键盘焦点在里面时暂停；点了圆点就不再自动切换；
+// 首屏：几张演示站的截图在窗口框中轮流淡入淡出，窗口上方一排名称（title）显示当前是哪张、点击切换，
+// 底部一行说明随截图切换（文件页面标出这个文件夹在磁盘上的位置）。
+// 每张停留 INTERVAL；标签页不可见、首屏离开视口、鼠标停在上面或键盘焦点在里面时暂停；点了名称就不再自动切换；
 // 系统开了"减少动态效果"时不自动切换，切换也不带过渡。没轮到的截图先不下载，轮到前一张时再加载
 const slides = [
   {
     name: 'files',
     title: '文件',
-    alt: 'Keepbay 的文件页面：照片按拍摄日期分组显示，右侧是日期条',
+    alt: 'Keepbay 的文件页面：日常相册中的照片按原比例排成网格',
     label: '磁盘上的位置',
     path: '/srv/nas/家庭相册/2025/日常',
   },
@@ -133,31 +134,30 @@ onBeforeUnmount(() => {
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
+    <div class="tabs" role="group" aria-label="切换截图">
+      <button
+        v-for="(s, i) in slides"
+        :key="s.name"
+        type="button"
+        class="tab"
+        :aria-current="i === active"
+        @click="pick(i)"
+      >
+        {{ s.title }}
+      </button>
+    </div>
     <HomeWindow address="nas.local:8899">
       <div class="stack">
         <div v-for="(s, i) in slides" :key="s.name" class="slide" :class="{ active: i === active }" :aria-hidden="i !== active">
           <KbShot :name="s.name" :alt="s.alt" :defer="!loaded[i]" />
         </div>
       </div>
-      <div class="caption">
-        <div class="stack">
-          <p v-for="(s, i) in slides" :key="s.name" class="slide line" :class="{ active: i === active }" :aria-hidden="i !== active">
-            <span class="label">{{ s.label }}</span>
-            <code v-if="'path' in s">{{ s.path }}</code>
-            <span v-else>{{ s.text }}</span>
-          </p>
-        </div>
-        <div class="dots" role="group" aria-label="切换截图">
-          <button
-            v-for="(s, i) in slides"
-            :key="s.name"
-            type="button"
-            class="dot"
-            :aria-label="s.title"
-            :aria-current="i === active"
-            @click="pick(i)"
-          />
-        </div>
+      <div class="caption stack">
+        <p v-for="(s, i) in slides" :key="s.name" class="slide line" :class="{ active: i === active }" :aria-hidden="i !== active">
+          <span class="label">{{ s.label }}</span>
+          <code v-if="'path' in s">{{ s.path }}</code>
+          <span v-else>{{ s.text }}</span>
+        </p>
       </div>
     </HomeWindow>
   </div>
@@ -186,18 +186,10 @@ onBeforeUnmount(() => {
 }
 
 .caption {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   padding: 10px 16px;
   border-top: 1px solid var(--vp-c-divider);
   background: var(--vp-c-brand-soft);
   font-size: 12px;
-}
-
-.caption .stack {
-  flex: 1;
-  min-width: 0;
 }
 
 .line {
@@ -218,34 +210,33 @@ onBeforeUnmount(() => {
   color: var(--vp-c-brand-1);
 }
 
-.dots {
+.tabs {
   display: flex;
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 8px;
 }
 
-/* 圆点 8px，点按区域 24px */
-.dot {
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
+.tab {
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  line-height: 24px;
+  color: var(--vp-c-text-2);
+  transition:
+    color 0.2s,
+    background-color 0.2s;
 }
 
-.dot::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--vp-c-text-2);
-  transition: background-color 0.2s;
+.tab:hover {
+  color: var(--vp-c-text-1);
 }
 
-.dot:hover::before {
-  background: var(--vp-c-text-1);
-}
-
-.dot[aria-current='true']::before {
-  background: var(--vp-c-brand-1);
+.tab[aria-current='true'] {
+  background: var(--vp-c-brand-soft);
+  font-weight: 500;
+  color: var(--vp-c-brand-1);
 }
 
 @media (prefers-reduced-motion: reduce) {
