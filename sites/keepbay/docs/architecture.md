@@ -61,7 +61,7 @@ graph TB
 | 搜索 | SQLite FTS5（文件名、全文），sqlite-vec（向量） |
 | 前端 | React、TanStack Router、TanStack Query、Zustand、Tailwind CSS、Base UI |
 | 图片 | libvips（带 libraw、librsvg），在受限子进程中运行 |
-| 视频、HEIC、实况照片视频的转换 | 系统中的 ffmpeg（不随程序附带），同样在受限环境中运行 |
+| 视频、HEIC、实况照片视频和 TS 视频的转换 | 系统中的 ffmpeg（不随程序附带），同样在受限环境中运行 |
 | PDF | PDFium 的 WebAssembly 版本，在内存安全的沙箱中运行 |
 | 本地 AI | ONNX Runtime |
 | 云端 AI | 按 OpenAI 兼容接口调用 |
@@ -326,6 +326,8 @@ seccomp 过滤器禁止打开文件、建立网络连接、删除、改名、修
 子进程的地址空间上限 4 GiB，不能写普通文件。每个任务 2 分钟超时，处理 500 个任务后换一个新的子进程。子进程崩溃只会让这一个文件处理失败。
 
 ffmpeg 是外部程序，启动时需要加载自己的动态库，无法禁止它打开文件。因此我们为它加载一个限制较宽的过滤器：只能以只读方式打开文件，不能写入、联网、创建进程，输入通过标准输入传入。
+
+TS 视频播放时的转封装也在这样的 ffmpeg 中进行，输出边生成边发给浏览器，不缓存。这类任务不受上面 2 分钟超时的限制，浏览器断开，或者连续 2 分钟发不出数据时才结束。
 
 PDF 则用 PDFium 的 WebAssembly 版本在主进程里解析，不挂载任何宿主目录，每个实例最多 256 MiB 内存。
 

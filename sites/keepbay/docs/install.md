@@ -22,7 +22,7 @@ Keepbay 由一个程序和一个 `lib/` 目录组成，解压即可运行，无�
 
 处理照片用的 libvips、libraw、librsvg 等库都已打包在 `lib/` 中，无需另外安装。
 
-视频缩略图、HEIC 照片、下载视频网站的视频需要系统中的 ffmpeg 和 yt-dlp。不安装也不影响其他功能，见[可选组件](#optional)。
+视频缩略图、TS 视频的在线播放、HEIC 照片、下载视频网站的视频需要系统中的 ffmpeg 和 yt-dlp。不安装也不影响其他功能，见[可选组件](#optional)。
 
 ::: warning 内测阶段
 内测期间只提供 Linux 安装包，暂不提供 Docker 镜像和 NAS 应用中心的安装包。
@@ -194,7 +194,7 @@ sudo /opt/keepbay/keepbay mount:grant --read-only /srv/photos   # 只读，添�
 
 ## 可选组件 {#optional}
 
-视频缩略图、视频时长、HEIC 照片都依赖 ffmpeg，用系统的包管理器安装即可。HEIC 需要 7.1 及以上、带 HEVC 解码器的版本。
+视频缩略图、视频时长、[TS 视频](./files#ts)的在线播放、HEIC 照片都依赖 ffmpeg，用系统的包管理器安装即可。HEIC 需要 7.1 及以上、带 HEVC 解码器的版本。
 
 浏览器不能播放的实况照片视频（多为 HEVC），服务器会在第一次播放时转成 H.264，需要 ffmpeg 带 HEVC 解码器和 H.264 编码器（libx264 或 libopenh264）。Debian、Ubuntu 和 Homebrew 的 ffmpeg 都带，见[实况照片](./files#live)。
 

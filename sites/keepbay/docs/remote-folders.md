@@ -242,7 +242,7 @@ graph LR
 
 1. <span id="traffic-n1"></span>直连不通时（跨域规则没设好、浏览器无法连接存储），自动改为经 Keepbay 中转。上传时遇到重名、选了替换的，也经 Keepbay 中转。
 2. <span id="traffic-n2"></span>下载前先读取 1 个字节确认能连上存储，连不上时这一次经 Keepbay 中转。页面是 https、存储是 http，或者存储在局域网而从公网打开 Keepbay 时，直接经 Keepbay。
-3. <span id="traffic-n3"></span>直连失败时，自动经 Keepbay 再试一次。
+3. <span id="traffic-n3"></span>直连失败时，自动经 Keepbay 再试一次。TS 视频不能在线播放，只能下载，见[TS 视频](./files#ts)。
 4. <span id="traffic-n4"></span>第一次查看时从存储读取原文件，生成的预览图保存在 Keepbay 上，之后直接由 Keepbay 提供。
 5. <span id="traffic-n5"></span>分享设了限速或水印，页面是 https、存储是 http，或者存储在局域网而访客从公网打开时，经 Keepbay。其他情况下访客的浏览器无法连接存储时，下载会失败，不会自动改为中转。加了水印的图片，访客下载的是 Keepbay 生成的版本。
 6. <span id="traffic-n6"></span>只列出存储桶（或前缀）中的对象、WebDAV 和 SFTP 文件夹中的内容，不下载文件，存储按请求次数计费。

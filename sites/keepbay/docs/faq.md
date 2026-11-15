@@ -306,7 +306,7 @@ Syncthing 同步时的临时文件、群晖和威联通生成的缩略图目录�
 
 ### 视频没有缩略图，HEIC 照片打不开？ {#ffmpeg}
 
-这两项功能都依赖系统中的 ffmpeg，Keepbay 不附带（HEVC 解码涉及专利授权）。安装 ffmpeg 即可：
+这两项功能都依赖系统中的 ffmpeg，TS 视频的在线播放也需要它。Keepbay 不附带 ffmpeg（HEVC 解码涉及专利授权），安装即可：
 
 ```bash
 sudo apt install ffmpeg      # Debian、Ubuntu
@@ -352,9 +352,9 @@ HEIC 还要求 ffmpeg 7.1 及以上、带 HEVC 解码器，较旧系统的软件
 
 上限约 2.68 亿像素，在「系统设置 › 媒体处理」中可以看到，不能修改。这类图片仍然可以下载，用电脑上的看图软件打开。
 
-### MKV、AVI 视频播放不了？ {#mkv}
+### MKV、AVI、TS 视频播放不了？ {#mkv}
 
-Keepbay 不转码视频，只能在浏览器中直接播放 MP4、MOV、WebM 等浏览器支持的格式。
+Keepbay 不提供视频的转码播放（实况照片中几秒的视频除外）。MP4、MOV、WebM 等浏览器支持的格式可以直接播放，TS 视频由服务器转换封装格式后播放，见[TS 视频](./files#ts)。
 
 MKV、AVI 请下载后用播放器打开。转码需要大量 CPU 资源，在 NAS 上运行会很慢，所以目前不提供。
 
