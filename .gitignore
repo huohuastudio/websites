@@ -4,3 +4,5 @@ node_modules/
 .DS_Store
 *.log
 .wrangler/
+# 本机截图、审查用的临时文件
+/.cache-shots/
