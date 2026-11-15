@@ -2,14 +2,14 @@
 import { withBase } from 'vitepress'
 
 // 界面截图（public/screenshots/ 中由 scripts/screenshots.mjs 生成）：浅色、深色各一张，按网站当前的主题显示其中一张；
-// 有手机截图（mobile）时，官网的手机宽度下换用手机截图。都懒加载：不显示的那几张不会下载
-const props = defineProps<{ name: string; alt: string; mobile?: boolean }>()
+// 有手机截图（mobile）时，官网的手机宽度下换用手机截图；compact 是放在窄格子里的截图，各种宽度都用它。
+// 都懒加载：不显示的那几张不会下载
+const props = defineProps<{ name: string; alt: string; mobile?: boolean; compact?: boolean }>()
 
 // 宽高与截图脚本中的尺寸一致
-const variants = [
-  { file: '', width: 2048, height: 1280 },
-  ...(props.mobile ? [{ file: '-mobile', width: 1170, height: 2100 }] : []),
-]
+const variants = props.compact
+  ? [{ file: '', width: 1200, height: 1500 }]
+  : [{ file: '', width: 2048, height: 1280 }, ...(props.mobile ? [{ file: '-mobile', width: 1170, height: 2100 }] : [])]
 </script>
 
 <template>

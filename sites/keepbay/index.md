@@ -174,13 +174,12 @@ faq:
 ---
 
 <script setup>
-// 首页的示意图只在这一页引入，不进主题入口
-import KbFamily from './.vitepress/theme/visuals/KbFamily.vue'
+// 首页的示意图和截图只在这一页引入，不进主题入口
 import KbFolders from './.vitepress/theme/visuals/KbFolders.vue'
 import KbHero from './.vitepress/theme/visuals/KbHero.vue'
 import KbInstall from './.vitepress/theme/visuals/KbInstall.vue'
 import KbOutbound from './.vitepress/theme/visuals/KbOutbound.vue'
-import KbSearch from './.vitepress/theme/visuals/KbSearch.vue'
+import KbShot from './.vitepress/theme/visuals/KbShot.vue'
 </script>
 
 <HomeHero
@@ -222,15 +221,19 @@ Keepbay 只在两种情况下替您移动文件：收件箱里的文件按您定
 
 是否使用云端模型由您决定。AI 功能属于[专业版](./docs/pro)。
 
-<template #visual><KbSearch /></template>
+<template #visual>
+<HomeWindow><KbShot name="search" compact alt="Keepbay 的搜索结果：搜索“京都的寺庙”，只看图片，找到京都相册中的照片，每项标明画面相符" /></HomeWindow>
+</template>
 </HomeCell>
 <HomeCell title="一家人共用" :level="2">
 
 按文件夹给家人授权只读或读写。没有授权的文件夹，家人看不到，也不知道它存在。
 
-例如，存放证件的文件夹只授权给自己，存放孩子作业的文件夹授权全家读写。
+例如，周晴可以读写家庭相册和自己的文件夹，家庭文档只能查看；林海的工作文件夹没有授权，周晴看不到。
 
-<template #visual><KbFamily /></template>
+<template #visual>
+<HomeWindow><KbShot name="members" compact alt="系统设置中成员周晴的文件夹授权：周晴的文件、家庭相册为读写，家庭文档为只读" /></HomeWindow>
+</template>
 </HomeCell>
 </HomeCells>
 </HomeSection>
