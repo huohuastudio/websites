@@ -188,7 +188,6 @@ import KbShot from './.vitepress/theme/visuals/KbShot.vue'
   title="自部署的私有网盘"
   highlight="私有网盘"
   animate
-  badge="内测中"
   text="装在您自己的服务器或 NAS 上，供您和家人使用。文件留在原来的文件夹里，AI 默认在您自己的设备上运行。"
   :actions="$frontmatter.heroActions"
 >

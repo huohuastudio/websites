@@ -4,14 +4,13 @@ import { VPButton } from 'vitepress/theme'
 import type { HomeAction } from './HomeActions.vue'
 
 // 首页首屏：居中的大标题、一句话介绍和按钮，下面是 visual 插槽（截图或示意图），放在带光晕的底板上；
-// 默认插槽放按钮下方的小字说明，badge 是标题上方的小标签（如测试状态）。
+// 默认插槽放按钮下方的小字说明。
 // highlight 是标题中突出显示的一段，颜色取 VitePress 首屏的 --vp-home-hero-name-color、--vp-home-hero-name-background（站点设渐变）；
 // animate 时标题逐字浮现，只在打开页面时播放一次，减少动态效果时不播放
 const props = defineProps<{
   title: string
   text: string
   actions: HomeAction[]
-  badge?: string
   highlight?: string
   animate?: boolean
 }>()
@@ -45,7 +44,6 @@ const chars = computed(() => {
 <template>
   <section class="home-hero">
     <div class="intro">
-      <p v-if="badge" class="badge">{{ badge }}</p>
       <h1 v-if="highlight || animate" class="title" :class="{ animate }" :aria-label="title">
         <span aria-hidden="true"><span v-for="(c, i) in chars" :key="i" class="ch" :class="{ key: c.key }" :style="c.style">{{ c.text }}</span></span>
       </h1>
@@ -81,16 +79,6 @@ const chars = computed(() => {
   text-align: center;
 }
 
-.badge {
-  display: inline-block;
-  margin: 0 0 20px;
-  padding: 2px 12px;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 999px;
-  font-size: 13px;
-  line-height: 22px;
-  color: var(--vp-c-text-2);
-}
 
 .title {
   margin: 0;
