@@ -1,6 +1,6 @@
 // 首页「文件留在原来的文件夹里」的短录屏：在 Keepbay 的文件页面上叠一个终端样式的面板，逐字打出命令，
 // 回车时在本机真正执行这条命令（把手机相册中的三张照片移进这个文件夹），Keepbay 监听到文件夹的变化后，页面上随即出现这三张照片。
-// 浅色、深色各录一段，编码成 WebM（VP9）和 MP4（H.264），首帧存成 WebP（加载前和减少动态效果时显示），存到 public/recordings/；
+// 浅色、深色各录一段，编码成 WebM（VP9）和 MP4（H.264），首帧（加载前显示）和照片出现后的结果帧（减少动态效果时显示）存成 WebP，存到 public/recordings/；
 // 宽高写进 .vitepress/theme/recordings.json（KbClip.vue 按它预留位置）。
 // Keepbay 的界面改了以后重新运行（W10d，docs/plan.md）。在本机运行，不进 Cloudflare 的构建。
 //
@@ -19,7 +19,7 @@ import { folderId, imagesLoaded, mount, newContext, onDemo, open, site } from '.
 const out = join(site, 'public/recordings')
 const manifestFile = join(site, '.vitepress/theme/recordings.json')
 const name = 'folders'
-// 界面按手机布局显示：格子在手机上只有 300px 左右宽，宽屏下最宽 480px（原大），各种宽度共用这一段。1200 × 1100
+// 界面按手机布局显示：格子在手机上只有 300px 左右宽，宽屏下最宽 560px（放大 1.17 倍，按 2.5 倍录仍然清晰），各种宽度共用这一段。1200 × 1100
 const viewport = { width: 480, height: 440 }
 const scale = 2.5
 const view = { view: 'grid', sort: 'taken', desc: true, dirsFirst: true, iconSize: 96, square: false }
@@ -107,20 +107,20 @@ function terminal({ prompt, command, lead, key, enter }) {
   }
 }
 
-/** 按时间戳把帧合成固定帧率，结尾淡回首帧，编码成 WebM 和 MP4；首帧存成 WebP。 */
+/** 按时间戳把帧合成固定帧率，结尾淡回首帧，编码成 WebM 和 MP4；首帧、最后一帧（照片已出现）存成 WebP。 */
 function encode(frames, end, file) {
   const dir = mkdtempSync(join(tmpdir(), 'keepbay-frames-'))
   try {
+    const png = (i) => join(dir, `${String(i).padStart(4, '0')}.png`)
+    const [first, last] = [png(0), png(frames.length - 1)]
     const list = frames.map((frame, i) => {
-      const png = join(dir, `${String(i).padStart(4, '0')}.png`)
-      writeFileSync(png, Buffer.from(frame.data, 'base64'))
+      writeFileSync(png(i), Buffer.from(frame.data, 'base64'))
       const next = frames[i + 1]?.time ?? end
-      return `file '${png}'\nduration ${(next - frame.time).toFixed(4)}`
+      return `file '${png(i)}'\nduration ${(next - frame.time).toFixed(4)}`
     })
     // concat 会忽略最后一帧的 duration，再写一次最后一帧
-    list.push(`file '${join(dir, `${String(frames.length - 1).padStart(4, '0')}.png`)}'`)
+    list.push(`file '${last}'`)
     writeFileSync(join(dir, 'list.txt'), list.join('\n'))
-    const first = join(dir, '0000.png')
     const length = end - frames[0].time
     const input = ['-f', 'concat', '-safe', '0', '-i', join(dir, 'list.txt'), '-loop', '1', '-t', String(FADE / 1000), '-i', first]
     const filter = [
@@ -135,7 +135,9 @@ function encode(frames, end, file) {
       ...output('[webm]', '-c:v', 'libvpx-vp9', '-crf', '28', '-b:v', '0', '-row-mt', '1', join(out, `${file}.webm`)),
       ...output('[mp4]', '-c:v', 'libx264', '-crf', '20', '-preset', 'slow', '-movflags', '+faststart', join(out, `${file}.mp4`)),
     ])
-    execFileSync('cwebp', ['-quiet', '-q', '82', '-o', join(out, `${file}.webp`), '--', first])
+    for (const [name, frame] of [[file, first], [`${file}-end`, last]]) {
+      execFileSync('cwebp', ['-quiet', '-q', '82', '-o', join(out, `${name}.webp`), '--', frame])
+    }
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }

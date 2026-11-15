@@ -3,6 +3,6 @@
   "viewer": {"wide":[2048,1280],"mobile":[1170,2100]},
   "desk": {"wide":[2048,1280],"mobile":[1170,2100]},
   "reminders": {"wide":[2048,1280],"mobile":[1170,2100]},
-  "search": {"compact":[1200,1500]},
-  "members": {"compact":[1200,1500]}
+  "search": {"compact":[1200,1290]},
+  "members": {"compact":[1200,1290]}
 }

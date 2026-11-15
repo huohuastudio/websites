@@ -21,11 +21,12 @@ const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 // 截图的尺寸：
 // - wide：1280 × 800 按 1.6 倍截，得到 2048 × 1280（与 Novaix 首页的截图一致）
 // - mobile：390 × 700 按 3 倍截，得到 1170 × 2100，在官网的手机宽度下换用这张，整页缩小后的宽屏截图看不清
-// - compact：400 × 500 按 3 倍截，得到 1200 × 1500，放在首页三列的格子里（只有 300–520px 宽），界面按手机布局显示，文字接近原大
+// - compact：400 × 430 按 3 倍截，得到 1200 × 1290，放在首页三列的格子里（只有 300–520px 宽），界面按手机布局显示，文字接近原大。
+//   高度正好放下搜索的前三条结果、成员的三个文件夹和「授权文件夹」按钮
 const sizes = {
   wide: { suffix: '', viewport: { width: 1280, height: 800 }, scale: 1.6 },
   mobile: { suffix: '-mobile', viewport: { width: 390, height: 700 }, scale: 3 },
-  compact: { suffix: '', viewport: { width: 400, height: 500 }, scale: 3 },
+  compact: { suffix: '', viewport: { width: 400, height: 430 }, scale: 3 },
 }
 
 /**
@@ -74,15 +75,37 @@ const shots = [
     local: true,
     sizes: ['compact'],
     path: async () => `/search?${new URLSearchParams({ q: '京都的寺庙', kind: 'image' })}`,
+    // 搜索结果只有列表，缩略图很小，画面上突出查询词和"画面相符"：「存为智能文件夹」和大小列不进截图（只隐藏，不改动布局）。
+    // Keepbay 的界面改了、找不到这些元素时报错，不截出没处理的图
+    prepare: (page) =>
+      page.getByRole('listbox').evaluate((list) => {
+        const button = (root, text) => [...root.querySelectorAll('button')].find((b) => b.textContent.trim() === text)
+        const hidden = [
+          button(document, '存为智能文件夹'),
+          button(list.previousElementSibling, '大小'),
+          ...[...list.querySelectorAll('[role="option"]')].map((row) => row.lastElementChild),
+        ]
+        if (hidden.length < 3 || hidden.some((el) => !el)) throw new Error('搜索页上找不到要隐藏的按钮或大小列')
+        for (const el of hidden) el.style.visibility = 'hidden'
+      }),
   },
   {
     // 成员 family（周晴）的授权：两个文件夹读写、一个只读，没授权的看不到
     name: 'members',
     sizes: ['compact'],
     path: async (request) => `/settings/members/${await userId(request, 'family')}`,
-    // 滚到「文件夹」一节（上面的资料一节不进截图），标题上方留一点空
+    // 滚到「文件夹」一节（上面的资料一节不进截图），标题上方留一点空。
+    // 突出文件夹和只读、读写：标题下的说明、服务器上的路径和复制路径的按钮不进截图（每个文件夹都要找到，否则报错）
     prepare: (page) =>
       page.getByRole('heading', { name: '文件夹', exact: true }).evaluate((el) => {
+        const list = el.closest('section').querySelector('ul')
+        const count = list.querySelectorAll('li').length
+        const paths = [...list.querySelectorAll('.font-mono')].map((path) => path.parentElement)
+        const buttons = [...list.querySelectorAll('button[aria-label^="复制"]')]
+        if (el.nextElementSibling?.tagName !== 'P' || !count || paths.length !== count || buttons.length !== count) {
+          throw new Error('成员页上找不到要去掉的说明、路径或复制按钮')
+        }
+        for (const node of [el.nextElementSibling, ...paths, ...buttons]) node.remove()
         el.style.scrollMarginTop = '16px'
         el.scrollIntoView({ block: 'start' })
       }),
