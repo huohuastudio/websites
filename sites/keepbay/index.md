@@ -4,6 +4,8 @@ title: Keepbay
 titleTemplate: 自部署的私有网盘
 # 首页不套文档正文样式，版式由共用主题的首页版块组件负责
 markdownStyles: false
+# 版块滚动进入视口时淡入（共用主题的 HomeSection）
+reveal: true
 
 # 不用 hero、features 这两个键名：默认主题见到它们会渲染自带的首屏和卡片
 heroActions:
@@ -222,7 +224,7 @@ Keepbay 只在两种情况下替您移动文件：收件箱里的文件按您定
 是否使用云端模型由您决定。AI 功能属于[专业版](./docs/pro)。
 
 <template #visual>
-<HomeWindow><KbShot name="search" compact alt="Keepbay 的搜索结果：搜索“京都的寺庙”，只看图片，找到京都相册中的照片，每项标明画面相符" /></HomeWindow>
+<HomeWindow><KbShot name="search" alt="Keepbay 的搜索结果：搜索“京都的寺庙”，只看图片，找到京都相册中的照片，每项标明画面相符" /></HomeWindow>
 </template>
 </HomeCell>
 <HomeCell title="一家人共用" :level="2">
@@ -232,7 +234,7 @@ Keepbay 只在两种情况下替您移动文件：收件箱里的文件按您定
 例如，周晴可以读写家庭相册和自己的文件夹，家庭文档只能查看；林海的工作文件夹没有授权，周晴看不到。
 
 <template #visual>
-<HomeWindow><KbShot name="members" compact alt="系统设置中成员周晴的文件夹授权：周晴的文件、家庭相册为读写，家庭文档为只读" /></HomeWindow>
+<HomeWindow><KbShot name="members" alt="系统设置中成员周晴的文件夹授权：周晴的文件、家庭相册为读写，家庭文档为只读" /></HomeWindow>
 </template>
 </HomeCell>
 </HomeCells>

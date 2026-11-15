@@ -1,4 +1,5 @@
-// 首页用的界面截图：登录演示站，按 shots 中的设置打开页面，每种尺寸各截浅色、深色两张，转成 WebP 存到 public/screenshots/。
+// 首页用的界面截图：登录演示站，按 shots 中的设置打开页面，每种尺寸各截浅色、深色两张，转成 WebP 存到 public/screenshots/，
+// 截了哪几种尺寸、宽高多少写进 .vitepress/theme/screenshots.json（KbShot.vue 按它渲染）。
 // Keepbay 的界面改了以后重新运行（W10，docs/plan.md）。在本机运行，不进 Cloudflare 的构建。
 //
 // 用法：pnpm --filter ./sites/keepbay shots [名称...]
@@ -9,13 +10,14 @@
 // 本机实例用演示站快照的数据（Keepbay 仓库 scripts/demo/README.md），以非演示模式启动，KEEPBAY_DEMO_URL 指向它。
 // 不写名称时，演示站上截其余的，本机实例上只截 local 的（成员页等会显示本机的文件夹路径）
 import { execFileSync } from 'node:child_process'
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 
 const site = join(dirname(fileURLToPath(import.meta.url)), '..')
 const out = join(site, 'public/screenshots')
+const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 const demo = 'https://demo.keepbay.app'
 const base = process.env.KEEPBAY_DEMO_URL ?? demo
 const onDemo = new URL(base).origin === demo
@@ -25,7 +27,7 @@ const account = {
   password: process.env.KEEPBAY_DEMO_PASSWORD ?? 'keepbay-demo',
 }
 
-// 截图的尺寸（KbShot.vue 中的宽高与这里一致）：
+// 截图的尺寸：
 // - wide：1280 × 800 按 1.6 倍截，得到 2048 × 1280（与 Novaix 首页的截图一致）
 // - mobile：390 × 700 按 3 倍截，得到 1170 × 2100，在官网的手机宽度下换用这张，整页缩小后的宽屏截图看不清
 // - compact：400 × 500 按 3 倍截，得到 1200 × 1500，放在首页三列的格子里（只有 300–520px 宽），界面按手机布局显示，文字接近原大
@@ -37,7 +39,8 @@ const sizes = {
 
 /**
  * 要截的页面。path：按接口查到 ID 后返回页面地址；sizes：截哪几种尺寸；prepare：页面加载完、截图前的操作；
- * view：文件夹的视图（Keepbay 存在浏览器本地，键为 keepbay.views.<用户 ID>）；local：只在本机实例上截。
+ * view：文件夹的视图（Keepbay 存在浏览器本地，键为 keepbay.views.<用户 ID>）；session：按接口查到后写进 sessionStorage 的项；
+ * local：只在本机实例上截。
  */
 const shots = [
   {
@@ -45,6 +48,30 @@ const shots = [
     sizes: ['wide', 'mobile'],
     path: async (request) => `/files/${await folderId(request, ['家庭相册', '2025', '日常'])}`,
     view: { view: 'grid', sort: 'taken', desc: true, dirsFirst: true, iconSize: 160, square: false },
+  },
+  {
+    // 查看器中的照片（京都伏见稻荷的鸟居）
+    name: 'viewer',
+    sizes: ['wide', 'mobile'],
+    path: async (request) => {
+      const folder = await folderId(request, ['家庭相册', '2024', '2024-10 京都'])
+      return `/files/${folder}?view=${await fileId(request, folder, 'IMG_20241003_071230.jpg')}`
+    },
+  },
+  {
+    // AI 桌面中问保修期的对话（快照中预先问好的，不调用模型）
+    name: 'desk',
+    sizes: ['wide', 'mobile'],
+    path: async () => '/?view=desk',
+    session: async (request) => ({ 'keepbay.chat': await conversationId(request, '家里哪些电器还在保修期内') }),
+    // 输入框处演示站专有的说明不进截图（本机实例上没有这一行）
+    prepare: (page) => onDemo && page.getByText('演示站点不能和 AI 对话').evaluate((el) => el.remove()),
+  },
+  {
+    // 重要日期提醒（快照中预先找好的）。收件箱的 AI 建议在快照中写成了"虚构的样本"，不用
+    name: 'reminders',
+    sizes: ['wide', 'mobile'],
+    path: async () => '/reminders',
   },
   {
     // 按画面搜照片，只看图片
@@ -82,6 +109,22 @@ async function folderId(request, names) {
   return id
 }
 
+/** 按文件名找到文件夹中文件的 ID。 */
+async function fileId(request, folder, name) {
+  const { items } = await (await request.get(`/api/v1/folders/${folder}/items`)).json()
+  const item = items.find((it) => !it.dir && it.name === name)
+  if (!item) throw new Error(`文件夹 ${folder} 中没有文件 ${name}`)
+  return item.id
+}
+
+/** 按标题的开头找到 AI 桌面中的对话。 */
+async function conversationId(request, title) {
+  const { items } = await (await request.get('/api/v1/assistant/conversations')).json()
+  const item = items.find((c) => c.title.startsWith(title))
+  if (!item) throw new Error(`没有对话 ${title}`)
+  return String(item.id)
+}
+
 /** 按用户名找到成员的 ID。 */
 async function userId(request, username) {
   const users = await (await request.get('/api/v1/users')).json()
@@ -108,6 +151,11 @@ async function shoot(browser, shot, size, scheme) {
         ([key, value]) => localStorage.setItem(key, value),
         [`keepbay.views.${me.id}`, JSON.stringify({ base: shot.view, folders: [] })],
       )
+    }
+    if (shot.session) {
+      await context.addInitScript((items) => {
+        for (const [key, value] of Object.entries(items)) sessionStorage.setItem(key, value)
+      }, await shot.session(context.request))
     }
     // 演示帐号是共用的，访客可能存了固定的浅色或深色：读偏好时去掉外观设置，按 colorScheme 显示（不改帐号上存的）
     await context.route('**/api/v1/me/prefs', async (route) => {
@@ -163,3 +211,16 @@ try {
 } finally {
   await browser.close()
 }
+
+// 尺寸清单：只更新这次截了的，按 shots 中的顺序排列，去掉 shots 中已经没有的
+const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'))
+for (const shot of selected) {
+  manifest[shot.name] = Object.fromEntries(
+    shot.sizes.map((name) => {
+      const { viewport, scale } = sizes[name]
+      return [name, [Math.round(viewport.width * scale), Math.round(viewport.height * scale)]]
+    }),
+  )
+}
+const lines = shots.filter((s) => manifest[s.name]).map((s) => `  ${JSON.stringify(s.name)}: ${JSON.stringify(manifest[s.name])}`)
+writeFileSync(manifestFile, `{\n${lines.join(',\n')}\n}\n`)

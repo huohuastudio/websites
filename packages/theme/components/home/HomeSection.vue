@@ -1,18 +1,46 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { useData } from 'vitepress'
+
 // 首页的一个版块：顶部一条通栏细线，内容铺满页面宽度。
 // 单元格类内容（HomeCells、HomeFeatureList 的 cells、HomePlans）贴边排列，其余内容放进 .home-pad 留边距。
-// layout 为 side 时标题在左、内容在右（宽屏）；center 时标题居中，底部带光晕
+// layout 为 side 时标题在左、内容在右（宽屏）；center 时标题居中，底部带光晕。
+// 页面 frontmatter 写 reveal: true 时，版块内容滚动进入视口时淡入、轻微上移（细线不动）；
+// 打开页面时已在视口中或上方的版块不做；系统开了"减少动态效果"和打印时直接显示（打开页面后才改设置也按 CSS 生效）
 defineProps<{
   id?: string
   title?: string
   lead?: string
   layout?: 'side' | 'center'
 }>()
+
+const { frontmatter } = useData()
+const inner = ref<HTMLElement>()
+const hidden = ref(false)
+let observer: IntersectionObserver | undefined
+
+onMounted(() => {
+  const el = inner.value!
+  if (!frontmatter.value.reveal || el.getBoundingClientRect().top < innerHeight) return
+  hidden.value = true
+  // 版块顶部进入视口下方 10% 以内时显示
+  observer = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry.isIntersecting) return
+      hidden.value = false
+      observer?.disconnect()
+    },
+    { rootMargin: '0px 0px -10% 0px' },
+  )
+  observer.observe(el)
+})
+
+onBeforeUnmount(() => observer?.disconnect())
 </script>
 
 <template>
   <section :id="id" class="home-section" :class="layout">
-    <div class="inner">
+    <div ref="inner" class="inner" :class="{ hidden }">
       <header v-if="title || $slots.header" class="header">
         <h2 v-if="title" class="title">{{ title }}</h2>
         <p v-if="lead" class="lead">{{ lead }}</p>
@@ -31,6 +59,28 @@ defineProps<{
 .home-section {
   border-top: 1px solid var(--home-line);
   scroll-margin-top: var(--vp-nav-height);
+}
+
+.inner {
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+
+.inner.hidden {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+@media (prefers-reduced-motion: reduce), print {
+  .inner {
+    transition: none;
+  }
+
+  .inner.hidden {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .header {
