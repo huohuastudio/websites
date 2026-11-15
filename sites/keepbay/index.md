@@ -48,7 +48,23 @@ privacy:
       - name: 安全功能不收费
         desc: 两步验证、通行密钥、外部帐号登录都在免费版中
       - name: 照片在隔离的进程中解码
-        desc: 这个进程不能联网、不能打开其他文件，即使特制的图片攻破了解码器，也无法读取数据库和密钥；视频和 HEIC 交给 ffmpeg 处理，可以只读打开文件，但不能联网、不能写文件；内核不支持隔离的设备默认不处理照片和视频，所有者选择照样处理时没有这些限制
+        desc: 即使特制的图片攻破了解码器，也无法读取数据库和密钥
+        details: 解码照片的进程不能联网，也不能打开其他文件。视频和 HEIC 交给 ffmpeg 处理，它可以只读打开文件，但不能联网、不能写文件。内核不支持隔离的设备默认不处理照片和视频；所有者选择照样处理时，没有这些限制。
+
+# 「界面一览」：name 是 KbShot 的截图名称
+screenshots:
+  - name: member-features
+    title: 成员权限
+    desc: 分享链接、云端 AI、离线下载会让数据离开这台设备，默认关闭，由所有者为每位成员单独开启
+    alt: 家庭成员周晴的功能设置：说明这些功能会让数据离开这台设备、默认都关闭，其中创建分享链接已开启，使用云端 AI 和离线下载关闭
+  - name: local-models
+    title: 本地模型
+    desc: 语义搜索、按画面搜图、识别图片中的文字所用的模型在您的设备上运行，数据不离开这台设备
+    alt: AI 模型设置中的本地模型：ONNX Runtime 运行环境，以及文本向量、图文向量、文字识别三个模型，都已安装
+  - name: ai-calls
+    title: 调用记录
+    desc: 每一次 AI 调用都有记录：谁发起的、哪项功能、用了哪个模型、发送了什么
+    alt: AI 调用记录：林海发起的语义搜索和按画面搜图，都在本地处理、未发送到云端，下面是后台处理的记录
 
 featureGroups:
   - title: 文件管理
@@ -255,6 +271,14 @@ Keepbay 只在两种情况下替您移动文件：收件箱里的文件按您定
 每种情况发送什么、密钥怎么保存、请求经过哪些检查，见[隐私与安全](./docs/privacy)。
 
 </div>
+</div>
+</HomeSection>
+
+<HomeSection id="screenshots" title="界面一览">
+<div class="home-pad">
+<HomeShowcase :items="$frontmatter.screenshots">
+<template #image="{ item }"><HomeWindow><KbShot :key="item.name" :name="item.name" :alt="item.alt" /></HomeWindow></template>
+</HomeShowcase>
 </div>
 </HomeSection>
 

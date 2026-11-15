@@ -3,8 +3,8 @@ import { computed, ref } from 'vue'
 import { withBase } from 'vitepress'
 
 export interface ShowcaseItem {
-  /** public 下的图片路径，如 /screenshots/dashboard.webp */
-  src: string
+  /** public 下的图片路径，如 /screenshots/dashboard.webp；用 image 插槽显示图片时可以不写 */
+  src?: string
   /** 标签页上的名称 */
   title: string
   /** 图片下方的说明 */
@@ -13,7 +13,8 @@ export interface ShowcaseItem {
   height?: number
 }
 
-// 界面截图展示：上方一排标签切换，下方一张大图和说明
+// 界面截图展示：上方一排标签切换，下方一张大图和说明。
+// 站点要自己渲染图片时（如浅色、深色各一张）用 image 插槽，参数 item 是当前这一项（items 中的其他字段照样传过去）
 const props = defineProps<{ items: ShowcaseItem[] }>()
 
 const active = ref(0)
@@ -36,7 +37,7 @@ function onKeydown(event: KeyboardEvent) {
     <div class="showcase-tabs" role="tablist" aria-label="界面截图" @keydown="onKeydown">
       <button
         v-for="(item, i) in items"
-        :key="item.src"
+        :key="item.title"
         ref="tabs"
         type="button"
         role="tab"
@@ -52,14 +53,17 @@ function onKeydown(event: KeyboardEvent) {
       </button>
     </div>
     <figure id="showcase-panel" class="showcase-panel" role="tabpanel" tabindex="0" :aria-labelledby="`showcase-tab-${active}`">
-      <img
-        :src="withBase(current.src)"
-        :alt="current.title"
-        :width="current.width ?? 1440"
-        :height="current.height ?? 900"
-        loading="lazy"
-        decoding="async"
-      />
+      <slot name="image" :item="current">
+        <img
+          v-if="current.src"
+          :src="withBase(current.src)"
+          :alt="current.title"
+          :width="current.width ?? 1440"
+          :height="current.height ?? 900"
+          loading="lazy"
+          decoding="async"
+        />
+      </slot>
       <figcaption v-if="current.desc">{{ current.desc }}</figcaption>
     </figure>
   </div>

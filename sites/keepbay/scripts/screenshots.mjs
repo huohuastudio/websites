@@ -110,7 +110,51 @@ const shots = [
         el.scrollIntoView({ block: 'start' })
       }),
   },
+  // 以下三张放在首页的「界面一览」，证明隐私一节的说法。都在本机实例上截：成员页会显示服务器上的路径，
+  // 调用记录要在截图前搜索两次（演示站的内存加载不了语义搜索的模型）
+  {
+    // 成员周晴能用的功能：会让数据离开设备的三项默认关闭，所有者给周晴开了分享链接
+    name: 'member-features',
+    local: true,
+    sizes: ['wide', 'mobile'],
+    path: async (request) => `/settings/members/${await userId(request, 'family')}`,
+    prepare: (page) => scrollToHeading(page, '功能'),
+  },
+  {
+    // 本地模型：运行环境和三个已安装的模型（上面的厂商、货币不进截图）
+    name: 'local-models',
+    local: true,
+    sizes: ['wide', 'mobile'],
+    path: async () => '/settings/ai',
+    prepare: (page) => scrollToHeading(page, '本地模型'),
+  },
+  {
+    // AI 调用记录。最新的记录是后台处理，一排都一样：先以林海的身份搜索两次（真实的调用，记录发起人和耗时），
+    // 列表上方就是这几条，再往下是后台处理的
+    name: 'ai-calls',
+    local: true,
+    sizes: ['wide', 'mobile'],
+    path: async (request) => {
+      for (const params of [{ q: '房租合同什么时候到期' }, { q: '京都的寺庙', kind: 'image' }]) {
+        const res = await request.get(`/api/v1/search?${new URLSearchParams(params)}`)
+        if (!res.ok()) throw new Error(`搜索失败：${res.status()}`)
+      }
+      return '/settings/ai/calls'
+    },
+    prepare: (page) => scrollToHeading(page, '调用记录'),
+  },
 ]
+
+/** 把设置页中的一节滚到顶部，标题上方留一点空（name 是这一节的标题，页面顶部的标题栏不算）。 */
+function scrollToHeading(page, name) {
+  return page
+    .locator('section')
+    .getByRole('heading', { name, exact: true })
+    .evaluate((el) => {
+      el.style.scrollMarginTop = '16px'
+      el.scrollIntoView({ block: 'start' })
+    })
+}
 
 /** 按文件名找到文件夹中文件的 ID。 */
 async function fileId(request, folder, name) {
