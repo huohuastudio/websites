@@ -6,9 +6,9 @@
 // 需要：Playwright 的 Chromium（pnpm exec playwright install chromium）、cwebp（brew install webp）
 // 环境变量见 keepbay.mjs
 //
-// 标了 local 的截图（语义搜索）要在本机实例上截：语义搜索会加载本地模型，演示站的内存不够。
+// 标了 local 的截图要在本机实例上截：语义搜索会加载本地模型，演示站的内存不够；成员页会显示服务器上的文件夹路径。
 // 本机实例用演示站快照的数据（Keepbay 仓库 scripts/demo/README.md），以非演示模式启动，KEEPBAY_DEMO_URL 指向它。
-// 不写名称时，演示站上截其余的，本机实例上只截 local 的（成员页等会显示本机的文件夹路径）
+// 不写名称时，演示站上截其余的，本机实例上只截 local 的
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -110,8 +110,7 @@ const shots = [
         el.scrollIntoView({ block: 'start' })
       }),
   },
-  // 以下三张放在首页的「界面一览」，证明隐私一节的说法。都在本机实例上截：成员页会显示服务器上的路径，
-  // 调用记录要在截图前搜索两次（演示站的内存加载不了语义搜索的模型）
+  // 以下三张放在首页的「界面一览」，证明隐私一节的说法
   {
     // 成员周晴能用的功能：会让数据离开设备的三项默认关闭，所有者给周晴开了分享链接
     name: 'member-features',
@@ -121,9 +120,8 @@ const shots = [
     prepare: (page) => scrollToHeading(page, '功能'),
   },
   {
-    // 本地模型：运行环境和三个已安装的模型（上面的厂商、货币不进截图）
+    // 本地模型：本机内存、运行环境和三个已安装的模型及其内存（上面的厂商、货币不进截图）
     name: 'local-models',
-    local: true,
     sizes: ['wide', 'mobile'],
     path: async () => '/settings/ai',
     prepare: (page) => scrollToHeading(page, '本地模型'),
