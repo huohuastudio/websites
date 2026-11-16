@@ -91,7 +91,7 @@ sudo /opt/keepbay/keepbay setup --user keepbay
 
 添加后 Keepbay 在后台扫描文件夹：先建立文件列表（这时已经可以浏览和按文件名搜索），再识别内容、生成缩略图、提取文字。
 
-文件较多时需要一段时间。进度显示在侧栏的后台任务中，也可以用 `keepbay index:status` 查看。各阶段的细节见[技术架构](./architecture#pipeline)。
+文件较多时需要一段时间。进度显示在侧栏的「更多 › 后台任务」中，也可以用 `keepbay index:status` 查看。各阶段的细节见[技术架构](./architecture#pipeline)。
 
 ## 下一步 {#next}
 

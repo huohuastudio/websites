@@ -39,7 +39,7 @@ privacy:
         desc: 成员只看得到授权给他的文件夹
       - name: 会让数据离开设备的功能默认关闭
         desc: 创建分享链接、使用云端 AI、离线下载，需要所有者为每位成员单独开启
-      - name: 访问记录
+      - name: 日志
         desc: 登录、下载、分享链接的打开和下载都有记录，保留 180 天
       - name: 分享有期限
         desc: 分享链接默认 7 天后失效，可以设密码、下载次数和限速
@@ -154,7 +154,7 @@ pricing:
     - { name: 分享链接, values: [true, true] }
     - { name: 离线下载, values: [true, true] }
     - { name: 两步验证、通行密钥、外部帐号登录, values: [true, true] }
-    - { name: 访问记录、自动备份、在线更新, values: [true, true] }
+    - { name: 日志、自动备份、在线更新, values: [true, true] }
     - { name: 家庭成员, values: [最多 2 人（含所有者）, 不限] }
     - { name: 语义搜索、以图搜图、识别图片中的文字, values: [false, true] }
     - { name: AI 桌面, values: [false, true] }
