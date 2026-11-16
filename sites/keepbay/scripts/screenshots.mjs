@@ -6,7 +6,8 @@
 // 需要：Playwright 的 Chromium（pnpm exec playwright install chromium）、cwebp（brew install webp）
 // 环境变量见 keepbay.mjs
 //
-// 标了 local 的截图要在本机实例上截：语义搜索会加载本地模型，演示站的内存不够；成员页会显示服务器上的文件夹路径。
+// 标了 local 的截图要在本机实例上截：语义搜索会加载本地模型，演示站的内存不够。
+// 显示服务器上文件夹路径的页面（成员页）在演示站上截：本机实例的数据放在临时目录中，路径会带出本机的目录名
 // 本机实例用演示站快照的数据（Keepbay 仓库 scripts/demo/README.md），以非演示模式启动，KEEPBAY_DEMO_URL 指向它。
 // 不写名称时，演示站上截其余的，本机实例上只截 local 的
 import { execFileSync } from 'node:child_process'
@@ -114,7 +115,6 @@ const shots = [
   {
     // 成员周晴能用的功能：会让数据离开设备的三项默认关闭，所有者给周晴开了分享链接
     name: 'member-features',
-    local: true,
     sizes: ['wide', 'mobile'],
     path: async (request) => `/settings/members/${await userId(request, 'family')}`,
     prepare: (page) => scrollToHeading(page, '功能'),
