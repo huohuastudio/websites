@@ -11,7 +11,7 @@ reveal: true
 heroActions:
   - theme: brand
     text: 下载安装
-    link: /docs/install
+    link: https://huohuastudio.com/products/keepbay
   - theme: alt
     text: 在线演示
     link: https://demo.keepbay.app
@@ -150,7 +150,7 @@ plans:
       - 家庭成员最多 2 人（含所有者）
     action:
       text: 下载安装
-      link: /docs/install
+      link: https://huohuastudio.com/products/keepbay
       theme: alt
   - name: 专业版
     price: ¥199
@@ -364,6 +364,6 @@ Keepbay 是一个程序加一个 `lib/` 目录，解压即可运行，不用另�
 >
 <HomeActions :actions="[
   { text: '打开演示站', link: 'https://demo.keepbay.app' },
-  { text: '下载安装', link: '/docs/install', theme: 'alt' },
+  { text: '下载安装', link: 'https://huohuastudio.com/products/keepbay', theme: 'alt' },
 ]" />
 </HomeSection>
