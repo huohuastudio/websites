@@ -51,8 +51,32 @@ privacy:
         desc: 即使特制的图片攻破了解码器，也无法读取数据库和密钥
         details: 解码照片的进程不能联网，也不能打开其他文件。视频和 HEIC 交给 ffmpeg 处理，它可以只读打开文件，但不能联网、不能写文件。内核不支持隔离的设备默认不处理照片和视频；所有者选择照样处理时，没有这些限制。
 
-# 「界面一览」：name 是 KbShot 的截图名称
+# 「界面一览」：name 是 KbShot 的截图名称。先是几项功能，后三张证明隐私一节的说法
 screenshots:
+  - name: music
+    title: 音乐
+    desc: 播放时显示封面和滚动歌词，也可以换成频谱；歌词取自同名的 .lrc 文件或音频内嵌的歌词，播完自动播放下一首
+    alt: 音乐播放器正在播放《晚风》，显示封面、标题、播放控件和滚动的歌词，正在唱的一行突出显示
+  - name: video
+    title: 视频
+    desc: 浏览器能直接播放的视频在网页中播放；电视录制的 TS 视频，编码符合要求的由服务器用 ffmpeg 转换封装格式后在线播放
+    alt: 查看器中播放一段海边的视频，下方是播放控件
+  - name: sheet
+    title: 表格
+    desc: 对接自己部署的 Collabora Online 或 ONLYOFFICE（截图中为 ONLYOFFICE）后，Word、Excel、PowerPoint 文档可以在网页中编辑，多人可以同时编辑
+    alt: 在查看器中用 ONLYOFFICE 编辑 Excel 表格「2025 年家庭开支」
+  - name: doc
+    title: 文档
+    desc: Word 文档同样在查看器中编辑；保存时原来的内容作为旧版本放进回收站，可以找回
+    alt: 在查看器中用 ONLYOFFICE 编辑 Word 文档「周报-2026-第45周」
+  - name: slides
+    title: 演示文稿
+    desc: PowerPoint 演示文稿同样在查看器中编辑；不部署编辑器时，Office 文档照常预览
+    alt: 在查看器中用 ONLYOFFICE 编辑 PowerPoint 演示文稿「2026 Q4 项目计划」
+  - name: share
+    title: 分享页面
+    desc: 对方打开分享链接就能浏览和下载，不需要帐号；链接可以设密码、有效期、下载次数，专业版可以给图片加水印
+    alt: 打开分享链接看到的「2024-10 京都」相册，照片排成网格，可以下载
   - name: member-features
     title: 成员权限
     desc: 分享链接、云端 AI、离线下载会让数据离开这台设备，默认关闭，由所有者为每位成员单独开启

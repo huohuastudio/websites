@@ -3,10 +3,10 @@
 // Keepbay 的界面改了以后重新运行（W10，docs/plan.md）。在本机运行，不进 Cloudflare 的构建。
 //
 // 用法：pnpm --filter ./sites/keepbay shots [名称...]
-// 需要：Playwright 的 Chromium（pnpm exec playwright install chromium）、cwebp（brew install webp）
+// 需要：Playwright 的 Chromium（pnpm exec playwright install chromium）、cwebp（brew install webp）；视频的截图要本机装有 Chrome
 // 环境变量见 keepbay.mjs
 //
-// 标了 local 的截图要在本机实例上截：语义搜索会加载本地模型，演示站的内存不够。
+// 标了 local 的截图要在本机实例上截：语义搜索会加载本地模型，演示站的内存不够；演示站也没有部署在线编辑器。
 // 显示服务器上文件夹路径的页面（成员页）在演示站上截：本机实例的数据放在临时目录中，路径会带出本机的目录名
 // 本机实例用演示站快照的数据（Keepbay 仓库 scripts/demo/README.md），以非演示模式启动，KEEPBAY_DEMO_URL 指向它。
 // 不写名称时，演示站上截其余的，本机实例上只截 local 的
@@ -50,10 +50,7 @@ const shots = [
     // 查看器中的照片（京都伏见稻荷的鸟居）
     name: 'viewer',
     sizes: ['wide', 'mobile'],
-    path: async (request) => {
-      const folder = await folderId(request, ['家庭相册', '2024', '2024-10 京都'])
-      return `/files/${folder}?view=${await fileId(request, folder, 'IMG_20241003_071230.jpg')}`
-    },
+    path: (request) => viewerPath(request, ['家庭相册', '2024', '2024-10 京都'], 'IMG_20241003_071230.jpg'),
   },
   {
     // AI 桌面中问保修期的对话（快照中预先问好的，不调用模型）
@@ -111,7 +108,82 @@ const shots = [
         el.scrollIntoView({ block: 'start' })
       }),
   },
-  // 以下三张放在首页的「界面一览」，证明隐私一节的说法
+  // 以下放在首页的「界面一览」：先是几项功能，后三张证明隐私一节的说法
+  {
+    // 音乐播放器：《晚风》的封面和滚动歌词。从第 5 行歌词开始播放（点歌词的一行就跳过去播放），画面上有正在唱的一行
+    name: 'music',
+    sizes: ['wide', 'mobile'],
+    path: (request) => viewerPath(request, ['家庭文档', '音乐'], '晚风.mp3'),
+    prepare: async (page) => {
+      const lines = page.locator('.kb-lyric').filter({ has: page.locator('.kb-lyric-text') })
+      if ((await lines.count()) < 5) throw new Error('音乐播放器上没有歌词')
+      await lines.nth(4).click()
+      await page.locator('.kb-lyric[data-on]').waitFor()
+      await hideFileNav(page)
+      // 等歌词滚动到位
+      await page.waitForTimeout(1200)
+    },
+  },
+  {
+    // 视频播放：海边的视频停在第 5 秒（浏览器原生的播放控件）。H.264 要用 Chrome 播放，Playwright 自带的 Chromium 不带这个解码器
+    name: 'video',
+    chrome: true,
+    sizes: ['wide', 'mobile'],
+    path: (request) => viewerPath(request, ['家庭相册', '2025', '2025-07 海边'], 'VID_20250712_161004.mp4'),
+    prepare: async (page) => {
+      // 等不到跳转完成（加载或解码出错）时报错，不截出黑屏
+      await page.locator('video').evaluate(
+        (video) =>
+          new Promise((resolve, reject) => {
+            const timer = setTimeout(() => reject(new Error('视频没有跳转到第 5 秒')), 15_000)
+            video.addEventListener('seeked', () => (clearTimeout(timer), resolve()), { once: true })
+            video.addEventListener('error', () => (clearTimeout(timer), reject(new Error('视频无法播放'))), { once: true })
+            video.muted = true
+            video.pause()
+            video.currentTime = 5
+          }),
+      )
+      await hideFileNav(page)
+    },
+  },
+  {
+    // 在线编辑：在 ONLYOFFICE 中编辑表格、文档、演示文稿。演示站没有部署编辑器，在本机实例上截（本机实例要先在系统设置中接好 ONLYOFFICE）
+    name: 'sheet',
+    local: true,
+    sizes: ['wide'],
+    path: (request) => viewerPath(request, ['家庭文档', '家庭'], '2025 年家庭开支.xlsx'),
+    prepare: openEditor,
+  },
+  {
+    name: 'doc',
+    local: true,
+    sizes: ['wide'],
+    path: (request) => viewerPath(request, ['林海的工作', '项目'], '周报-2026-第45周.docx'),
+    prepare: (page) => openEditor(page, { spell: true }),
+  },
+  {
+    name: 'slides',
+    local: true,
+    sizes: ['wide'],
+    path: (request) => viewerPath(request, ['林海的工作', '项目'], '2026 Q4 项目计划.pptx'),
+    prepare: openEditor,
+  },
+  {
+    // 打开分享链接看到的页面（京都相册，带水印）。演示站的分享链接只给登录了演示帐号的浏览器看，页面与访客看到的相同
+    name: 'share',
+    sizes: ['wide', 'mobile'],
+    path: async (request) => {
+      const shares = await (await request.get('/api/v1/shares')).json()
+      const share = shares.find((s) => s.title === '2024-10 京都')
+      if (!share) throw new Error('没有京都相册的分享链接')
+      return `/s/${share.token}`
+    },
+    // 链接失效、改了密码等情况下页面上没有相册，等不到时报错
+    prepare: async (page) => {
+      await page.getByText('2024-10 京都').first().waitFor({ timeout: 10_000 })
+      await page.getByRole('button', { name: '全部下载' }).waitFor({ timeout: 10_000 })
+    },
+  },
   {
     // 成员周晴能用的功能：会让数据离开设备的三项默认关闭，所有者给周晴开了分享链接
     name: 'member-features',
@@ -152,6 +224,40 @@ function scrollToHeading(page, name) {
       el.style.scrollMarginTop = '16px'
       el.scrollIntoView({ block: 'start' })
     })
+}
+
+/** 在查看器中打开文件夹（names 是名称路径）中的文件 name 的页面地址。 */
+async function viewerPath(request, names, name) {
+  const folder = await folderId(request, names)
+  return `/files/${folder}?view=${await fileId(request, folder, name)}`
+}
+
+/**
+ * 在查看器中点「编辑」，等在线编辑器（ONLYOFFICE）加载完：编辑区已画出、没有加载中的遮罩，等不到时报错。
+ * spell：文档中的中文被拼写检查标上红色波浪线，要关掉（编辑器状态栏中的开关，只在这个浏览器中生效，不改文档），找不到开关时报错
+ */
+async function openEditor(page, { spell = false } = {}) {
+  await page.getByRole('button', { name: '编辑', exact: true }).click()
+  const editor = page.frameLocator('iframe').frameLocator('iframe')
+  await editor.locator('#editor_sdk canvas, #ws-canvas').first().waitFor({ timeout: 60_000 })
+  await editor.locator('.asc-loadmask').waitFor({ state: 'hidden', timeout: 60_000 })
+  if (spell) {
+    const toggle = editor.locator('#btn-doc-spell')
+    if (!(await toggle.count())) throw new Error('编辑器中找不到拼写检查的开关')
+    if (await toggle.locator('.active').count()) await toggle.click()
+  }
+  // 编辑器画完文档内容
+  await page.waitForTimeout(3000)
+}
+
+/** 隐藏查看器两侧切换上一项、下一项的按钮：鼠标移过时出现，在手机宽度下会压住内容。找不到时报错（界面改了） */
+async function hideFileNav(page) {
+  const hidden = await page.evaluate(() => {
+    const buttons = document.querySelectorAll('[aria-label="上一项"], [aria-label="下一项"]')
+    for (const el of buttons) el.style.visibility = 'hidden'
+    return buttons.length
+  })
+  if (!hidden) throw new Error('查看器中找不到上一项、下一项按钮')
 }
 
 /** 按文件名找到文件夹中文件的 ID。 */
@@ -216,17 +322,23 @@ if (!selected.length) throw new Error(`没有这些截图：${wanted.join('、')
 const local = onDemo ? selected.filter((s) => s.local) : []
 if (local.length) throw new Error(`${local.map((s) => s.name).join('、')} 要在本机实例上截，请把 KEEPBAY_DEMO_URL 指向本机实例`)
 mkdirSync(out, { recursive: true })
-const browser = await chromium.launch()
+// 标了 chrome 的截图用本机安装的 Chrome，用到时才启动
+const browsers = {}
+async function browserFor(shot) {
+  const key = shot.chrome ? 'chrome' : 'chromium'
+  browsers[key] ??= await chromium.launch(shot.chrome ? { channel: 'chrome' } : {})
+  return browsers[key]
+}
 try {
   for (const shot of selected) {
     for (const size of shot.sizes) {
       for (const scheme of ['light', 'dark']) {
-        console.log(`${await shoot(browser, shot, sizes[size], scheme)}.webp`)
+        console.log(`${await shoot(await browserFor(shot), shot, sizes[size], scheme)}.webp`)
       }
     }
   }
 } finally {
-  await browser.close()
+  await Promise.all(Object.values(browsers).map((b) => b.close()))
 }
 
 // 尺寸清单：只更新这次截了的，按 shots 中的顺序排列，去掉 shots 中已经没有的

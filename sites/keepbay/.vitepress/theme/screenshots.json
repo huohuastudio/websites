@@ -5,6 +5,12 @@
   "reminders": {"wide":[2048,1280],"mobile":[1170,2100]},
   "search": {"compact":[1200,1290]},
   "members": {"compact":[1200,1290]},
+  "music": {"wide":[2048,1280],"mobile":[1170,2100]},
+  "video": {"wide":[2048,1280],"mobile":[1170,2100]},
+  "sheet": {"wide":[2048,1280]},
+  "doc": {"wide":[2048,1280]},
+  "slides": {"wide":[2048,1280]},
+  "share": {"wide":[2048,1280],"mobile":[1170,2100]},
   "member-features": {"wide":[2048,1280],"mobile":[1170,2100]},
   "local-models": {"wide":[2048,1280],"mobile":[1170,2100]},
   "ai-calls": {"wide":[2048,1280],"mobile":[1170,2100]}
