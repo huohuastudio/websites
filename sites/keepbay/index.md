@@ -210,7 +210,7 @@ faq:
   - q: 需要什么样的设备？
     a: 一台装 Linux 的服务器、NAS 或小主机，x86_64 或 arm64 架构，glibc 2.28 及以上（Debian 10、Ubuntu 20.04、RHEL 8 起）。能 SSH 登录、满足这些条件的 NAS 也可以装，部分群晖机型有限制，见<a href="/docs/install#nas">NAS</a>。
   - q: 有 Docker 镜像、Windows 版或手机 App 吗？
-    a: 目前都没有。内测期只提供 Linux 安装包，Docker 镜像以后会考虑。如果家中只有 Windows 或 Mac 电脑，可以安装在 NAS、软路由或一台小主机上。网页可以在手机浏览器上正常使用，支持上传、预览和分享。
+    a: 有 Docker 镜像（x86_64、arm64），见<a href="/docs/docker">Docker 安装</a>。Windows 版和手机 App 暂时没有：如果家中只有 Windows 或 Mac 电脑，可以安装在 NAS、软路由或一台小主机上。网页可以在手机浏览器上正常使用，支持上传、预览和分享。
   - q: 能管理 S3、WebDAV、SFTP、百度网盘、阿里云盘上的文件吗？
     a: S3 兼容的对象存储、WebDAV（坚果云、Nextcloud、群晖等）和 SFTP，专业版可以直接添加为<a href="/docs/remote-folders">远程文件夹</a>。国内网盘不能直接连接，可以先添加到 OpenList，再经它的 WebDAV 接入，或者用 rclone 同步到本地或挂载，详见<a href="/docs/cloud-storage">云盘</a>。
 ---

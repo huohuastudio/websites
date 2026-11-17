@@ -60,9 +60,9 @@ sudo /opt/keepbay/keepbay service:install --user keepbay --data-dir /srv/keepbay
 
 ### 能不能用 Docker 部署？ {#docker}
 
-目前不提供 Docker 镜像，以后会考虑提供。
+可以。从 1.0.0-beta.9 起提供 Docker 镜像 `0xxb/keepbay`（x86_64、arm64），官方的 compose.yaml 已带在线编辑用的 Collabora，见 [Docker 安装](./docker)。
 
-Keepbay 由一个程序和一个 `lib/` 目录组成，没有其他依赖。使用 Docker 会多出文件属主（PUID、PGID）和目录映射的配置，配置有误时排查更复杂。
+使用 Docker 时要配置文件属主（PUID、PGID）和目录映射，容器只能访问挂载进去的文件夹。直接安装没有这些配置，两种方式的功能相同。
 
 ### 支持 Windows 或 macOS 吗？ {#platforms}
 

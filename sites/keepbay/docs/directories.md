@@ -11,11 +11,11 @@ Keepbay 创建的内容集中在以下位置：安装目录、数据目录、系
 ```
 /opt/keepbay/
 ├── versions/                                  # 各个版本的程序
-│   ├── keepbay_0.1.0-beta.5_linux_amd64/      # 上一个版本，用于回滚
-│   ├── keepbay_0.1.0-beta.7_linux_amd64/      # 正在用的版本
+│   ├── keepbay_<上一个版本>_linux_amd64/      # 上一个版本，用于回滚
+│   ├── keepbay_<版本>_linux_amd64/            # 正在用的版本
 │   ├── .download-<版本>                        # 在线更新：下载中的安装包
 │   └── .staging-<版本>/                        # 在线更新：解压中的新版本
-├── current -> versions/keepbay_0.1.0-beta.7_linux_amd64
+├── current -> versions/keepbay_<版本>_linux_amd64
 ├── .current-new                               # 在线更新：切换 current 时的临时链接
 └── keepbay -> current/keepbay                 # 命令行使用这个路径
 ```
@@ -60,6 +60,7 @@ Keepbay 创建的内容集中在以下位置：安装目录、数据目录、系
 | `avatars/` | 用户上传的头像 | 删除后头像会丢失 |
 | `models/` | 下载的本地 AI 模型和 ONNX Runtime。下载中的文件在 `.partial/` 中 | 可以删除，需要时重新下载 |
 | `downloads/` | 视频网站离线下载（yt-dlp）的工作目录，每个任务一个子目录 | 下载进行中不要删除 |
+| `tools/` | Keepbay 安装的 yt-dlp 和 Deno，每个程序一个子目录 | 可以删除，需要时在「系统设置 › 离线下载」中重新安装 |
 | `stage/` | 远程文件夹的暂存，每个远程文件夹一个子目录：中转上传，以及解压、离线下载到远程文件夹的临时文件夹（其中的 `.keepbay-publish` 记录上传到存储后的名称）。中断后重启会继续传输 | 运行中不要删除。移除远程文件夹时自动删除对应的子目录 |
 | `tmp/` | 临时文件：处理远程文件夹中的文件时从存储下载的副本、编辑图片的结果、远程文件夹上传的记录（S3 分片上传的 `s3-parts/`，WebDAV、SFTP 上传的 `webdav-up/`、`sftp-up/`） | 停止服务后可以删除，`s3-parts/`、`webdav-up/`、`sftp-up/` 除外：它们记录存储上未完成的上传，删除后 Keepbay 无法清理存储上残留的分片或临时文件，这些内容会继续占用存储空间 |
 | `backups/` | 数据库备份。文件名以 `keepbay-auto-`（自动备份）、`keepbay-manual-`（手动备份）、`pre-migrate-`（升级数据库前）、`before-restore-`（恢复前）开头。在「备份」中设置了其他备份目录的，自动和手动备份写在那个目录中。写到一半的备份名称以 `.keepbay-partial-` 开头，下次备份前自动清理 | 旧的备份可以删除，最近的建议保留 |

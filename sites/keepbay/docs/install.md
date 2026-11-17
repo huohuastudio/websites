@@ -22,10 +22,10 @@ Keepbay 由一个程序和一个 `lib/` 目录组成，解压即可运行，无�
 
 处理照片用的 libvips、libraw、librsvg 等库都已打包在 `lib/` 中，无需另外安装。
 
-视频缩略图、TS 视频的在线播放、HEIC 照片、下载视频网站的视频需要系统中的 ffmpeg 和 yt-dlp。不安装也不影响其他功能，见[可选组件](#optional)。
+视频缩略图、TS 视频的在线播放、HEIC 照片需要系统中的 ffmpeg；下载视频网站的视频需要 yt-dlp，可以由 Keepbay 安装。不安装也不影响其他功能，见[可选组件](#optional)。
 
-::: warning 内测阶段
-内测期间只提供 Linux 安装包，暂不提供 Docker 镜像和 NAS 应用中心的安装包。
+::: tip Docker
+也可以用 Docker 安装，见 [Docker 安装](./docker)。NAS 应用中心的安装包暂不提供。
 :::
 
 ## 安装包 {#package}
@@ -35,7 +35,7 @@ Keepbay 由一个程序和一个 `lib/` 目录组成，解压即可运行，无�
 解压后是一个同名目录：
 
 ```
-keepbay_1.0.0-beta.8_linux_amd64/
+keepbay_<版本>_linux_amd64/
 ├── keepbay        # 主程序，前端页面已经编译在里面
 ├── lib/           # libvips 等动态库和字体配置
 ├── INSTALL.md     # 安装说明
@@ -52,9 +52,9 @@ keepbay_1.0.0-beta.8_linux_amd64/
 ```
 /opt/keepbay/
 ├── versions/
-│   ├── keepbay_0.1.0-beta.7_linux_amd64/   # 上一个版本
-│   └── keepbay_1.0.0-beta.8_linux_amd64/   # 正在用的版本
-├── current -> versions/keepbay_1.0.0-beta.8_linux_amd64
+│   ├── keepbay_<上一个版本>_linux_amd64/   # 上一个版本
+│   └── keepbay_<版本>_linux_amd64/         # 正在用的版本
+├── current -> versions/keepbay_<版本>_linux_amd64
 └── keepbay -> current/keepbay               # 命令行使用这个路径
 
 /var/lib/keepbay/                            # 数据目录，见下文
@@ -200,7 +200,7 @@ sudo /opt/keepbay/keepbay mount:grant --read-only /srv/photos   # 只读，添�
 
 HEVC 解码涉及专利授权，因此 Keepbay 不附带 ffmpeg。未安装时 HEIC 文件显示为普通文件，仍可下载。安装后在「系统设置 › 媒体处理」中点击「重新检测」，无需重启。
 
-yt-dlp 用于离线下载视频网站的视频。Keepbay 在 PATH 中查找它，也可以在「系统设置 › 离线下载」中填写路径。
+yt-dlp 用于离线下载视频网站的视频。所有者可以在「系统设置 › 离线下载」中由 Keepbay 安装 yt-dlp 和下载 YouTube 要用的 Deno，装好后自动更新；也可以自行安装。见[离线下载](./offline-download#yt-dlp)。
 
 本地 AI 模型属于专业版。语义搜索、以图搜图、识别图片中的文字用的模型，以及运行它们的 ONNX Runtime，都在「系统设置 › AI 模型」中按需下载，不占安装包的体积。
 

@@ -25,6 +25,7 @@ export default defineSiteConfig({
           { text: '介绍', link: '/docs/introduce' },
           { text: '隐私与安全', link: '/docs/privacy' },
           { text: '安装', link: '/docs/install' },
+          { text: 'Docker 安装', link: '/docs/docker' },
           { text: '首次设置', link: '/docs/setup' },
           { text: '外网访问', link: '/docs/remote-access' },
           { text: '升级', link: '/docs/upgrade' },

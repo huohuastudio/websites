@@ -62,7 +62,7 @@ Keepbay 不自带编辑器。支持两种，任选其一：
 
 ## 部署编辑器 {#deploy}
 
-下面用 Docker 部署，编辑器只监听本机端口，由反向代理提供 HTTPS。
+下面用 Docker 部署，编辑器只监听本机端口，由反向代理提供 HTTPS。用 [Docker 安装](./docker) Keepbay 时，官方的 compose.yaml 已带 Collabora，两个地址也已写好，只需填写编辑器地址。
 
 ### 两个地址 {#addresses}
 
