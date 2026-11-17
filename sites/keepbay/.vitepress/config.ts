@@ -49,6 +49,8 @@ export default defineSiteConfig({
           { text: '搜索', link: '/docs/search' },
           { text: '回收站和撤销', link: '/docs/trash' },
           { text: '离线下载', link: '/docs/offline-download' },
+          { text: 'WebDAV', link: '/docs/webdav' },
+          { text: '在线编辑', link: '/docs/office' },
         ],
       },
       {
