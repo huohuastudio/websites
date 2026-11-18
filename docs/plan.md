@@ -299,7 +299,7 @@ W23 留下的素材，只改 Keepbay：
 - **Keepbay AI 一节手机上边距大**：舞台不固定时外框宽 84vw、手机截图限宽 300px，比其他版块窄。改为外框 `calc(100vw - 48px)`（KbAi、KbWipe），手机截图铺满内容宽度
 - **断行**：标题和展示性短语（`.sx-title`、`.sx-phrase`）只在标点和空格处断行；正文段落保持默认断行（试过全局 keep-all，一句话比一行长时强制断开会把标点放到行首），`.sx` 加 `text-wrap: pretty`。Novaix 各组件原来给正文设的 keep-all 去掉。没有标点的长标题用 `<wbr>`、数据字符串用 `\u200b` 标出可断处。360–1440 六种宽度下 DOM 检查无行首标点、无拆开的英文单词
 - **亮点轮播触摸滑动**：横向拖动跟手，松开超过 48px 换相邻一张，纵向滑动仍滚动页面
-- **统计**（用户定）：三个站点都同时用 Google Analytics 4 和 Cloudflare Web Analytics（Google 统计在中国大陆加载不了，Cloudflare 补上国内访客的总量）；Keepbay 也加 Google 统计（隐私部分说的是产品本身，不改）。共用配置 `googleAnalyticsId`、`analyticsToken`，只在构建产物中加载。待用户提供三个站点的衡量 ID 和 Cloudflare 令牌
+- **统计**（用户定）：三个站点都用 Google Analytics 4（共用配置 `googleAnalyticsId`，只在构建产物中加载），Keepbay 也加（隐私部分说的是产品本身，不改）。曾定与 Cloudflare Web Analytics 一起用（Google 统计在中国大陆加载不了），用户随后改为只用 Google 统计，不加 Cloudflare；`analyticsToken` 选项保留但不填
 
 ## W24 Novaix、Lsky 首页补截图（2026-11-18 用户定）
 
