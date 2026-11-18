@@ -2,6 +2,7 @@
 layout: home
 title: Keepbay
 titleTemplate: 自部署的私有网盘
+description: Keepbay 是自部署的私有网盘，安装在您自己的服务器或 NAS 上，直接管理已有的文件夹。提供文件预览、照片时间线、分享和收集文件、家庭成员权限，专业版另有在本地运行的 AI 搜索和整理。文件和数据不经过我们。
 # 首页不套文档正文样式，版式由共用主题的首页版块组件负责
 markdownStyles: false
 # 版块滚动进入视口时淡入（共用主题的 HomeSection）
@@ -53,6 +54,10 @@ privacy:
 
 # 「界面一览」：name 是 KbShot 的截图名称。先是几项功能，后三张证明隐私一节的说法
 screenshots:
+  - name: photos
+    title: 照片
+    desc: 您能看到的照片和视频跨文件夹按拍摄时间排在一起，按天分组，右侧的日期条按年、月跳转；可以排除文件夹、隐藏截图，文件仍留在原来的文件夹中
+    alt: 照片时间线：2026 年 2 月 17 日等几天的照片按天分组排成等高的行，右侧是按年份标出的日期条
   - name: music
     title: 音乐
     desc: 播放时显示封面和滚动歌词，也可以换成频谱；歌词取自同名的 .lrc 文件或音频内嵌的歌词，播完自动播放下一首
@@ -67,7 +72,7 @@ screenshots:
     alt: 在查看器中用 ONLYOFFICE 编辑 Excel 表格「2025 年家庭开支」
   - name: doc
     title: 文档
-    desc: Word 文档同样在查看器中编辑；保存时原来的内容作为旧版本放进回收站，可以找回
+    desc: Word 文档同样在查看器中编辑；保存时原来的内容成为旧版本，可以在信息面板的「历史版本」中预览和恢复
     alt: 在查看器中用 ONLYOFFICE 编辑 Word 文档「周报-2026-第45周」
   - name: slides
     title: 演示文稿
@@ -94,11 +99,13 @@ featureGroups:
   - title: 文件管理
     items:
       - name: 浏览和预览
-        desc: 列表和网格视图，包含十万个文件的文件夹也能流畅浏览；预览图片（包括相机 RAW）、视频、音频、PDF、Office 文档、文本和代码
+        desc: 列表和网格视图，包含十万个文件的文件夹也能流畅浏览；预览图片（包括相机 RAW）、视频、音频、PDF、Office 文档、文本和代码，视频自动加载同名的字幕
+      - name: 收藏、最近和照片
+        desc: 收藏常用的文件和文件夹，查看最近打开、最近修改的文件；照片和视频跨文件夹按拍摄时间排成时间线
       - name: 上传和下载
         desc: 上传支持断点续传，可以打包下载
-      - name: 撤销和回收站
-        desc: 移动、复制、改名、移到回收站都能撤销；删除的文件默认先进回收站
+      - name: 撤销、回收站和历史版本
+        desc: 移动、复制、改名、移到回收站都能撤销；编辑、替换过的文件保留旧版本，可以预览和恢复
       - name: 离线下载
         desc: 由服务器下载网址、磁力链接，安装 yt-dlp 后还可以下载视频网站的视频
   - title: 搜索
@@ -118,7 +125,7 @@ featureGroups:
       - name: AI 标签
         desc: 从您创建的标签中选择合适的，自动添加到文件上
       - name: 重要日期提醒
-        desc: 从护照、合同、保单中提取到期日，确认后通过 Bark 或邮件提醒
+        desc: 从护照、合同、保单中提取到期日，确认后通过您设置的通知渠道提醒
   - title: 家人和分享
     items:
       - name: 成员和权限
@@ -127,10 +134,14 @@ featureGroups:
         desc: 用 Authentik、Keycloak、Google、Microsoft、GitHub 等帐号登录
       - name: 分享链接
         desc: 可以设密码、有效期、下载次数和限速；分享带拍摄地点的照片时会提醒
+      - name: 收集文件
+        desc: 把链接发给别人，对方不用登录即可往指定的文件夹上传文件，看不到其中已有的内容
       - name: 证件照水印（专业版）
         desc: 分享证件照片时加上"仅用于某某用途"的水印，访客无法获取原图
-  - title: 维护
+  - title: 通知和维护
     items:
+      - name: 通知
+        desc: 新版本、备份失败、磁盘离线、日期提醒、收到上传的文件等，发到 Bark、邮件、企业微信、钉钉、飞书或 Telegram
       - name: 自动备份
         desc: 每天备份一次数据库，保留最近 7 份
       - name: 在线更新
@@ -144,8 +155,8 @@ plans:
     note: 永久免费
     items:
       - 不限文件夹和文件数量
-      - 文件管理、预览、搜索、标签
-      - 分享链接、离线下载
+      - 文件管理、照片时间线、预览、搜索、标签
+      - 分享链接、收集文件、离线下载
       - 两步验证、通行密钥、外部帐号登录
       - 家庭成员最多 2 人（含所有者）
     action:
@@ -173,9 +184,11 @@ pricing:
     - name: 专业版
   rows:
     - { name: 文件管理、预览、上传下载、回收站, values: [true, true] }
+    - { name: 收藏、最近、照片时间线、历史版本, values: [true, true] }
     - { name: 文件名和全文搜索, values: [true, true] }
     - { name: 标签和智能文件夹, values: [true, true] }
-    - { name: 分享链接, values: [true, true] }
+    - { name: 分享链接、收集文件, values: [true, true] }
+    - { name: 通知（Bark、邮件、企业微信、钉钉、飞书、Telegram）, values: [true, true] }
     - { name: 离线下载, values: [true, true] }
     - { name: 两步验证、通行密钥、外部帐号登录, values: [true, true] }
     - { name: 日志、自动备份、在线更新, values: [true, true] }
@@ -322,7 +335,7 @@ Keepbay 是一个程序加一个 `lib/` 目录，解压即可运行，不用另�
 
 需要一台 Linux 服务器、NAS 或小主机：x86_64 或 arm64，glibc 2.28 及以上（Debian 10、Ubuntu 20.04、RHEL 8 起）。内测期间只提供 Linux 安装包。
 
-安装步骤见[安装](./docs/install)。Keepbay 还在内测，存放重要资料前，请先做好备份。
+安装步骤见[普通安装](./docs/install)，也可以[用 Docker 安装](./docs/docker)。Keepbay 还在内测，存放重要资料前，请先做好备份。
 
 <template #visual><KbInstall /></template>
 </HomeCell>

@@ -10,6 +10,8 @@ export default defineSiteConfig({
   description: '自部署的私有网盘',
   dir: 'sites/keepbay',
   logo: '/logo.svg',
+  ogImage: '/og.png',
+  keywords: 'Keepbay,私有网盘,自部署网盘,家庭网盘,NAS 网盘,文件管理,照片管理,照片时间线,语义搜索,本地 AI,WebDAV,自托管',
   mermaid: true,
   nav: [
     { text: '文档', link: '/docs/introduce', activeMatch: '^/docs/' },
@@ -24,7 +26,7 @@ export default defineSiteConfig({
         items: [
           { text: '介绍', link: '/docs/introduce' },
           { text: '隐私与安全', link: '/docs/privacy' },
-          { text: '安装', link: '/docs/install' },
+          { text: '普通安装', link: '/docs/install' },
           { text: 'Docker 安装', link: '/docs/docker' },
           { text: '首次设置', link: '/docs/setup' },
           { text: '外网访问', link: '/docs/remote-access' },
@@ -46,6 +48,7 @@ export default defineSiteConfig({
         collapsed: false,
         items: [
           { text: '浏览和预览', link: '/docs/files' },
+          { text: '照片时间线', link: '/docs/photos' },
           { text: '上传和下载', link: '/docs/upload' },
           { text: '搜索', link: '/docs/search' },
           { text: '回收站和撤销', link: '/docs/trash' },

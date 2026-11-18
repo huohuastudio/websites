@@ -5,6 +5,7 @@
   "reminders": {"wide":[2048,1280],"mobile":[1170,2100]},
   "search": {"compact":[1200,1290]},
   "members": {"compact":[1200,1290]},
+  "photos": {"wide":[2048,1280],"mobile":[1170,2100]},
   "music": {"wide":[2048,1280],"mobile":[1170,2100]},
   "video": {"wide":[2048,1280],"mobile":[1170,2100]},
   "sheet": {"wide":[2048,1280]},

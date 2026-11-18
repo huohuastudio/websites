@@ -44,8 +44,9 @@ Environment=NO_PROXY=localhost,127.0.0.1
 - AI 厂商（每个厂商可以单独设置是否经过代理）
 - 下载本地模型和运行环境
 - 外部帐号登录：连接 Google、Microsoft、GitHub 等提供方
-- 离线下载
-- Bark 通知
+- 离线下载。下载地址的域名经代理交给 Cloudflare 或 Google 的公共 DNS 解析，见[离线下载](./offline-download#security)
+- [在线编辑](./office)：读取编辑器支持的格式和验签用的公钥
+- Bark、企业微信、钉钉、飞书、Telegram 通知
 - 远程文件夹：Keepbay 连接远程存储。S3 兼容存储用浏览器直连时由浏览器直接连接，不经过这里的代理
 
 以下连接不经过代理：

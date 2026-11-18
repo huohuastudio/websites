@@ -14,7 +14,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { chromium } from 'playwright'
-import { folderId, newContext, onDemo, open, site } from './keepbay.mjs'
+import { folderId, imagesLoaded, newContext, onDemo, open, site } from './keepbay.mjs'
 
 const out = join(site, 'public/screenshots')
 const manifestFile = join(site, '.vitepress/theme/screenshots.json')
@@ -109,6 +109,27 @@ const shots = [
       }),
   },
   // 以下放在首页的「界面一览」：先是几项功能，后三张证明隐私一节的说法
+  {
+    // 照片时间线：看得到的照片和视频跨文件夹按拍摄时间排列，按天分组，右侧是日期条。
+    // 最前面几天是收件箱中的扫描件和票据样本，滚到 2026 年 2 月 17 日（春节的一组照片）再截
+    name: 'photos',
+    sizes: ['wide', 'mobile'],
+    path: async () => '/photos',
+    // 宽屏右侧的信息栏关掉，照片占满宽度
+    storage: { 'keepbay.infoPanel': 'false' },
+    prepare: async (page) => {
+      const day = '2026年2月17日'
+      await page.getByText(day).first().waitFor({ timeout: 10_000 })
+      await page.evaluate((day) => {
+        const header = [...document.querySelectorAll('div')].find((el) => el.childElementCount === 0 && el.textContent.startsWith(day))
+        let scroller = header.parentElement
+        while (getComputedStyle(scroller).overflowY !== 'auto') scroller = scroller.parentElement
+        scroller.scrollTop += header.getBoundingClientRect().top - scroller.getBoundingClientRect().top
+      }, day)
+      await page.waitForTimeout(500)
+      await imagesLoaded(page)
+    },
+  },
   {
     // 音乐播放器：《晚风》的封面和滚动歌词。从第 5 行歌词开始播放（点歌词的一行就跳过去播放），画面上有正在唱的一行
     name: 'music',
