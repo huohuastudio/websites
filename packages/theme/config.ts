@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { defineConfigWithTheme, type DefaultTheme, type HeadConfig } from 'vitepress'
@@ -33,6 +34,8 @@ export interface SiteOptions {
   logo: string
   /** public 下的分享预览图，如 /og.png */
   ogImage?: string
+  /** 搜索引擎的关键词，页面 frontmatter 中的 keywords 优先 */
+  keywords?: string
   /** Cloudflare Web Analytics 的令牌，留空时不加载统计脚本 */
   analyticsToken?: string
   nav?: DefaultTheme.NavItem[]
@@ -50,13 +53,53 @@ function shareTitle(pageTitle: string, template: string | boolean | undefined, s
   return pageTitle === suffix.slice(3) ? pageTitle : pageTitle + suffix
 }
 
+/**
+ * 页面的描述：取正文中一级标题后的第一段（文档规范要求每页开头用一两句话概述），去掉 Markdown 标记，
+ * 超过 120 个字时截到句号。没有这样的段落（如首页）时返回空
+ */
+function pageSummary(file: string): string {
+  const lines = readFileSync(file, 'utf8')
+    .replace(/^---\n[\s\S]*?\n---\n/, '')
+    .split('\n')
+  const start = lines.findIndex((line) => line.startsWith('# '))
+  if (start < 0) return ''
+  const para: string[] = []
+  for (const line of lines.slice(start + 1)) {
+    if (!line.trim()) {
+      if (para.length) break
+      continue
+    }
+    // 第一段不是普通文字（提示框、引用、列表、表格、代码、HTML、标题）时不取
+    if (!para.length && /^(:::|>|[-*+] |\d+\. |\||```|<|#|!\[)/.test(line.trim())) return ''
+    para.push(line.trim())
+  }
+  // 行内代码先取出来，换成占位符，其中的 <、_ 等不当作标记处理，最后原样放回
+  const codes: string[] = []
+  const text = para
+    // 中文行直接相连；两边都是英文、数字等字符时补一个空格，免得网址、单词粘在一起
+    .join('\n')
+    .replace(/([\x21-\x7e])\n(?=[\x21-\x7e])/g, '$1 ')
+    .replace(/\n/g, '')
+    .replace(/`([^`]+)`/g, (_, code: string) => `\0${codes.push(code) - 1}\0`)
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    // 只去掉 HTML 标签和组件（如 <Badge … />），<服务器地址> 这类占位符保留
+    .replace(/<\/?[A-Za-z][^>]*>/g, '')
+    .replace(/(\*\*|__)(.+?)\1/g, '$2')
+    .replace(/\0(\d+)\0/g, (_, i: string) => codes[Number(i)])
+    .trim()
+  if (text.length <= 120) return text
+  const cut = text.lastIndexOf('。', 120)
+  return cut > 0 ? text.slice(0, cut + 1) : text.slice(0, 120) + '…'
+}
+
 /** 页面在站点中的地址（cleanUrls）：index.md → /，docs/index.md → /docs/，docs/a.md → /docs/a */
 function pagePath(relativePath: string): string {
   return '/' + relativePath.replace(/(^|\/)index\.md$/, '$1').replace(/\.md$/, '')
 }
 
 export function defineSiteConfig(options: SiteOptions) {
-  const { hostname, title, description, dir, logo, ogImage, analyticsToken, versions, mermaid } = options
+  const { hostname, title, description, dir, logo, ogImage, keywords, analyticsToken, versions, mermaid } = options
   const year = new Date().getFullYear()
   // head 中写了 robots noindex 的页面（如跳转页），不进 sitemap。
   // 由 transformPageData 收集，生成 sitemap 时读取：构建时所有页面先渲染完才生成 sitemap
@@ -84,32 +127,36 @@ export function defineSiteConfig(options: SiteOptions) {
       ['link', { rel: 'icon', href: logo }],
       ['meta', { property: 'og:type', content: 'website' }],
       ['meta', { property: 'og:site_name', content: title }],
-      ...(ogImage
-        ? ([
-            ['meta', { property: 'og:image', content: hostname + ogImage }],
-            ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
-          ] satisfies HeadConfig[])
-        : []),
+      ['meta', { property: 'og:locale', content: 'zh_CN' }],
+      ...(ogImage ? ([['meta', { property: 'og:image', content: hostname + ogImage }]] satisfies HeadConfig[]) : []),
       // 嵌入模式：在首屏渲染前加上 class，避免导航栏先闪一下
       ['script', {}, `new URLSearchParams(location.search).get('embed')==='1'&&document.documentElement.classList.add('embed-mode')`],
     ],
 
-    // 每页的规范地址和分享信息写进 frontmatter.head：站内跳转时客户端会随页面更新。
-    // 页面在 frontmatter 中自己写了同名标签时以页面的为准
-    transformPageData(pageData) {
+    // 每页的规范地址、描述、关键词和分享信息写进 frontmatter.head：站内跳转时客户端会随页面更新。
+    // 页面没写 description 时取正文的第一段（也用于 <meta name="description">）；页面在 frontmatter 中自己写了同名标签时以页面的为准
+    transformPageData(pageData, { siteConfig }) {
       const path = pagePath(pageData.relativePath)
       const url = hostname + path
       const pageTitle = shareTitle(pageData.title || title, pageData.titleTemplate ?? pageData.frontmatter.titleTemplate, title)
+      pageData.description ||= pageSummary(join(siteConfig.srcDir, pageData.filePath))
+      const pageDescription = pageData.description || description
+      const pageKeywords = pageData.frontmatter.keywords ?? keywords
       const head: HeadConfig[] = (pageData.frontmatter.head ??= [])
-      const has = (key: string) => head.some(([, attrs]) => attrs?.rel === key || attrs?.property === key)
+      const keyOf = (attrs?: Record<string, string>) => attrs?.rel ?? attrs?.property ?? attrs?.name
+      const has = (key?: string) => head.some(([, attrs]) => keyOf(attrs) === key)
       if (head.some(([, attrs]) => attrs?.name === 'robots' && /noindex/.test(attrs.content ?? ''))) noindex.add(path)
       const tags: HeadConfig[] = [
         ['link', { rel: 'canonical', href: url }],
         ['meta', { property: 'og:title', content: pageTitle }],
-        ['meta', { property: 'og:description', content: pageData.description || description }],
+        ['meta', { property: 'og:description', content: pageDescription }],
         ['meta', { property: 'og:url', content: url }],
+        ['meta', { name: 'twitter:card', content: ogImage ? 'summary_large_image' : 'summary' }],
+        ['meta', { name: 'twitter:title', content: pageTitle }],
+        ['meta', { name: 'twitter:description', content: pageDescription }],
+        ...(pageKeywords ? ([['meta', { name: 'keywords', content: pageKeywords }]] satisfies HeadConfig[]) : []),
       ]
-      head.push(...tags.filter(([, attrs]) => !has(attrs.rel ?? attrs.property)))
+      head.push(...tags.filter(([, attrs]) => !has(keyOf(attrs))))
     },
 
     // 统计只在构建产物中加载，开发时不加载
