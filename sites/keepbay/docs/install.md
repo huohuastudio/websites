@@ -30,9 +30,19 @@ Keepbay 由一个程序和一个 `lib/` 目录组成，解压即可运行，无�
 
 ## 安装包 {#package}
 
-安装包的文件名是 `keepbay_<版本>_linux_<架构>.tar.gz`，另有一份 `keepbay_<版本>_checksums.txt` 列出每个安装包的 SHA256。
+安装包在 GitHub 的 [Keepbay 发布页](https://github.com/huohuastudio/keepbay-releases/releases)下载，不需要注册帐号。国内访问 GitHub 可能较慢。
 
-解压后是一个同名目录：
+每个版本有以下三个文件：
+
+| 文件 | 说明 |
+|---|---|
+| `keepbay_linux_amd64.tar.gz` | x86_64 的安装包 |
+| `keepbay_linux_arm64.tar.gz` | arm64 的安装包 |
+| `keepbay_checksums.txt` | 两个安装包的 SHA256 |
+
+文件名不带版本号，固定地址 `https://github.com/huohuastudio/keepbay-releases/releases/latest/download/<文件名>` 总是指向最新版本；指定版本时，把 `latest/download` 换成 `download/v<版本>`。
+
+解压后是一个带版本号的目录：
 
 ```
 keepbay_<版本>_linux_amd64/
@@ -68,16 +78,21 @@ Keepbay 创建的全部目录和文件，包括在您的文件夹中和远程存
 
 ## 安装步骤 {#steps}
 
-### 1. 核对并解压 {#unpack}
+### 1. 下载、核对并解压 {#unpack}
 
-先用 `uname -m` 查看架构：输出 `x86_64` 用 `amd64` 的安装包，`aarch64` 用 `arm64` 的安装包。
+先用 `uname -m` 查看架构：输出 `x86_64` 用 `amd64` 的安装包，`aarch64` 用 `arm64` 的安装包。以下以 amd64 为例。
 
 ```bash
-# 输出的 SHA256 与 checksums.txt 中的一致才继续
-sha256sum keepbay_<版本>_linux_amd64.tar.gz
+# 下载最新版本和 SHA256 清单
+curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/keepbay_linux_amd64.tar.gz
+curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/keepbay_checksums.txt
+
+# 显示 keepbay_linux_amd64.tar.gz: OK 才继续
+sha256sum -c --ignore-missing keepbay_checksums.txt
 
 sudo mkdir -p /opt/keepbay/versions
-sudo tar -xzf keepbay_<版本>_linux_amd64.tar.gz -C /opt/keepbay/versions --no-same-owner
+sudo tar -xzf keepbay_linux_amd64.tar.gz -C /opt/keepbay/versions --no-same-owner
+# 解压出的目录名带版本号，如 keepbay_1.0.0-beta.11_linux_amd64
 sudo ln -sfn versions/keepbay_<版本>_linux_amd64 /opt/keepbay/current
 sudo ln -sfn current/keepbay /opt/keepbay/keepbay
 

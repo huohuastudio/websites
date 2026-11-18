@@ -4,8 +4,10 @@ import { ref } from 'vue'
 
 // 安装：右侧的命令随滚动逐行亮起。减少动态效果时全部显示
 const lines = [
-  { text: '# 解压到 /opt/keepbay/versions（完整步骤见安装文档）', kind: 'comment' },
-  { text: 'sudo tar -xzf keepbay_<版本>_linux_amd64.tar.gz -C /opt/keepbay/versions' },
+  { text: '# 从 GitHub 下载最新版本（完整步骤见安装文档）', kind: 'comment' },
+  { text: 'curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/keepbay_linux_amd64.tar.gz' },
+  { text: '# 解压到 /opt/keepbay/versions', kind: 'comment' },
+  { text: 'sudo tar -xzf keepbay_linux_amd64.tar.gz -C /opt/keepbay/versions' },
   { text: '# 建一个专用用户，只用来运行 Keepbay', kind: 'comment' },
   { text: 'sudo useradd --system --home-dir /var/lib/keepbay --shell /usr/sbin/nologin keepbay' },
   { text: '# 首次设置：数据目录、端口、所有者帐号，安装为系统服务', kind: 'comment' },

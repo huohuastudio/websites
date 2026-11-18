@@ -19,7 +19,7 @@ plans:
       - 家庭成员最多 2 人（含所有者）
     action:
       text: 下载安装
-      link: https://huohuastudio.com/products/keepbay
+      link: https://github.com/huohuastudio/keepbay-releases/releases
       theme: alt
   - name: 专业版
     price: ¥199

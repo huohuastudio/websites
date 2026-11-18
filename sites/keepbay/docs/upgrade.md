@@ -90,7 +90,12 @@ flowchart TD
 :::
 
 ```bash
-sudo tar -xzf keepbay_<新版本>_linux_amd64.tar.gz -C /opt/keepbay/versions --no-same-owner
+# 下载新版本：最新版本用 latest/download，指定版本用 download/v<新版本>，核对方法见安装页的第 1 步
+curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/keepbay_linux_amd64.tar.gz
+curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/keepbay_checksums.txt
+sha256sum -c --ignore-missing keepbay_checksums.txt
+
+sudo tar -xzf keepbay_linux_amd64.tar.gz -C /opt/keepbay/versions --no-same-owner
 sudo ln -sfn versions/keepbay_<新版本>_linux_amd64 /opt/keepbay/current
 sudo systemctl restart keepbay
 ```
@@ -131,9 +136,9 @@ sudo systemctl start keepbay
 sudo systemctl stop keepbay
 sudo mv /opt/keepbay /opt/keepbay.old
 
-# 按安装页的第 1 步解压新版本、建两个链接
+# 按安装页的第 1 步下载、核对、解压新版本，建两个链接
 sudo mkdir -p /opt/keepbay/versions
-sudo tar -xzf keepbay_<版本>_linux_amd64.tar.gz -C /opt/keepbay/versions --no-same-owner
+sudo tar -xzf keepbay_linux_amd64.tar.gz -C /opt/keepbay/versions --no-same-owner
 sudo ln -sfn versions/keepbay_<版本>_linux_amd64 /opt/keepbay/current
 sudo ln -sfn current/keepbay /opt/keepbay/keepbay
 sudo chown -R keepbay: /opt/keepbay
