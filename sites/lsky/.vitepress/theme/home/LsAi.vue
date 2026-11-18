@@ -101,7 +101,7 @@ const on = (i: number) => field.value < 0 || field.value === i
   margin: 0 auto;
   padding: 14px;
   border-radius: 30px;
-  background: var(--sx-alt);
+  background: var(--sx-card);
 }
 
 /* 左边的图片：润色后换成蓝天白云 */
@@ -167,8 +167,7 @@ const on = (i: number) => field.value < 0 || field.value === i
 .tags span {
   padding: 5px 13px;
   border-radius: 980px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card-in);
   font-size: 15px;
   opacity: 0;
   transform: translateY(8px) scale(0.92);
@@ -186,8 +185,7 @@ const on = (i: number) => field.value < 0 || field.value === i
   margin: 0;
   padding: 11px 14px;
   border-radius: 12px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card-in);
   font-size: 15px;
   line-height: 1.55;
 }

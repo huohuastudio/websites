@@ -2,7 +2,7 @@
 import { SxShot, easeOut, seg, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 
-// 相册和分享：截图随滚动放大到原大，右侧要点依次出现，访问密码逐位填入
+// 相册和分享：截图（白底区域，放在底板上）随滚动放大到原大，右侧要点依次出现，访问密码逐位填入
 
 const items = [
   { title: '相册访问密码', text: '公开的相册可以设置 4 到 32 位的密码。加密相册中的图片不会出现在广场、用户主页等公开列表中。' },
@@ -38,8 +38,10 @@ useScrollFrame((still) => {
       </div>
       <div class="grid">
         <div ref="fig" class="fig">
-          <div class="sx-win">
-            <SxShot src="/screenshots/albums" :width="1600" :height="1000" alt="相册页面" />
+          <div class="sx-plate">
+            <div class="sx-win">
+              <SxShot src="/screenshots/albums" :width="1600" :height="1000" alt="相册页面" />
+            </div>
           </div>
           <div ref="lock" class="lock" aria-hidden="true">
             <b>输入访问密码</b>
@@ -79,16 +81,15 @@ useScrollFrame((still) => {
   object-position: top;
 }
 
-/* 访问密码框：压在截图右下角 */
+/* 访问密码框：跨在截图底边上，伸出底板。底色掺品牌色，与白色截图、浅灰底板、白底都分得开 */
 .lock {
   position: absolute;
-  right: 28px;
-  top: calc(100% - 36px);
+  right: calc(var(--sx-plate-pad) + 16px);
+  top: calc(100% - var(--sx-plate-pad) - 36px);
   width: 260px;
   padding: 18px 20px;
   border-radius: 18px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-panel);
   font-size: 14px;
   opacity: var(--lo, 1);
   transform: translateY(calc((1 - var(--lo, 1)) * 20px));
@@ -111,7 +112,7 @@ useScrollFrame((still) => {
   place-items: center;
   height: 34px;
   border-radius: 8px;
-  box-shadow: inset 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card-in);
 }
 
 .pw i.on::after {

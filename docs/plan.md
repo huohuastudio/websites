@@ -263,6 +263,14 @@ W23 留下的素材，只改 Keepbay：
   - 表示状态的内描边保留（Novaix 流程选中步骤、高可用故障节点、Lsky 审核的违规和警告色框等）
 - 改完按 W26 的方法比对新旧版本，交给 GPT 看图确认没有卡片、截图与背景融在一起
 
+**W28a 完成情况**（2026-11-18）：
+
+- **共用样式**：`--sx-card`、`--sx-card-in` 由 `.sx-alt` 和 `.dark` 决定取值，`--sx-tile`、`--sx-edge` 删除；截图底板 `.sx-plate`（留白 `--sx-plate-pad`）；`.sx-term` 的标题栏用 `::before` 画，标题取 `data-title`，长行在任意字符处折行（不再横向滚动，免得标题栏随内容滚走）
+- **终端标题**：统一写成"主机 — 命令"（Keepbay `nas — bash`、`nas — ls`，Novaix `server — bash`，Lsky `server — curl`、`server — docker`），Novaix 数据库一节显示的是配置文件，标题为 `config.yaml`
+- **底板**：Keepbay 首屏和录屏、Novaix 首屏、Lsky 首屏和相册；Keepbay 格式一节的截图改为每张带 8px 卡片色边框（展开后相互叠住的几张也分得清）。Lsky 相册的访问密码框跨在截图底边、伸出底板，底色用 `--sx-panel`
+- **手机截图**：Keepbay 首屏两侧的手机加 7px 设备边框（浅色 #1d1d1f，深色 #2c2c2e），窄屏只显示的一张也用同样的边框
+- 窄屏下按字符折行时，命令中的选项（如 `-C`）或续行符 `\` 可能恰好落在折行处，与真实终端按列折行一致，不另处理
+
 **W28b SEO**
 - **结构化数据（JSON-LD）**：由共用主题生成，数据来自站点配置和首页 frontmatter。全站加 Organization（Spark Studio）和 WebSite；首页加 SoftwareApplication（名称、说明、平台、类别，价格取 frontmatter 中的套餐）和 FAQPage（首页常见问题，frontmatter 的 faq）；文档页加 BreadcrumbList（按侧栏的分组和页面标题）。用 Google 的结构化数据规则自查字段
 - **首页描述和分享图**：Novaix、Lsky 首页的 description 补到 80–120 字（现在只有"面向中小型 VPS 服务商的 IDC 管理系统""图床和云端相册程序"），写法参照 Keepbay 首页；Lsky 补分享图 og.png（参照 Keepbay 的 scripts/og.mjs）；分享图加 og:image:width、height、alt

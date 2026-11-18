@@ -77,7 +77,7 @@ const refresh = useScrollFrame((still) => {
 const layout = useLayoutCache(
   () => [stage.value, head.value, rig.value, ...flies],
   () => {
-    // 截图起始的下移量：让缩放后的截图顶边落在按钮下方 40px 处，至少下移舞台高度的 18%
+    // 截图起始的下移量：让缩放后的底板顶边落在按钮下方 40px 处，至少下移舞台高度的 18%
     const bottom = head.value!.offsetTop + actions.value!.offsetTop + actions.value!.offsetHeight
     const r = rig.value!
     // .rig 用 translate(-50%, -50%) 居中，offsetTop 即截图中线的位置
@@ -100,7 +100,7 @@ const layout = useLayoutCache(
         </div>
       </div>
       <div ref="rig" class="rig">
-        <div class="sx-enter d4">
+        <div class="sx-enter d4 sx-plate">
           <div ref="frame" class="sx-win stack2">
             <div class="layer up">
               <SxShot src="/screenshots/upload" :width="1600" :height="1000" alt="上传页面：批量选择的图片排在上传队列中" priority />
@@ -127,10 +127,12 @@ const layout = useLayoutCache(
   --sx-run: 270vh;
 }
 
-/* 截图宽度：同时受视口宽度和舞台高度限制，四周留出标题区和说明的位置。
+/* 截图放在底板上（首屏是白底）。底板宽度 --rw 同时受视口宽度和舞台高度限制，四周留出标题区和说明的位置：
+   底板高度 = 截图宽度 / 1.6 + 上下留白，不超过舞台高度减 146px。--fw 是底板中截图的宽度。
    截图中线按整个视口居中（舞台中线上移半个导航栏高度），与原型的位置一致 */
 .sx-stage {
-  --fw: min(1040px, 80vw, calc((var(--sx-vh) - 146px) * 1.6));
+  --rw: min(1040px, 80vw, calc((var(--sx-vh) - 146px) * 1.6 - 1.2 * var(--sx-plate-pad)));
+  --fw: calc(var(--rw) - 2 * var(--sx-plate-pad));
   --cy: calc(50% - var(--sx-nav) / 2);
 }
 
@@ -181,7 +183,7 @@ const layout = useLayoutCache(
   position: absolute;
   left: 50%;
   top: var(--cy);
-  width: var(--fw);
+  width: var(--rw);
   transform: translate(-50%, -50%) translateY(var(--dy, 0px)) scale(var(--s, 1));
 }
 
@@ -212,7 +214,6 @@ const layout = useLayoutCache(
 .layer.ph {
   transform: translateY(calc((1 - var(--b, 0)) * 101%));
   border-radius: 18px 18px 0 0;
-  box-shadow: 0 0 0 1px var(--sx-edge);
 }
 
 .fly {
@@ -225,8 +226,7 @@ const layout = useLayoutCache(
   gap: 12px;
   padding: 10px 16px 10px 10px;
   border-radius: 14px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card);
   font-size: 14px;
   white-space: nowrap;
   opacity: var(--o, 0);
@@ -253,7 +253,7 @@ const layout = useLayoutCache(
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(var(--cy) + var(--fw) / 3.2 + 18px);
+  top: calc(var(--cy) + var(--fw) / 3.2 + var(--sx-plate-pad) + 18px);
   margin: 0;
   padding-inline: 24px;
   text-align: center;
@@ -317,7 +317,6 @@ const layout = useLayoutCache(
     overflow: visible;
     border-radius: 0;
     background: none;
-    box-shadow: none;
   }
 
   .stack2 {
@@ -333,7 +332,6 @@ const layout = useLayoutCache(
     transform: none;
     opacity: 1;
     border-radius: 18px;
-    box-shadow: 0 0 0 1px var(--sx-edge);
   }
 
   .fly {

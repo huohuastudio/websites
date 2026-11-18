@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
   gap: 10px;
   padding: 16px 20px;
   border-radius: 980px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
 }
 
 .dots button {
@@ -207,7 +207,7 @@ onBeforeUnmount(() => {
   height: 44px;
   border: 0;
   border-radius: 50%;
-  background: var(--sx-tile);
+  background: var(--sx-card);
   color: var(--sx-text);
   font-size: 13px;
   cursor: pointer;

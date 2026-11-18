@@ -122,8 +122,7 @@ useScrollFrame((still) => {
   margin-bottom: 64px;
   overflow: hidden;
   border-radius: 28px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card);
   transform: scale(var(--cs, 1));
   transform-origin: 50% 0;
 }

@@ -48,7 +48,7 @@ useScrollFrame((still) => {
             <h3>开放接口</h3>
             <p>100 多个接口，可以开发客户端，也可以对接其他系统。接口定义遵循 OpenAPI 规范。</p>
           </div>
-          <pre class="sx-term v"><div class="c"># 在用户中心的「API令牌」页面创建令牌</div><div>curl https://example.com/api/v2/&lt;接口路径&gt; \</div><div>  -H "Authorization: Bearer &lt;令牌&gt;" \</div><div>  -H "Accept: application/json"</div></pre>
+          <pre class="sx-term v" data-title="server — curl"><div class="c"># 在用户中心的「API令牌」页面创建令牌</div><div>curl https://example.com/api/v2/&lt;接口路径&gt; \</div><div>  -H "Authorization: Bearer &lt;令牌&gt;" \</div><div>  -H "Accept: application/json"</div></pre>
         </div>
         <div :ref="(el) => (cards[2] = el as HTMLElement)" class="q4">
           <div>
@@ -64,7 +64,7 @@ useScrollFrame((still) => {
             <h3>Docker 安装</h3>
             <p>镜像中已包含运行环境、消息队列和计划任务。也可以在 PHP 8.3 及以上的环境中直接安装。</p>
           </div>
-          <pre class="sx-term v"><div class="c"># 数据保存在宿主机的 ~/data 目录</div><div>docker run -d --name lsky-pro -p 8000:8000 \</div><div>  -v ~/data:/app/storage/app \</div><div>  -v ~/data/themes:/app/themes \</div><div>  0xxb/lsky-pro:latest</div><div class="c"># 在浏览器中打开 http://服务器IP:8000</div></pre>
+          <pre class="sx-term v" data-title="server — docker"><div class="c"># 数据保存在宿主机的 ~/data 目录</div><div>docker run -d --name lsky-pro -p 8000:8000 \</div><div>  -v ~/data:/app/storage/app \</div><div>  -v ~/data/themes:/app/themes \</div><div>  0xxb/lsky-pro:latest</div><div class="c"># 在浏览器中打开 http://服务器IP:8000</div></pre>
         </div>
       </div>
     </div>
@@ -84,7 +84,7 @@ useScrollFrame((still) => {
   gap: 22px;
   padding: 32px;
   border-radius: 28px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
   opacity: calc(0.35 + var(--o, 1) * 0.65);
   transform: translateY(calc((1 - var(--o, 1)) * 40px));
 }
@@ -119,24 +119,19 @@ useScrollFrame((still) => {
   gap: 10px;
   padding: 11px;
   border-radius: 12px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card-in);
   font-size: 15px;
   opacity: var(--lo, 1);
   transform: translateX(calc((1 - var(--lo, 1)) * -24px));
 }
 
-/* 命令行示例：卡片较窄，内边距比默认的小 */
-.sx-term {
-  padding: 20px 22px;
+/* 命令行示例：卡片较窄，内边距比默认的小（标题栏按这两个变量对齐） */
+.q4 .sx-term {
+  --sx-term-x: 22px;
+  --sx-term-y: 20px;
 }
 
-.sx-term div {
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
-/* 主题：三张卡片随滚动展开成扇形 */
+/* 主题：三张卡片随滚动展开成扇形。卡片不描边，压在下面的两张底色深一些，与上面的一张分开 */
 .fan {
   position: relative;
   height: 190px;
@@ -153,10 +148,13 @@ useScrollFrame((still) => {
   height: 160px;
   padding: 14px;
   border-radius: 14px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card-in);
   transform: translateX(-50%) translateX(calc(var(--f, 1) * var(--dx))) rotate(calc(var(--f, 1) * var(--r)));
   transform-origin: 50% 100%;
+}
+
+.fan > div:not(:last-child) {
+  background: color-mix(in srgb, var(--sx-card-in) 92%, var(--sx-text));
 }
 
 .fan i {

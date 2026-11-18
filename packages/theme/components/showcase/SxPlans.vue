@@ -98,7 +98,7 @@ defineProps<{
   align-items: flex-start;
   padding: 40px;
   border-radius: 28px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
 }
 
 .name {
@@ -139,7 +139,7 @@ li {
 .compare {
   margin-top: 20px;
   border-radius: 20px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
 }
 
 .compare summary {

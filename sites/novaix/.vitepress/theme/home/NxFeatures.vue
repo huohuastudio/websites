@@ -176,7 +176,7 @@ useScrollFrame((still) => {
   overflow: hidden;
   min-height: 360px;
   border-radius: 28px;
-  background: var(--sx-alt);
+  background: var(--sx-card);
   opacity: var(--o, 1);
   transform: translateY(calc((1 - var(--o, 1)) * 40px));
 }
@@ -189,7 +189,6 @@ useScrollFrame((still) => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: var(--sx-tile);
 }
 
 .txt {

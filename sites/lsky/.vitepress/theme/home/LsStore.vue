@@ -154,8 +154,7 @@ useScrollFrame((still) => {
   top: 50%;
   padding: 7px 14px;
   border-radius: 980px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card);
   color: var(--sx-text);
   font-size: clamp(12px, 1.05vw, 15px);
   white-space: nowrap;
@@ -177,8 +176,7 @@ useScrollFrame((still) => {
   width: 40%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card);
   text-align: center;
   transform: translate(-50%, -50%);
 }

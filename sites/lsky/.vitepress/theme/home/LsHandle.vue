@@ -251,7 +251,7 @@ useScrollFrame((still) => {
 .dims span {
   padding: 3px 10px;
   border-radius: 980px;
-  background: var(--sx-tile);
+  background: var(--sx-card-in);
   font-family: var(--vp-font-family-mono);
 }
 

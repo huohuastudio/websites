@@ -143,7 +143,7 @@ useScrollFrame((still) => {
   height: var(--oh);
   overflow: hidden;
   border-radius: 28px;
-  background: var(--sx-alt);
+  background: var(--sx-card);
 }
 
 .oc .t {
@@ -247,8 +247,7 @@ useScrollFrame((still) => {
   gap: 8px;
   padding: 6px 13px;
   border-radius: 980px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card-in);
   font-size: 14px;
   white-space: nowrap;
 }

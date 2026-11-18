@@ -97,7 +97,7 @@ useScrollFrame((still) => {
 .ty {
   padding: 16px 20px 15px;
   border-radius: 16px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
   opacity: var(--t, 1);
   transform-origin: 50% 0;
   transform: rotateX(calc((1 - var(--t, 1)) * -80deg));

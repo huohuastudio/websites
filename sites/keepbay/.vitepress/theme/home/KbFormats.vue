@@ -100,7 +100,7 @@ useScrollFrame((still) => {
 .rows span {
   padding: 6px 16px;
   border-radius: 980px;
-  background: var(--sx-alt);
+  background: var(--sx-card);
   color: var(--sx-text-2);
   font-size: 15px;
 }
@@ -127,12 +127,15 @@ figure {
   transform: translate(-50%, -50%) translateX(calc(var(--f, 0) * var(--dx))) translateY(calc((1 - var(--f, 0)) * var(--sy) + var(--f, 0) * var(--fy))) rotate(calc(var(--f, 0) * var(--r)));
 }
 
+/* 截图带一圈卡片色的边框：白色截图与白底区分开，展开后相互叠住的几张也分得清（框的宽高比含边框） */
 .shot {
   aspect-ratio: 16 / 10;
-  border-radius: 14px;
+  padding: 8px;
+  border-radius: 16px;
 }
 
 .shot :deep(img) {
+  border-radius: 8px;
   object-position: top;
 }
 

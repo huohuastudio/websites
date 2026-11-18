@@ -139,8 +139,7 @@ useScrollFrame((still) => {
   overflow: hidden;
   padding: 14px 20px;
   border-radius: 14px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card);
   font: 16px/1.4 var(--vp-font-family-mono);
   white-space: nowrap;
 }
@@ -175,7 +174,7 @@ useScrollFrame((still) => {
   }
 }
 
-/* 可用的参数：网址中用到的高亮 */
+/* 可用的参数：网址中用到的反色高亮 */
 .params {
   display: flex;
   flex-wrap: wrap;
@@ -186,20 +185,18 @@ useScrollFrame((still) => {
 .params span {
   padding: 3px 9px;
   border-radius: 6px;
-  box-shadow: inset 0 0 0 1px var(--sx-line);
+  background: var(--sx-card);
   color: var(--sx-text-3);
   font: 13px/1.5 var(--vp-font-family-mono);
   transition: color 0.3s, background-color 0.3s;
 }
 
 .dark .params span {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
   color: var(--sx-text-2);
 }
 
 .params span.on {
   background: var(--sx-text);
-  box-shadow: none;
   color: var(--sx-bg);
 }
 
@@ -263,7 +260,7 @@ figcaption {
 code {
   padding: 2px 8px;
   border-radius: 980px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
   color: var(--sx-text);
   font-family: var(--vp-font-family-mono);
 }

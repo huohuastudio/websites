@@ -146,17 +146,19 @@ useScrollFrame((frameStill) => {
         </div>
         <div ref="bar" class="bar"><i /></div>
       </div>
-      <div class="sx-win">
-        <video
-          ref="video"
-          :style="{ aspectRatio: `${width} / ${height}` }"
-          muted
-          playsinline
-          preload="auto"
-          aria-label="录屏：在终端中执行 mv ~/手机相册/*.jpg .，把三张照片移进家庭相册的「2025-07 海边」文件夹，几秒后 Keepbay 的文件页面中出现这三张照片，没有刷新页面"
-          @loadedmetadata="onReady"
-          @seeked="onReady"
-        />
+      <div class="sx-plate">
+        <div class="sx-win">
+          <video
+            ref="video"
+            :style="{ aspectRatio: `${width} / ${height}` }"
+            muted
+            playsinline
+            preload="auto"
+            aria-label="录屏：在终端中执行 mv ~/手机相册/*.jpg .，把三张照片移进家庭相册的「2025-07 海边」文件夹，几秒后 Keepbay 的文件页面中出现这三张照片，没有刷新页面"
+            @loadedmetadata="onReady"
+            @seeked="onReady"
+          />
+        </div>
       </div>
     </div>
   </section>
@@ -218,6 +220,7 @@ useScrollFrame((frameStill) => {
   background: var(--sx-text);
 }
 
+/* 录屏中是白色界面，放在底板（.sx-plate）上，免得与白色背景融在一起；底板四周的留白加上录屏仍不超过舞台高度 */
 .sx-win video {
   max-height: calc(var(--sx-vh) * 0.8);
   object-fit: contain;

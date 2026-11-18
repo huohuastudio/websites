@@ -45,7 +45,7 @@ const startOffset = useLayoutCache(
 </script>
 
 <template>
-  <section ref="root" class="sx-pin hero">
+  <section ref="root" class="sx-pin hero kb-hero">
     <div ref="stage" class="sx-stage">
       <div ref="head" class="head sx-wrap">
         <h1 class="sx-display" :aria-label="title">
@@ -65,8 +65,10 @@ const startOffset = useLayoutCache(
       </div>
       <div ref="rig" class="rig">
         <div class="sx-enter d4">
-          <div class="sx-win win">
-            <KbShot name="files" alt="Keepbay 的文件页面：日常相册中的照片按原比例排成网格" />
+          <div class="sx-plate win">
+            <div class="sx-win">
+              <KbShot name="files" alt="Keepbay 的文件页面：日常相册中的照片按原比例排成网格" />
+            </div>
           </div>
           <div class="phone l"><KbShot name="photos" size="mobile" alt="手机上的照片时间线" /></div>
           <div class="phone r"><KbShot name="share" size="mobile" alt="手机上打开的分享页面" /></div>
@@ -117,12 +119,13 @@ const startOffset = useLayoutCache(
   justify-content: center;
 }
 
-/* 截图的中心对准视口中线（舞台钉在固定导航栏下方时，向上让出导航栏高度的一半），与底部说明之间留出空间 */
+/* 截图的中心对准视口中线（舞台钉在固定导航栏下方时，向上让出导航栏高度的一半），与底部说明之间留出空间。
+   宽度另受舞台高度限制：底板（含留白）比同宽的截图高约 24px，放大到原尺寸时上下各留约 12px，不被导航栏和舞台边缘遮住 */
 .rig {
   position: absolute;
   left: 50%;
   top: calc(50% - var(--sx-nav) / 2);
-  width: min(1040px, 78vw);
+  width: min(1040px, 78vw, calc((var(--sx-vh) - var(--sx-nav) - 48px) * 1.6));
   transform: translate(-50%, -50%) translateY(var(--dy, 0px)) scale(var(--s, 1));
   perspective: 2200px;
 }
@@ -132,21 +135,21 @@ const startOffset = useLayoutCache(
   transform-origin: 50% 100%;
 }
 
+/* 手机：深色的设备边框（颜色见文末不带 scoped 的样式），宽度含边框 */
 .phone {
   position: absolute;
   bottom: -7%;
   width: 23%;
-  padding: 4px;
-  border-radius: 36px;
-  background: #1d1d1f;
+  padding: 7px;
+  border-radius: 38px;
+  background: var(--kb-bezel);
   opacity: var(--po, 0);
 }
 
 .phone :deep(img) {
   aspect-ratio: 1170 / 2100;
   object-fit: cover;
-  border-radius: 32px;
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  border-radius: 31px;
 }
 
 .phone.l {
@@ -184,6 +187,7 @@ const startOffset = useLayoutCache(
     position: relative;
     left: auto;
     top: auto;
+    width: min(1040px, 78vw);
     margin: 56px auto 0;
     transform: none;
   }
@@ -214,7 +218,7 @@ const startOffset = useLayoutCache(
   }
 }
 
-/* 窄屏：只放一张手机截图 */
+/* 窄屏：只放一张手机截图，底板换成手机的设备边框。多一层 .rig，免得与共用的 .sx-plate 规则比先后 */
 @media (max-width: 760px) {
   .head {
     position: static;
@@ -233,16 +237,33 @@ const startOffset = useLayoutCache(
     transform: none;
   }
 
-  .win {
+  .rig .win {
     max-width: 300px;
     margin: 0 auto;
-    border-radius: 28px;
+    padding: 7px;
+    border-radius: 38px;
+    background: var(--kb-bezel);
     transform: none;
+  }
+
+  .win .sx-win {
+    border-radius: 31px;
   }
 
   .phone,
   .note {
     display: none;
   }
+}
+</style>
+
+<style>
+/* 手机设备边框的颜色。不用 scoped：要按 <html> 上的 dark 类选择；深色下略亮，在黑底上也看得出边框 */
+.kb-hero {
+  --kb-bezel: #1d1d1f;
+}
+
+.dark .kb-hero {
+  --kb-bezel: #2c2c2e;
 }
 </style>

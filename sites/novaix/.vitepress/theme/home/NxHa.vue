@@ -185,8 +185,7 @@ onBeforeUnmount(() => observer?.disconnect())
 }
 
 .legend i.np {
-  background: var(--sx-alt);
-  box-shadow: inset 0 0 0 1px var(--sx-line);
+  background: var(--sx-card);
 }
 
 /* 节点组示意图：节点状态的绿色、红色只用在这里 */
@@ -197,7 +196,7 @@ onBeforeUnmount(() => observer?.disconnect())
   position: relative;
   padding: 26px;
   border-radius: 28px;
-  background: var(--sx-alt);
+  background: var(--sx-card);
 }
 
 .dark .grp {
@@ -227,7 +226,7 @@ onBeforeUnmount(() => observer?.disconnect())
 .grp-h small span {
   padding: 3px 10px;
   border-radius: 980px;
-  background: var(--sx-tile);
+  background: var(--sx-card-in);
   color: var(--sx-text-2);
   font-size: 13px;
 }
@@ -241,7 +240,7 @@ onBeforeUnmount(() => observer?.disconnect())
 .hnode {
   padding: 16px 14px 14px;
   border-radius: 18px;
-  background: var(--sx-tile);
+  background: var(--sx-card-in);
   box-shadow: inset 0 0 0 1px transparent;
   transition: box-shadow 0.4s;
 }
@@ -302,8 +301,7 @@ onBeforeUnmount(() => observer?.disconnect())
   height: 46px;
   padding: 0 12px;
   border-radius: 10px;
-  background: var(--sx-alt);
-  box-shadow: inset 0 0 0 1px var(--sx-line);
+  background: var(--sx-card);
   font-size: 14px;
   white-space: nowrap;
   transform: translate(var(--x, 0px), var(--y, 0px));
@@ -312,7 +310,6 @@ onBeforeUnmount(() => observer?.disconnect())
 
 .inst.prot {
   background: var(--sx-panel);
-  box-shadow: none;
 }
 
 .inst svg {

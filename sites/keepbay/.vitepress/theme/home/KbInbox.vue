@@ -100,7 +100,7 @@ onBeforeUnmount(() => removeEventListener('resize', refresh))
 .panel {
   padding: 22px;
   border-radius: 24px;
-  background: var(--sx-alt);
+  background: var(--sx-card);
 }
 
 h4 {
@@ -127,7 +127,7 @@ h4 {
 }
 
 .dest .slot {
-  background: var(--sx-tile);
+  background: var(--sx-card-in);
 }
 
 .rule {
@@ -151,8 +151,7 @@ h4 {
   height: 52px;
   padding: 0 16px;
   border-radius: 12px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card-in);
   font-size: 15px;
   white-space: nowrap;
   transform: translate(var(--tx, 0px), var(--ty, 0px));
@@ -165,8 +164,7 @@ h4 {
   width: 26px;
   height: 32px;
   border-radius: 5px;
-  background: var(--sx-alt);
-  box-shadow: inset 0 0 0 1px var(--sx-line);
+  background: var(--sx-card);
   color: var(--sx-text-2);
   font-size: 9px;
   font-weight: 600;

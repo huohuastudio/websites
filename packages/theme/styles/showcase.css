@@ -2,23 +2,27 @@
  * 官网首页的配色、版式和通用样式（参照 Apple 产品页：简约，白底和浅灰底交替，不用光晕、渐变底和阴影）。
  * 首页内容包在 .sx 中；文档页不受影响。品牌色取各站点 brand.css 中的 --vp-c-brand-3（浅色、深色下相同），
  * 只用于按钮、链接和掺进截图面板的底色。
- * 截图的处理：独立的截图框只带很淡的细边（.sx-win）；卡片中的截图延伸到卡片右边和底边，
+ * 卡片和截图框不描边、不加阴影，靠底色与背景的差别区分：卡片用 --sx-card（白底区域浅灰，浅灰区域白色），
+ * 卡片中的小元素（输入框、标签、分段按钮等）用 --sx-card-in（与卡片相反的颜色）。
+ * 截图的处理：白底区域的白色截图放在底板（.sx-plate）或浅灰区域中；卡片中的截图延伸到卡片右边和底边，
  * 最后 32px 渐隐到卡片底色（.sx-fade-rb、.sx-fade-b），卡片底色用 --sx-panel，免得白色截图与白色背景融在一起
  */
 .sx {
   --sx-bg: #ffffff;
   --sx-alt: #f5f5f7;
-  --sx-tile: #ffffff;
+  --sx-card: #f5f5f7;
+  --sx-card-in: #ffffff;
   --sx-text: #1d1d1f;
   --sx-text-2: #6e6e73;
   --sx-text-3: #86868b;
   --sx-line: rgba(0, 0, 0, 0.1);
-  --sx-edge: rgba(0, 0, 0, 0.12);
   --sx-panel: color-mix(in srgb, var(--vp-c-brand-3) 9%, #f5f5f7);
   --sx-link: var(--vp-c-brand-1);
   --sx-btn: var(--vp-c-brand-3);
   --sx-btn-hover: var(--vp-button-brand-hover-bg);
   --sx-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* 截图底板的留白，版块按它换算底板中截图的尺寸 */
+  --sx-plate-pad: clamp(16px, 2.6vw, 32px);
   /* 舞台钉住的位置：默认主题的导航栏在宽度 ≥960px 时才固定在顶部，固定时舞台钉在它下方，可用高度扣掉它 */
   --sx-nav: 0px;
   --sx-vh: calc(100vh - var(--sx-nav));
@@ -39,13 +43,13 @@
 .dark .sx {
   --sx-bg: #000000;
   --sx-alt: #101011;
-  --sx-tile: #1c1c1e;
+  --sx-card: #1c1c1e;
+  --sx-card-in: #2c2c2e;
   --sx-text: #f5f5f7;
   /* 次要文字比 Apple 的默认值亮一些，在纯黑底和面板上的小字也清楚 */
   --sx-text-2: #b8b8bd;
   --sx-text-3: #9d9da3;
   --sx-line: rgba(255, 255, 255, 0.14);
-  --sx-edge: rgba(255, 255, 255, 0.12);
   --sx-panel: color-mix(in srgb, var(--vp-c-brand-3) 22%, #1c1c1e);
 }
 
@@ -91,7 +95,14 @@
 }
 
 .sx-alt {
+  --sx-card: #ffffff;
+  --sx-card-in: #f5f5f7;
   background: var(--sx-alt);
+}
+
+.dark .sx-alt {
+  --sx-card: #1c1c1e;
+  --sx-card-in: #2c2c2e;
 }
 
 /* 标题层级 */
@@ -191,13 +202,12 @@
   color: var(--sx-bg);
 }
 
-/* 独立的截图框：圆角和很淡的细边，没有阴影 */
+/* 独立的截图框：圆角，不描边、不加阴影 */
 .sx-win {
   position: relative;
   overflow: hidden;
   border-radius: 18px;
-  background: var(--sx-alt);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card);
 }
 
 .sx-win > :where(img, video) {
@@ -205,21 +215,52 @@
   height: auto;
 }
 
-/* 终端：浅色、深色下都是深底 */
+/* 截图底板：白底区域中的白色界面截图放在浅灰底板上。深色下截图本身是深色，底板透明，留白不变（免得切换主题时布局跳动） */
+.sx-plate {
+  padding: var(--sx-plate-pad);
+  border-radius: 28px;
+  background: var(--sx-card);
+}
+
+.dark .sx-plate {
+  background: transparent;
+}
+
+/* 终端：macOS 终端样式，顶部标题栏带红黄绿三个圆点，标题文字取 data-title；浅色、深色下都是深底。
+   长行在任意字符处换行（与终端按列折行一致），标题栏不随内容横向滚动 */
 .sx-term {
+  --sx-term-x: 26px;
+  --sx-term-y: 22px;
   margin: 0;
-  padding: 22px 26px;
-  overflow-x: auto;
+  padding: var(--sx-term-y) var(--sx-term-x);
+  overflow: hidden;
   border-radius: 18px;
   background: #1d1d1f;
   color: #f5f5f7;
   font: 13px/1.9 var(--vp-font-family-mono);
   letter-spacing: 0;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
-.dark .sx-term {
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+.sx-term::before {
+  content: attr(data-title);
+  content: attr(data-title) / '';
+  display: block;
+  height: 36px;
+  margin: calc(-1 * var(--sx-term-y)) calc(-1 * var(--sx-term-x)) 16px;
+  padding-inline: 80px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle 6px at 20px 50%, #ff5f57 5.5px, transparent 6px),
+    radial-gradient(circle 6px at 40px 50%, #febc2e 5.5px, transparent 6px),
+    radial-gradient(circle 6px at 60px 50%, #28c840 5.5px, transparent 6px),
+    #2c2c2e;
+  color: #98989d;
+  font: 500 12px/36px var(--vp-font-family-base);
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sx-term .c {
@@ -228,7 +269,8 @@
 
 @media (max-width: 760px) {
   .sx-term {
-    padding: 18px;
+    --sx-term-x: 18px;
+    --sx-term-y: 18px;
     font-size: 12px;
   }
 }

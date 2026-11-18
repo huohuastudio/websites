@@ -107,7 +107,7 @@ useScrollFrame((still) => {
   width: 48.5%;
   padding: 34px 34px 26px;
   border-radius: 28px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
   opacity: var(--mo, 1);
   transform: translateY(-50%) translateX(var(--mx, 0%)) scale(var(--ms, 1));
 }

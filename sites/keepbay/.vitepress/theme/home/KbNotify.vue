@@ -98,7 +98,7 @@ onBeforeUnmount(() => clearInterval(timer))
   width: 360px;
   padding: 14px 16px;
   border-radius: 20px;
-  background: var(--sx-alt);
+  background: var(--sx-card);
   font-size: 15px;
   line-height: 1.4;
 }

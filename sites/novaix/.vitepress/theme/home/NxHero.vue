@@ -149,7 +149,7 @@ const layout = useLayoutCache(
         </div>
       </div>
       <div ref="scene" class="scene">
-        <div class="dash">
+        <div class="dash sx-plate">
           <div class="sx-win">
             <SxShot src="/screenshots/dashboard" :width="2048" :height="1280" alt="Novaix 管理面板的仪表盘：收入、订单、实例和节点的概况" priority />
           </div>
@@ -157,6 +157,7 @@ const layout = useLayoutCache(
         <div
           ref="term"
           class="sx-term nterm"
+          data-title="server — bash"
           :class="{ fadein: fadeIn }"
           role="img"
           aria-label="安装命令：下载、解压、运行"
@@ -240,12 +241,16 @@ const layout = useLayoutCache(
   }
 }
 
+/* 场景：仪表盘截图放在底板中（白底区域），底板内的截图保持 16:10。
+   高度 = 截图高度 + 上下留白 = 宽度 / 1.6 + 0.75 × 留白，宽度上限扣掉 1.2 × 留白，场景高度仍不超过可用高度减 158px */
 .scene {
+  --sw: min(1040px, 80vw, calc((var(--sx-vh) - 158px) * 1.6 - 1.2 * var(--sx-plate-pad)));
+
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(1040px, 80vw, calc((var(--sx-vh) - 158px) * 1.6));
-  aspect-ratio: 16 / 10;
+  width: var(--sw);
+  height: calc((var(--sw) - 2 * var(--sx-plate-pad)) / 1.6 + 2 * var(--sx-plate-pad));
   transform: translate(-50%, -50%) translateY(calc(var(--dy, 0px) - 2.5vh));
 }
 
@@ -361,7 +366,7 @@ const layout = useLayoutCache(
   }
 
   .scene {
-    width: min(1040px, 80vw, calc((var(--sx-vh) - 118px) * 1.6));
+    --sw: min(1040px, 80vw, calc((var(--sx-vh) - 118px) * 1.6 - 1.2 * var(--sx-plate-pad)));
   }
 }
 
@@ -382,9 +387,9 @@ const layout = useLayoutCache(
     flex-direction: column;
     width: 100%;
     max-width: 1000px;
+    height: auto;
     margin: 56px auto 0;
     padding-inline: 24px;
-    aspect-ratio: auto;
     transform: none;
   }
 

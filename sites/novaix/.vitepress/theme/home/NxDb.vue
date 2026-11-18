@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
           role="tabpanel"
           :aria-labelledby="`dbt${i}`"
         >
-          <div class="sx-term">
+          <div class="sx-term" data-title="config.yaml">
             <div v-for="(l, j) in db.conf" :key="j" :style="{ '--i': j }">{{ l.code }}<span v-if="l.note" class="c">{{ l.note }}</span></div>
           </div>
           <dl class="dbfacts">
@@ -169,7 +169,7 @@ dd {
   margin: 0 auto 32px;
   padding: 4px;
   border-radius: 980px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
 }
 
 .dbseg button {
@@ -186,9 +186,9 @@ dd {
   transition: color 0.3s, background-color 0.3s;
 }
 
+/* 选中项与分段控件的底色相反，靠底色区分，不描边 */
 .dbseg button[aria-selected='true'] {
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card-in);
   color: var(--sx-text);
   font-weight: 600;
 }
@@ -253,11 +253,7 @@ dd {
 }
 
 .dbpane .sx-term {
-  padding: 26px 28px;
   font-size: 13.5px;
-  line-height: 1.9;
-  white-space: pre-wrap;
-  word-break: break-all;
 }
 
 .sx-term div,
@@ -287,7 +283,7 @@ dd {
   margin: 0;
   padding: 8px 26px;
   border-radius: 18px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
 }
 
 .dbfacts div {

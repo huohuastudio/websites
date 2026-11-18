@@ -152,7 +152,7 @@ useScrollFrame((still) => {
   height: min(520px, calc(var(--sx-vh) - 108px));
   padding: 24px;
   border-radius: 28px;
-  background: var(--sx-alt);
+  background: var(--sx-card);
 }
 
 .field {
@@ -162,8 +162,7 @@ useScrollFrame((still) => {
   min-height: 60px;
   padding: 14px 20px;
   border-radius: 14px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card-in);
   font-size: 20px;
 }
 

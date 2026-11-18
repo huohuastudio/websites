@@ -85,7 +85,7 @@ useScrollFrame((still) => {
   min-height: 380px;
   overflow: hidden;
   border-radius: 28px;
-  background: var(--sx-alt);
+  background: var(--sx-card);
   opacity: var(--o, 1);
   transform: translateY(calc((1 - var(--o, 1)) * 48px));
 }

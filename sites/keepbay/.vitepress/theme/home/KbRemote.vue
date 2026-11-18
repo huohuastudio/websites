@@ -77,7 +77,7 @@ useScrollFrame((still) => {
 .node {
   padding: 20px 14px;
   border-radius: 20px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
 }
 
 h4 {
@@ -121,7 +121,7 @@ circle {
   margin: 0 auto;
   padding: 16px 28px;
   border-radius: 22px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
   font-size: 21px;
   font-weight: 600;
   transform: scale(calc(0.9 + var(--d, 0) * 0.1));
@@ -137,7 +137,7 @@ circle {
   margin: 28px auto 0;
   padding: 10px 22px;
   border-radius: 20px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
   font-size: 16px;
 }
 

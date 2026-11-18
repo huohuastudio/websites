@@ -41,7 +41,7 @@ useScrollFrame((still) => {
         <div ref="zoom" class="zoom">
           <KbShot name="files" size="wide" fit detail alt="Keepbay 中的同一个文件夹：日常相册中的照片排成网格，左侧是文件夹列表" />
         </div>
-        <div class="disk" aria-hidden="true">
+        <div class="disk sx-term" data-title="nas — ls" aria-hidden="true">
           <div class="cmd"><b>$</b> ls /srv/nas/家庭相册/2025/日常</div>
           <div class="ls">
             <div v-for="n in names" :key="n">{{ n }}.jpg</div>
@@ -76,7 +76,6 @@ useScrollFrame((still) => {
   margin: 0 auto;
   overflow: hidden;
   border-radius: 18px;
-  box-shadow: 0 0 0 1px var(--sx-edge);
 }
 
 .zoom {
@@ -86,11 +85,14 @@ useScrollFrame((still) => {
   transform: scale(var(--zs, 1)) translate(var(--zx, 0%), var(--zy, 0%));
 }
 
-.disk {
+/* 磁盘上的文件夹：共用的终端样式（带标题栏），铺满截图框，随擦去从右向左收起。
+   多一层 .frame，免得与共用的 .sx-term 规则比先后 */
+.frame .disk {
+  --sx-term-x: 28px;
+  --sx-term-y: 24px;
   position: absolute;
   inset: 0;
-  padding: 24px 28px;
-  background: #1d1d1f;
+  border-radius: inherit;
   clip-path: inset(0 calc(var(--w, 0) * 100%) 0 0);
   color: #d2d2d7;
   font: 13px/1.85 var(--vp-font-family-mono);
@@ -153,8 +155,9 @@ useScrollFrame((still) => {
 }
 
 @media (max-width: 760px) {
-  .disk {
-    padding: 12px;
+  .frame .disk {
+    --sx-term-x: 12px;
+    --sx-term-y: 12px;
     font-size: 9px;
   }
 

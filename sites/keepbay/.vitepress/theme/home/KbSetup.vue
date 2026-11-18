@@ -39,7 +39,7 @@ useScrollFrame((still) => {
           需要一台 Linux 服务器、NAS 或小主机：x86_64 或 arm64，glibc 2.28 及以上。安装步骤见<a href="./docs/install">普通安装</a>，也可以<a href="./docs/docker">用 Docker 安装</a>。Keepbay 还在内测，存放重要资料前，请先做好备份。
         </p>
       </div>
-      <pre ref="term" class="sx-term"><div v-for="(line, i) in lines" :key="i" :class="[line.kind, { on: i < shown }]">{{ line.text }}</div></pre>
+      <pre ref="term" class="sx-term" data-title="nas — bash"><div v-for="(line, i) in lines" :key="i" :class="[line.kind, { on: i < shown }]">{{ line.text }}</div></pre>
     </div>
   </section>
 </template>
@@ -60,12 +60,7 @@ useScrollFrame((still) => {
   margin: 14px 0 0;
 }
 
-.sx-term {
-  min-width: 0;
-}
-
 .sx-term div {
-  white-space: pre-wrap;
   opacity: 0.12;
   transition: opacity 0.4s;
 }

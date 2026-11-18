@@ -98,8 +98,7 @@ useScrollFrame((still) => {
   margin: 0 auto 28px;
   padding: 4px;
   border-radius: 980px;
-  background: var(--sx-tile);
-  box-shadow: 0 0 0 1px var(--sx-edge);
+  background: var(--sx-card);
 }
 
 .tabs span {
@@ -124,7 +123,6 @@ useScrollFrame((still) => {
   margin: 0 auto;
   overflow: hidden;
   border-radius: 18px;
-  box-shadow: 0 0 0 1px var(--sx-edge);
 }
 
 .row {
@@ -183,7 +181,6 @@ useScrollFrame((still) => {
     width: min(1000px, 84vw);
     aspect-ratio: auto;
     overflow: visible;
-    box-shadow: none;
   }
 
   .row {
@@ -196,7 +193,6 @@ useScrollFrame((still) => {
     aspect-ratio: 16 / 10;
     margin-bottom: 20px;
     border-radius: 18px;
-    box-shadow: 0 0 0 1px var(--sx-edge);
   }
 
   .zoom {

@@ -101,7 +101,7 @@ useScrollFrame((still) => {
 .svc li {
   padding: 5px 13px;
   border-radius: 980px;
-  background: var(--sx-tile);
+  background: var(--sx-card);
   font-size: 14px;
 }
 
@@ -153,6 +153,7 @@ useScrollFrame((still) => {
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 10px;
+  /* 与区域背景同色：没扫过的图片半透明，淡进背景 */
   background: var(--sx-alt);
 }
 
@@ -202,12 +203,12 @@ useScrollFrame((still) => {
   opacity: 1;
 }
 
+/* 违规、疑似违规的色框 */
 .tile::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  box-shadow: inset 0 0 0 1px var(--sx-edge);
   pointer-events: none;
 }
 
