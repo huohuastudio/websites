@@ -45,7 +45,7 @@ useScrollFrame((still) => {
 
 <template>
   <section ref="root" class="sx-pin formats">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
         <h2 class="sx-title">在网页中直接打开</h2>
         <p class="sx-lead">预览都在浏览器里完成，服务器上无需另外安装 Office 或转换程序。</p>
@@ -74,11 +74,6 @@ useScrollFrame((still) => {
 .sx-stage {
   display: flex;
   flex-direction: column;
-  padding-top: 36px;
-}
-
-.sx-head {
-  margin-bottom: 24px;
 }
 
 .rows {
@@ -122,7 +117,7 @@ figure {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(34vw, 480px, calc((var(--sx-vh) - 428px) * 1.6));
+  width: min(34vw, 480px, calc((var(--sx-vh) - 368px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   margin: 0;
   transform: translate(-50%, -50%) translateX(calc(var(--f, 0) * var(--dx))) translateY(calc((1 - var(--f, 0)) * var(--sy) + var(--f, 0) * var(--fy))) rotate(calc(var(--f, 0) * var(--r)));
 }
@@ -148,8 +143,9 @@ figcaption {
 }
 
 @media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 12px;
+  /* 矮视口的其余部分更紧凑，底部仍留出与原来相同的余量 */
+  figure {
+    width: min(34vw, 480px, calc((var(--sx-vh) - 392px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   }
 }
 

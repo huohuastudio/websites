@@ -27,6 +27,9 @@
   /* 舞台钉住的位置：默认主题的导航栏在宽度 ≥960px 时才固定在顶部，固定时舞台钉在它下方，可用高度扣掉它 */
   --sx-nav: 0px;
   --sx-vh: calc(100vh - var(--sx-nav));
+  /* 固定舞台中标题区的留白：舞台顶部到标题、标题区到下方内容。版块换算截图尺寸时把它们算进去，视口变矮时截图随之缩小 */
+  --sx-stage-pad: 80px;
+  --sx-stage-gap: 56px;
 
   background: var(--sx-bg);
   color: var(--sx-text);
@@ -38,6 +41,27 @@
 @media (min-width: 960px) {
   .sx {
     --sx-nav: var(--vp-nav-height);
+  }
+}
+
+@media (max-height: 920px) {
+  .sx {
+    --sx-stage-pad: 64px;
+    --sx-stage-gap: 44px;
+  }
+}
+
+@media (max-height: 832px) and (min-width: 761px) {
+  .sx {
+    --sx-stage-pad: 48px;
+    --sx-stage-gap: 32px;
+  }
+}
+
+@media (max-height: 780px) and (min-width: 761px) {
+  .sx {
+    --sx-stage-pad: 40px;
+    --sx-stage-gap: 24px;
   }
 }
 
@@ -310,6 +334,15 @@
 
 /* 窄屏、视口太矮（与 motion.ts 的 isFlat 一致）或减少动态效果时，舞台不固定，内容按顺序排下来，
    各版块显示最终状态。舞台规则多一层 .sx：版块在 scoped 样式中给舞台设的 padding-top 只对固定时生效 */
+/* 标题在舞台顶部的固定版块：标题区上下的留白。优先级低于下面舞台不固定时的 padding-block */
+.sx-stage-top {
+  padding-top: var(--sx-stage-pad);
+}
+
+.sx-stage-top .sx-head {
+  margin-bottom: var(--sx-stage-gap);
+}
+
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
   .sx .sx-pin {
     height: auto;

@@ -213,6 +213,16 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 
+@media (max-width: 760px) {
+  .cap {
+    padding: 22px 24px 18px;
+  }
+
+  .img {
+    margin: 0 24px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .track {
     transition: none;

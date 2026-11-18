@@ -35,7 +35,7 @@ const on = (i: number) => field.value < 0 || field.value === i
 
 <template>
   <section id="ai" ref="sec" class="sx-pin ai">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
         <h2 class="sx-title"><span>AI 生成标签和描述</span><span>按文字润色图片</span></h2>
         <p class="sx-lead">可以手动提交，也可以在上传后自动生成。管理员通过角色组控制哪些用户可以使用、可以用多少次。</p>
@@ -76,14 +76,6 @@ const on = (i: number) => field.value < 0 || field.value === i
   --sx-run: 250vh;
 }
 
-.sx-stage {
-  padding-top: 36px;
-}
-
-.sx-head {
-  margin-bottom: 32px;
-}
-
 .sx-title {
   font-size: clamp(32px, 4vw, 50px);
 }
@@ -93,7 +85,7 @@ const on = (i: number) => field.value < 0 || field.value === i
 }
 
 .card {
-  --ch: clamp(280px, calc(var(--sx-vh) - 328px), 470px);
+  --ch: clamp(280px, calc(var(--sx-vh) - 298px - var(--sx-stage-pad) - var(--sx-stage-gap)), 470px);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
@@ -230,18 +222,15 @@ const on = (i: number) => field.value < 0 || field.value === i
   text-align: center;
 }
 
-/* 矮视口：标题区和字段收紧 */
+/* 矮视口：标题和字段收紧 */
 @media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 16px;
-  }
-
-  .sx-head {
-    margin-bottom: 18px;
-  }
-
   .sx-title {
     font-size: clamp(28px, 4.4vh, 36px);
+  }
+
+  /* 矮视口的标题和字段更紧凑，底部仍留出与原来相同的余量 */
+  .card {
+    --ch: clamp(280px, calc(var(--sx-vh) - 294px - var(--sx-stage-pad) - var(--sx-stage-gap)), 470px);
   }
 
   .fields {

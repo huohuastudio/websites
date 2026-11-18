@@ -228,7 +228,7 @@ td.yes {
 
 @media (max-width: 760px) {
   .plan {
-    padding: 28px;
+    padding: 28px 24px;
   }
 }
 </style>

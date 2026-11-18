@@ -28,7 +28,7 @@ useScrollFrame((still) => {
 
 <template>
   <section id="modes" ref="root" class="sx-pin sx-alt modes">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
         <h2 class="sx-title"><span class="nw">容器和虚拟机，</span><span class="nw">同一套界面</span></h2>
         <p class="sx-lead">同时管理 LXC 容器和 QEMU/KVM 虚拟机。创建套餐时选择类型，之后的下单、开通和管理都在同一套界面中完成。</p>
@@ -73,11 +73,6 @@ useScrollFrame((still) => {
 .sx-stage {
   display: flex;
   flex-direction: column;
-  padding-top: 60px;
-}
-
-.sx-head {
-  margin-bottom: 32px;
 }
 
 .sx-lead,
@@ -148,7 +143,7 @@ useScrollFrame((still) => {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(100%, calc((var(--sx-vh) - 388px) * 1.6));
+  width: min(100%, calc((var(--sx-vh) - 296px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   opacity: var(--so, 0);
   transform: translate(-50%, -50%) scale(var(--ss, 0.7));
 }
@@ -185,16 +180,8 @@ useScrollFrame((still) => {
 }
 
 @media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 28px;
-  }
-
-  .sx-head {
-    margin-bottom: 20px;
-  }
-
   .mshot {
-    width: min(100%, calc((var(--sx-vh) - 298px) * 1.6));
+    width: min(100%, calc((var(--sx-vh) - 250px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   }
 
   .shotbox {

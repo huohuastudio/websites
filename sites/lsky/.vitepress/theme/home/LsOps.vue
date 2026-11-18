@@ -59,7 +59,7 @@ useScrollFrame((still) => {
 
 <template>
   <section id="ops" ref="sec" class="sx-pin ops">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head">
         <h2 class="sx-title"><span class="ph">对外提供</span><span class="ph">图床服务</span></h2>
         <p class="sx-lead">套餐、订单、优惠券、在线支付、工单、公告和举报管理都在程序中，可以直接对外提供服务。</p>
@@ -115,11 +115,6 @@ useScrollFrame((still) => {
 .sx-stage {
   display: flex;
   flex-direction: column;
-  padding-top: 40px;
-}
-
-.sx-head {
-  margin-bottom: 36px;
 }
 
 .view {
@@ -127,7 +122,7 @@ useScrollFrame((still) => {
 }
 
 .track {
-  --oh: clamp(330px, calc(var(--sx-vh) - 258px), 620px);
+  --oh: clamp(330px, calc(var(--sx-vh) - 182px - var(--sx-stage-pad) - var(--sx-stage-gap)), 620px);
   display: flex;
   gap: 20px;
   width: max-content;
@@ -280,14 +275,11 @@ useScrollFrame((still) => {
   background: var(--sx-text);
 }
 
-/* 矮视口：标题区和卡片收紧 */
+/* 矮视口：卡片收紧 */
 @media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 16px;
-  }
-
-  .sx-head {
-    margin-bottom: 18px;
+  /* 矮视口的其余部分更紧凑，底部仍留出与原来相同的余量 */
+  .track {
+    --oh: clamp(330px, calc(var(--sx-vh) - 224px - var(--sx-stage-pad) - var(--sx-stage-gap)), 620px);
   }
 
   .oc.sm p {

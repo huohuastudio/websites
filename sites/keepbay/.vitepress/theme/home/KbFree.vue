@@ -174,6 +174,20 @@ h3 {
   }
 }
 
+@media (max-width: 760px) {
+  .txt {
+    padding: 24px 24px 0;
+  }
+
+  .k {
+    padding: 0 24px 24px;
+  }
+
+  .img {
+    left: 24px;
+  }
+}
+
 @media (max-width: 560px) {
   .s2 {
     grid-column: span 2;

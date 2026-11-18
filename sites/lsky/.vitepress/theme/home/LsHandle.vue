@@ -39,7 +39,7 @@ useScrollFrame((still) => {
 
 <template>
   <section id="handle" ref="sec" class="sx-pin handle">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
         <h2 class="sx-title"><span class="ph">上传后</span><span class="ph">按规则处理图片</span></h2>
         <p class="sx-lead">在图片处理驱动中添加规则，上传到关联储存的图片按分类顺序依次处理，结果覆盖原图。</p>
@@ -79,11 +79,6 @@ useScrollFrame((still) => {
 .sx-stage {
   display: flex;
   flex-direction: column;
-  padding-top: 40px;
-}
-
-.sx-head {
-  margin-bottom: 36px;
 }
 
 .hd {
@@ -150,7 +145,7 @@ useScrollFrame((still) => {
 
 /* 示意图：左边原图，右边逐步处理的结果 */
 .easel {
-  --eh: clamp(240px, calc(var(--sx-vh) - 308px), 500px);
+  --eh: clamp(240px, calc(var(--sx-vh) - 232px - var(--sx-stage-pad) - var(--sx-stage-gap)), 500px);
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(0, 3fr);
@@ -255,14 +250,11 @@ useScrollFrame((still) => {
   font-family: var(--vp-font-family-mono);
 }
 
-/* 矮视口：标题区收紧 */
+/* 矮视口：示意图和规则收紧 */
 @media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 16px;
-  }
-
-  .sx-head {
-    margin-bottom: 18px;
+  /* 矮视口的其余部分更紧凑，底部仍留出与原来相同的余量 */
+  .easel {
+    --eh: clamp(240px, calc(var(--sx-vh) - 274px - var(--sx-stage-pad) - var(--sx-stage-gap)), 500px);
   }
 
   .rules li {

@@ -84,7 +84,7 @@ useScrollFrame((still) => {
 
 <template>
   <section id="cloud" ref="sec" class="sx-pin sx-alt cloud">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
         <h2 class="sx-title"><span class="ph">在网址中加参数，</span><span class="ph">生成不同的版本</span></h2>
         <p class="sx-lead">访问图片时按参数实时生成，原图保持不变，生成的图片缓存在服务器上。</p>
@@ -116,14 +116,6 @@ useScrollFrame((still) => {
 <style scoped>
 .cloud {
   --sx-run: 300vh;
-}
-
-.sx-stage {
-  padding-top: 28px;
-}
-
-.sx-head {
-  margin-bottom: 24px;
 }
 
 .cl {
@@ -202,7 +194,7 @@ useScrollFrame((still) => {
 
 /* 原图和输出 */
 .panels {
-  --ph: clamp(200px, calc(var(--sx-vh) - 508px), 400px);
+  --ph: clamp(200px, calc(var(--sx-vh) - 456px - var(--sx-stage-pad) - var(--sx-stage-gap)), 400px);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
@@ -273,16 +265,8 @@ code {
   text-align: center;
 }
 
-/* 矮视口：标题区和各部分收紧 */
+/* 矮视口：各部分收紧 */
 @media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 16px;
-  }
-
-  .sx-head {
-    margin-bottom: 18px;
-  }
-
   .url {
     padding: 10px 16px;
     font-size: 14px;
@@ -298,7 +282,7 @@ code {
   }
 
   .panels {
-    --ph: clamp(200px, calc(var(--sx-vh) - 378px), 400px);
+    --ph: clamp(200px, calc(var(--sx-vh) - 344px - var(--sx-stage-pad) - var(--sx-stage-gap)), 400px);
   }
 
   figure {

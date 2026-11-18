@@ -32,7 +32,7 @@ useScrollFrame((still) => {
 
 <template>
   <section ref="root" class="sx-pin sx-alt wipe">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
         <h2 class="sx-title">文件留在原来的文件夹里</h2>
         <p class="sx-lead">Keepbay 只读取文件并建立索引，不移动文件，也不改变目录结构。</p>
@@ -59,17 +59,9 @@ useScrollFrame((still) => {
   --sx-run: 250vh;
 }
 
-.sx-stage {
-  padding-top: 40px;
-}
-
-.sx-head {
-  margin-bottom: 36px;
-}
-
 /* 宽度受舞台高度限制：舞台高度减去标题、说明和留白（--chrome）后按 16:10 换算 */
 .frame {
-  --chrome: 288px;
+  --chrome: calc(212px + var(--sx-stage-pad) + var(--sx-stage-gap));
   position: relative;
   width: min(1000px, 84vw, calc((var(--sx-vh) - var(--chrome)) * 1.6));
   aspect-ratio: 16 / 10;
@@ -134,12 +126,8 @@ useScrollFrame((still) => {
 }
 
 @media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 12px;
-  }
-
   .frame {
-    --chrome: 218px;
+    --chrome: calc(170px + var(--sx-stage-pad) + var(--sx-stage-gap));
   }
 
   .caption {

@@ -55,7 +55,7 @@ useScrollFrame((still) => {
 
 <template>
   <section ref="root" class="sx-pin sx-alt ai">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
         <h2 class="sx-title">AI 在您的设备上运行<span class="sx-badge">专业版</span></h2>
         <p class="sx-lead">语义搜索、按画面搜图、识别图片中的文字都有本地模型，照片不会发送到云端。</p>
@@ -80,14 +80,6 @@ useScrollFrame((still) => {
 <style scoped>
 .ai {
   --sx-run: 320vh;
-}
-
-.sx-stage {
-  padding-top: 28px;
-}
-
-.sx-head {
-  margin-bottom: 28px;
 }
 
 .tabs {
@@ -116,7 +108,7 @@ useScrollFrame((still) => {
 
 /* 宽度受舞台高度限制，见 KbWipe 中的说明 */
 .frame {
-  --chrome: 328px;
+  --chrome: calc(272px + var(--sx-stage-pad) + var(--sx-stage-gap));
   position: relative;
   width: min(1000px, 84vw, calc((var(--sx-vh) - var(--chrome)) * 1.6));
   aspect-ratio: 16 / 10;
@@ -154,12 +146,8 @@ useScrollFrame((still) => {
 }
 
 @media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 12px;
-  }
-
   .frame {
-    --chrome: 248px;
+    --chrome: calc(208px + var(--sx-stage-pad) + var(--sx-stage-gap));
   }
 
   .tabs {

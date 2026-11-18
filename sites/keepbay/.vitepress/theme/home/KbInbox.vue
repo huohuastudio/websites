@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { isFlat, pinProgress, seg, smooth, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 // 收件箱自动整理：三个文件随滚动依次从收件箱飞进目标文件夹，到达后显示所用的规则，最后出现"撤销"提示。
-// 舞台不固定时文件直接放在目标文件夹中；窄屏不显示飞行的文件，规则和提示直接显示
+// 窄屏舞台不固定，按整理区在视口中的位置推进；矮视口宽屏和减少动态效果时文件直接放在目标文件夹中
+// （矮视口宽屏的导航栏固定在顶部，飞行的文件会被它挡住）
 const files = [
   { type: 'PDF', name: '2026-03 洗衣机发票.pdf' },
   { type: 'JPG', name: 'IMG_20260314_101522.jpg' },
@@ -42,7 +43,13 @@ function update(p: number) {
   undo.value!.style.setProperty('--uo', String(seg(p, 0.82, 0.92)))
 }
 
-const refresh = useScrollFrame((still) => update(still || isFlat() ? 1 : pinProgress(root.value!)), root)
+function progress(still: boolean) {
+  if (still) return 1
+  if (!isFlat()) return pinProgress(root.value!)
+  return innerWidth <= 760 ? viewProgress(sort.value!, innerHeight * 0.8) : 1
+}
+
+const refresh = useScrollFrame((still) => update(progress(still)), root)
 
 // 减少动态效果时 useScrollFrame 只调用一次，窗口大小变化后要重新摆放
 onMounted(() => addEventListener('resize', refresh))
@@ -51,7 +58,7 @@ onBeforeUnmount(() => removeEventListener('resize', refresh))
 
 <template>
   <section ref="root" class="sx-pin inbox">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
         <h2 class="sx-title">收件箱自动整理<span class="sx-badge">专业版</span></h2>
         <p class="sx-lead">新文件先放进收件箱，按您定的规则或 AI 的建议归档。只整理收件箱，不改动其他文件夹。</p>
@@ -71,7 +78,7 @@ onBeforeUnmount(() => removeEventListener('resize', refresh))
           </div>
         </div>
         <div v-for="(f, i) in files" :key="f.name" :ref="(el) => (chips[i] = el as HTMLElement)" class="chip">
-          <b>{{ f.type }}</b>{{ f.name }}
+          <b>{{ f.type }}</b><span>{{ f.name }}</span>
         </div>
       </div>
       <div ref="undo" class="undo">已整理 3 个文件<span>撤销</span></div>
@@ -82,10 +89,6 @@ onBeforeUnmount(() => removeEventListener('resize', refresh))
 <style scoped>
 .inbox {
   --sx-run: 210vh;
-}
-
-.sx-stage {
-  padding-top: 28px;
 }
 
 .sort {
@@ -157,6 +160,13 @@ h4 {
   transform: translate(var(--tx, 0px), var(--ty, 0px));
 }
 
+/* 窄屏下名称过长时截断 */
+.chip span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .chip b {
   display: grid;
   place-items: center;
@@ -191,11 +201,8 @@ h4 {
   background: color-mix(in srgb, var(--sx-bg) 18%, transparent);
 }
 
-@media (max-height: 920px) {
-  .sx-head {
-    margin-bottom: 24px;
-  }
-
+/* 视口矮于 1000px 时整理区收紧，否则加上舞台留白放不下 */
+@media (max-height: 1000px) {
   .slot,
   .chip {
     height: 42px;
@@ -218,27 +225,11 @@ h4 {
   }
 }
 
-@media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 12px;
-  }
-}
-
-/* 手机：不显示飞行的文件，规则和提示直接显示 */
+/* 手机：收件箱和目标文件夹上下排列，文件向下飞进各个文件夹 */
 @media (max-width: 760px) {
   .sort {
     grid-template-columns: 1fr;
     gap: 24px;
-  }
-
-  .chip {
-    display: none;
-  }
-
-  .rule,
-  .undo {
-    opacity: 1;
-    transform: none;
   }
 }
 </style>

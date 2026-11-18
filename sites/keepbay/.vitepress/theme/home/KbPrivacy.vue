@@ -231,8 +231,18 @@ h3 {
     min-height: 0;
   }
 
+  /* 卡片内边距收到 24px，文字离屏幕约 48px */
+  .t,
+  .v {
+    padding: 32px 24px;
+  }
+
   .v {
     min-height: 260px;
+  }
+
+  .crop {
+    inset: 24px 0 0 24px;
   }
 }
 </style>

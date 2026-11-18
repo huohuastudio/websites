@@ -86,7 +86,7 @@ useScrollFrame((still) => {
 
 <template>
   <section id="flow" ref="root" class="sx-pin sx-alt flow">
-    <div class="sx-stage">
+    <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
         <h2 class="sx-title">从下单到售后</h2>
         <p class="sx-lead">套餐、订单、支付、开通、续费、工单和发票都在系统内完成，不需要另外的财务系统。</p>
@@ -121,11 +121,6 @@ useScrollFrame((still) => {
 .sx-stage {
   display: flex;
   flex-direction: column;
-  padding-top: 60px;
-}
-
-.sx-head {
-  margin-bottom: 40px;
 }
 
 .sx-lead,
@@ -253,7 +248,7 @@ useScrollFrame((still) => {
 .fvis {
   position: relative;
   justify-self: end;
-  width: min(100%, calc((var(--sx-vh) - 348px) * 1.6));
+  width: min(100%, calc((var(--sx-vh) - 248px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   aspect-ratio: 16 / 10;
   overflow: hidden;
   border-radius: 22px;
@@ -274,23 +269,15 @@ useScrollFrame((still) => {
   height: auto;
 }
 
-/* 矮视口：标题区收紧，面板改用较小的留边 */
+/* 矮视口：步骤条收紧，面板改用较小的留边 */
 @media (max-height: 832px) and (min-width: 761px) {
-  .sx-stage {
-    padding-top: 28px;
-  }
-
-  .sx-head {
-    margin-bottom: 20px;
-  }
-
   .rail {
     margin-bottom: 26px;
   }
 
   .fvis {
     --gut: 24px;
-    width: min(100%, calc((var(--sx-vh) - 278px) * 1.6));
+    width: min(100%, calc((var(--sx-vh) - 230px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   }
 }
 
@@ -310,7 +297,7 @@ useScrollFrame((still) => {
 
   .fvis {
     justify-self: center;
-    width: min(100%, calc((var(--sx-vh) - 608px) * 1.6));
+    width: min(100%, calc((var(--sx-vh) - 508px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   }
 }
 
