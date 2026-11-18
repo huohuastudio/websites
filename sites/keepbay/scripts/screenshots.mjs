@@ -4,7 +4,7 @@
 // Keepbay 的界面改了以后重新运行（W10，docs/plan.md）。在本机运行，不进 Cloudflare 的构建。
 //
 // 用法：pnpm --filter ./sites/keepbay shots [名称...]
-// 需要：Playwright 的 Chromium（pnpm exec playwright install chromium）、cwebp（brew install webp）；视频的截图要本机装有 Chrome
+// 需要：Playwright 的 Chromium（pnpm exec playwright install chromium）、cwebp（brew install webp）、ImageMagick（brew install imagemagick）；视频的截图要本机装有 Chrome
 // 环境变量见 keepbay.mjs
 //
 // 标了 local 的截图要在本机实例上截：语义搜索会加载本地模型，演示站的内存不够；演示站也没有部署在线编辑器。
@@ -27,7 +27,10 @@ const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 // - compact：400 × 430 按 3 倍截，得到 1200 × 1290，放在首页搜索一节的结果区，界面按手机布局显示。高度正好放下搜索的前三条结果
 // - panel：480 × 400 按 3 倍截，得到 1440 × 1200，放在首页搜索一节的结果区（宽屏下约 480 × 396），界面按手机布局显示
 // - card：卡片中的局部图，只截与说明相关的部分。截图窗口和截取的区域在各张截图的 card 中设定（见 shots），按 2 倍截。
-//   区域与卡片中截图框的宽高比相同，宽度约为截图框最大显示宽度 ÷ 0.9（见下面的 slots）
+//   区域与卡片中截图框的宽高比相同，宽度约为截图框最大显示宽度 ÷ 0.9（见下面的 slots）。
+//   截图框宽度固定的（card 中写了显示宽度 show），按显示尺寸出 1 倍、1.25 倍、2 倍三张，首页按屏幕挑选、1:1 显示，
+//   不再由浏览器缩小（Windows 1 倍屏上缩小的位图文字发虚）。先按 2 倍渲染（倍数 = 2 × show ÷ 区域宽度），再用 Lanczos 缩成另两张：
+//   按 0.9、1.125 这种倍数直接渲染时文字本身就画软了（W31，2026-11-18 对比后定）。旋转显示的格式小卡片做不到 1:1，只出 2 倍一张
 const sizes = {
   wide: { suffix: '', viewport: { width: 1024, height: 640 }, scale: 2 },
   mobile: { suffix: '-mobile', viewport: { width: 390, height: 700 }, scale: 3 },
@@ -35,18 +38,23 @@ const sizes = {
   panel: { suffix: '', viewport: { width: 480, height: 400 }, scale: 3 },
   card: { suffix: '', scale: 2 },
 }
+// 写了 show 的 card 截图，除 2 倍的主图外另出的倍数，文件名为 <名称>-<倍数>x-<主题>.webp
+const densities = [1, 1.25]
 
 // card 中截一小块的截图用的窗口，与原来的宽屏截图相同
 const desktop = { width: 1280, height: 800 }
 
-// 卡片中截图框的尺寸对应的截取区域（CSS 像素）：
-// - highlight：「了解亮点」轮播，截图框 816 × 510
+// 卡片中截图框的尺寸对应的截取区域（CSS 像素），show 是截图框的显示宽度（宽屏下固定）。
+// 界面文字按原尺寸的 0.9 倍显示（区域 = show ÷ 0.9）；0.9 倍时关键内容放不全、或以照片为主的，放宽到 0.8 倍（区域 = show ÷ 0.8，
+// 多放约四分之一的内容），不再更小（W31，2026-11-18 定）：
+// - highlight：「了解亮点」轮播，截图框 816 × 510；highlightMore 是放宽到 0.8 倍的
 // - format：「在网页中直接打开」的扇形小卡片，截图框 368–464px 宽（随视口），按最窄时不小于 0.85 算
 // - privacy：「隐私与安全」卡片的右半边，截图框 484 × 515–528，顶端对齐，矮视口下裁掉底部
 const slots = {
-  highlight: { width: 906, height: 566 },
+  highlight: { width: 906, height: 566, show: 816 },
+  highlightMore: { width: 1020, height: 637, show: 816 },
   format: { width: 416, height: 260 },
-  privacy: { width: 538, height: 587 },
+  privacy: { width: 538, height: 587, show: 484 },
 }
 
 /** 截取区域 slot 放在侧栏（宽 side）右边：窗口宽度是侧栏加上区域，侧栏不进截图 */
@@ -246,20 +254,20 @@ const shots = [
   },
   {
     // 在线编辑：在 ONLYOFFICE 中编辑演示文稿。演示站没有部署编辑器，在本机实例上截（本机实例要先在系统设置中接好 ONLYOFFICE）。
-    // 截编辑区和上方的工具栏，左侧的幻灯片列表、外层的标题栏和下方的备注区不进截图（编辑器在 iframe 中，按 1280 × 800 窗口中的位置截）
+    // 截编辑区和上方的工具栏，左侧的幻灯片列表、外层的标题栏和下方的备注区不进截图（编辑器在 iframe 中，按窗口中的位置截）。按 0.8 倍截，多放幻灯片的内容
     name: 'slides',
     local: true,
     sizes: ['card'],
-    card: { viewport: desktop, ...slots.highlight, at: () => ({ x: 280, y: 85 }) },
+    card: { viewport: { width: 280 + slots.highlightMore.width, height: 800 }, ...slots.highlightMore, at: () => ({ x: 280, y: 85 }) },
     path: (request) => viewerPath(request, ['林海的工作', '项目'], '2026 Q4 项目计划.pptx'),
     prepare: (page) => openEditor(page, { spell: true }),
   },
   {
     // 打开分享链接看到的页面（京都相册，带水印）。演示站的分享链接只给登录了演示帐号的浏览器看，页面与访客看到的相同。
-    // 从相册的标题截起，下面是两行照片，上方的页头不进截图。手机截图放在首屏的手机画面中
+    // 从相册的标题截起，下面是两行照片，上方的页头不进截图。按 0.8 倍截，第二排的文件名也放得下。手机截图放在首屏的手机画面中
     name: 'share',
     sizes: ['card', 'mobile'],
-    card: { viewport: { width: slots.highlight.width, height: 720 }, ...slots.highlight, at: async (page) => ({ x: 0, y: (await bounds(page.locator('main'))).y }) },
+    card: { viewport: { width: slots.highlightMore.width, height: 800 }, ...slots.highlightMore, at: async (page) => ({ x: 0, y: (await bounds(page.locator('main'))).y }) },
     path: async (request) => {
       const shares = await (await request.get('/api/v1/shares')).json()
       const share = shares.find((s) => s.title === '2024-10 京都')
@@ -273,10 +281,10 @@ const shots = [
     },
   },
   {
-    // AI 桌面的对话：截取区域放在侧栏（236px）右边；下方的输入框不进截图
+    // AI 桌面的对话：截取区域放在侧栏（236px）右边；下方的输入框不进截图。按 0.8 倍截，回答和附带的文件放得下
     name: 'desk-card',
     sizes: ['card'],
-    card: besideSidebar(236, slots.highlight, 800),
+    card: besideSidebar(236, slots.highlightMore, 800),
     ...desk,
   },
   // 以下是「在网页中直接打开」的五张小卡片：在 1280 × 800 的窗口中截一小块
@@ -330,17 +338,17 @@ const shots = [
   // 以下是「免费版就是完整的网盘」的格子
   {
     // 照片时间线：截取区域放在图标栏（56px，768–1023px 宽时侧栏收成图标栏）右边。
-    // 格子约 649 × 630；手机宽度下换用手机截图（首屏的手机画面也用它）
+    // 格子约 649 × 630，按 0.8 倍截，多放照片；手机宽度下换用手机截图（首屏的手机画面也用它）
     name: 'photos',
     sizes: ['card', 'mobile'],
-    card: besideSidebar(56, { width: 721, height: 700 }, 700),
+    card: besideSidebar(56, { width: 811, height: 787, show: 649 }, 787),
     ...photos,
   },
   {
     // 成员 family（周晴）的授权：两个文件夹读写、一个只读，没授权的看不到。格子约 299 × 260，窗口设成截取区域的大小，界面按手机布局显示
     name: 'members',
     sizes: ['card'],
-    card: { width: 332, height: 289 },
+    card: { width: 332, height: 289, show: 299 },
     path: async (request) => `/settings/members/${await userId(request, 'family')}`,
     // 滚到「文件夹」一节（上面的资料一节不进截图），标题上方留一点空。
     // 突出文件夹和只读、读写：标题下的说明、服务器上的路径和复制路径的按钮不进截图（每个文件夹都要找到，否则报错）
@@ -415,9 +423,9 @@ async function corner(locator, dx, dy) {
 /** 尺寸 name 的截图窗口、倍数和截取区域（card 按截图中的设置，其余截整个窗口）。 */
 function sizeOf(shot, name) {
   if (name !== 'card') return { ...sizes[name], clip: sizes[name].viewport }
-  const { width, height, viewport = { width, height }, at } = shot.card
+  const { width, height, viewport = { width, height }, at, show } = shot.card
   if (width > viewport.width || height > viewport.height) throw new Error(`${shot.name} 的截取区域比窗口大`)
-  return { ...sizes.card, viewport, clip: { width, height }, at }
+  return { ...sizes.card, viewport, clip: { width, height }, at, show, scale: show ? (2 * show) / width : sizes.card.scale }
 }
 
 /** 在线编辑器（ONLYOFFICE）所在的 iframe：查看器中的 iframe 里再嵌一层 */
@@ -520,6 +528,16 @@ function seed(context, kind, items) {
   )
 }
 
+const maxBuffer = 256 * 1024 * 1024
+
+/** 卡片的截图存成 WebP：界面图无损压缩通常更小，照片多的图有损（质量 90）更小，两种都试，存较小的一种 */
+function cardWebp(name, png) {
+  const encode = (args) => execFileSync('cwebp', ['-quiet', ...args, '-o', '-', '--', '-'], { input: png, maxBuffer })
+  const lossless = encode(['-lossless', '-z', '9'])
+  const lossy = encode(['-q', '90'])
+  writeFileSync(join(out, `${name}.webp`), lossless.length <= lossy.length ? lossless : lossy)
+}
+
 /** 截一张。返回文件名；推近用的高清图另存为 <名称>-detail-<主题>.webp，同时返回推近后看到的区域占画面的百分比 [x, y, 宽, 高] */
 async function shoot(browser, shot, sizeName, scheme) {
   const size = sizeOf(shot, sizeName)
@@ -541,6 +559,17 @@ async function shoot(browser, shot, sizeName, scheme) {
     const png = await page.screenshot({ clip: await clipOf(page, size) })
     // PNG 从标准输入交给 cwebp
     const webp = (name, args = []) => execFileSync('cwebp', ['-quiet', '-q', '82', ...args, '-o', join(out, `${name}.webp`), '--', '-'], { input: png })
+    if (sizeName === 'card') {
+      cardWebp(file, png)
+      if (size.show) {
+        // 主图是 2 倍，按百分比缩小，宽度正好是 show × d，与主图同比例
+        for (const d of densities) {
+          const resized = execFileSync('magick', ['png:-', '-filter', 'Lanczos', '-resize', `${d * 50}%`, 'png:-'], { input: png, maxBuffer })
+          cardWebp(`${shot.name}-${d}x-${scheme}`, resized)
+        }
+      }
+      return { file }
+    }
     if (!detail) {
       webp(file)
       return { file }
@@ -604,6 +633,8 @@ for (const shot of selected) {
     }),
   )
   if (regions[shot.name]) manifest[shot.name].detail = regions[shot.name]
+  // 另出的倍数（KbShot 按它写 srcset）
+  if (shot.card?.show) manifest[shot.name].dpr = densities
 }
 const lines = shots.filter((s) => manifest[s.name]).map((s) => `  ${JSON.stringify(s.name)}: ${JSON.stringify(manifest[s.name])}`)
 writeFileSync(manifestFile, `{\n${lines.join(',\n')}\n}\n`)

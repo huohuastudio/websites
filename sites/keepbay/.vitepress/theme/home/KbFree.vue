@@ -41,11 +41,11 @@ useScrollFrame((still) => {
             <h3>照片时间线</h3>
             <p>照片和视频跨文件夹按拍摄时间排在一起，按天分组，右侧的日期条按年、月跳转。</p>
           </div>
-          <div class="img sx-fade-rb" style="--op: center top; --zo: 50% 0">
+          <div class="img sx-fade-rb" style="--op: center top; --zo: 50% 0; --max: 649px">
             <KbShot name="photos" fit alt="照片时间线：照片按天分组排成等高的行，右侧是按年份标出的日期条" />
           </div>
         </div>
-        <div :ref="cell" class="cell s2">
+        <div :ref="cell" class="cell s2 side" style="--max: 299px">
           <div class="txt">
             <h3>一家人共用</h3>
             <p>按文件夹授权只读或读写。</p>
@@ -171,6 +171,26 @@ h3 {
     grid-column: span 2;
     grid-row: auto;
     min-height: 480px;
+  }
+}
+
+/* 截图最宽为宽屏下的显示宽度（--max，与截图脚本中的 show 一致）：窄屏下格子占满一行时截图不放大，仍按 1:1 显示。
+   手机宽度（≤580px）下仍铺满格子：手机多是 3 倍屏，截图本来就要放大，留出空隙反而显得没对齐 */
+@media (min-width: 581px) {
+  .img {
+    max-width: var(--max, none);
+  }
+}
+
+/* 格子占满一行、又放得下左右两栏时，成员授权的截图放在文字右边，贴住格子的右边缘（截图宽 299px，不放大） */
+@media (max-width: 960px) and (min-width: 581px) {
+  .side .txt {
+    padding-right: calc(var(--max) + 64px);
+  }
+
+  .side .img {
+    left: auto;
+    width: var(--max);
   }
 }
 

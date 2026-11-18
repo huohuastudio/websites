@@ -7,14 +7,15 @@ import manifest from '../screenshots.json'
 // size 指定只用其中一种（如只用卡片的局部图、只用手机截图），不随页面宽度切换；fit 时铺满容器（object-fit: cover，位置用 style 中的 object-position 调）。
 // 浅色、深色和两种尺寸都渲染出来，由 CSS 按 <html> 上的 dark 类和页面宽度显示其中一张：服务端渲染与客户端一致，不会水合不一致。
 // 都懒加载：不显示的那几张不会下载。class、style 等属性加到每一张图片上。
-// detail 时叠上推近用的高清图（清单中有 detail 的截图才有，见 zoom.ts），只在首页舞台固定时显示
+// detail 时叠上推近用的高清图（清单中有 detail 的截图才有，见 zoom.ts），只在首页舞台固定时显示。
+// 清单中有 dpr 的截图，卡片的局部图另有按显示尺寸出的 1 倍、1.25 倍图，用 srcset 按屏幕挑选（2 倍屏用主图），1:1 显示不再缩小
 defineOptions({ inheritAttrs: false })
 
 type Size = 'wide' | 'mobile' | 'compact' | 'panel' | 'card'
 
 const props = defineProps<{ name: keyof typeof manifest; alt: string; size?: 'wide' | 'mobile' | 'card'; fit?: boolean; detail?: boolean }>()
 
-const { detail: region, ...sizes }: Partial<Record<Size, number[]>> & { detail?: number[] } = manifest[props.name]
+const { detail: region, dpr, ...sizes }: Partial<Record<Size, number[]>> & { detail?: number[]; dpr?: number[] } = manifest[props.name]
 const variants = Object.entries(sizes)
   .filter(([size]) => !props.size || size === props.size)
   .map(([size, [width, height]]) => ({ size, width, height }))
@@ -24,6 +25,12 @@ const detailStyle = region && {
   width: `${region[2]}%`,
   height: `${region[3]}%`,
 }
+// 截图文件：<名称><后缀>-<主题>.webp，后缀为 -mobile（手机截图）、-1x 等（倍数图）、-detail（推近用的高清图）或空
+const file = (suffix: string, scheme: string) => withBase(`/screenshots/${props.name}${suffix}-${scheme}.webp`)
+const main = (size: string, scheme: string) => file(size === 'mobile' ? '-mobile' : '', scheme)
+// 清单中的 dpr 只属于 card 这一档（脚本只给 card 出倍数图）
+const srcset = (size: string, scheme: string) =>
+  size === 'card' && dpr ? [...dpr.map((d) => `${file(`-${d}x`, scheme)} ${d}x`), `${main(size, scheme)} 2x`].join(', ') : undefined
 // 有手机截图、又没有指定尺寸时才按页面宽度二选一：手机宽度下用手机截图，其余宽度用另一种（kb-shot-desk）
 const responsive = !props.size && !!sizes.mobile
 </script>
@@ -35,7 +42,8 @@ const responsive = !props.size && !!sizes.mobile
       :key="scheme"
       v-bind="$attrs"
       :class="['kb-shot', `kb-shot-${scheme}`, responsive && (v.size === 'mobile' ? 'kb-shot-mobile' : 'kb-shot-desk'), fit && 'kb-shot-fit']"
-      :src="withBase(`/screenshots/${name}${v.size === 'mobile' ? '-mobile' : ''}-${scheme}.webp`)"
+      :src="main(v.size, scheme)"
+      :srcset="srcset(v.size, scheme)"
       :alt="alt"
       :width="v.width"
       :height="v.height"
@@ -47,7 +55,7 @@ const responsive = !props.size && !!sizes.mobile
       v-for="scheme in ['light', 'dark']"
       :key="scheme"
       :class="['kb-shot-detail', `kb-shot-${scheme}`]"
-      :src="withBase(`/screenshots/${name}-detail-${scheme}.webp`)"
+      :src="file('-detail', scheme)"
       :style="detailStyle"
       alt=""
       loading="lazy"
