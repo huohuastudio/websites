@@ -42,6 +42,8 @@ export interface SiteOptions {
   keywords?: string
   /** Cloudflare Web Analytics 的令牌，留空时不加载统计脚本 */
   analyticsToken?: string
+  /** Google Analytics 4 的衡量 ID（G-XXXXXXXXXX），留空时不加载 */
+  googleAnalyticsId?: string
   nav?: DefaultTheme.NavItem[]
   socialLinks?: DefaultTheme.SocialLink[]
   sidebar?: DefaultTheme.Sidebar
@@ -103,7 +105,7 @@ function pagePath(relativePath: string): string {
 }
 
 export function defineSiteConfig(options: SiteOptions) {
-  const { hostname, title, description, dir, logo, ogImage, app, sidebar, keywords, analyticsToken, versions, mermaid } = options
+  const { hostname, title, description, dir, logo, ogImage, app, sidebar, keywords, analyticsToken, googleAnalyticsId, versions, mermaid } = options
   const image = ogImage && hostname + ogImage.src
   const year = new Date().getFullYear()
   // head 中写了 robots noindex 的页面（如跳转页），不进 sitemap。
@@ -194,14 +196,24 @@ export function defineSiteConfig(options: SiteOptions) {
       ])
     },
 
-    // 统计只在构建产物中加载，开发时不加载
+    // 统计只在构建产物中加载，开发时不加载。
+    // Google Analytics 4 默认按浏览器历史记录的变化统计页面浏览，站内跳转（pushState）也会记录，不用另外上报
     transformHead() {
-      if (!analyticsToken) return
-      return [['script', {
-        defer: '',
-        src: 'https://static.cloudflareinsights.com/beacon.min.js',
-        'data-cf-beacon': JSON.stringify({ token: analyticsToken }),
-      }]]
+      const tags: HeadConfig[] = []
+      if (analyticsToken) {
+        tags.push(['script', {
+          defer: '',
+          src: 'https://static.cloudflareinsights.com/beacon.min.js',
+          'data-cf-beacon': JSON.stringify({ token: analyticsToken }),
+        }])
+      }
+      if (googleAnalyticsId) {
+        tags.push(
+          ['script', { async: '', src: `https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}` }],
+          ['script', {}, `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',${JSON.stringify(googleAnalyticsId)})`],
+        )
+      }
+      return tags
     },
 
     async buildEnd({ outDir }) {

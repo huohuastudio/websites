@@ -36,6 +36,16 @@
   font-size: 17px;
   line-height: 1.6;
   letter-spacing: -0.01em;
+  /* 尽量不让最后一行只剩一两个字 */
+  text-wrap: pretty;
+}
+
+/* 标题和展示性的短语（大字、并列的几个词）只在标点和空格处断行，免得词语从中间断开（"通行密钥"断成"通 / 行密钥"）；
+   长到一行放不下时再在任意处断开。正文段落不用：一句话常比一行长，强制断开时标点会落到行首。没有标点的长标题用 <wbr> 标出可断处 */
+.sx-title,
+.sx-phrase {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 @media (min-width: 960px) {

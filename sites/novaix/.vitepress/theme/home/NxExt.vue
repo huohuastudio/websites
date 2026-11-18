@@ -70,13 +70,6 @@ useScrollFrame((still) => {
 </template>
 
 <style scoped>
-.sx-lead,
-.ext-note p,
-.ty span {
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-}
-
 .ty span {
   text-wrap: balance;
 }

@@ -148,13 +148,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.sx-lead,
-dd,
-.db-note {
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-}
-
 .sx-head .sx-lead,
 dd {
   text-wrap: balance;

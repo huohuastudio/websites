@@ -34,7 +34,7 @@ useScrollFrame((still) => {
   <section ref="root" class="sx-pin sx-alt wipe">
     <div class="sx-stage sx-stage-top">
       <div class="sx-wrap sx-head center">
-        <h2 class="sx-title">文件留在原来的文件夹里</h2>
+        <h2 class="sx-title">文件留在<wbr />原来的文件夹里</h2>
         <p class="sx-lead">Keepbay 只读取文件并建立索引，不移动文件，也不改变目录结构。</p>
       </div>
       <div ref="frame" class="frame">
@@ -138,7 +138,7 @@ useScrollFrame((still) => {
 /* 舞台不固定时不受舞台高度限制 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
   .frame {
-    width: min(1000px, 84vw);
+    width: min(1000px, calc(100vw - 48px));
   }
 }
 

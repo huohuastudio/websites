@@ -75,13 +75,6 @@ useScrollFrame((still) => {
   flex-direction: column;
 }
 
-.sx-lead,
-.mcard li,
-.mcap {
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-}
-
 .sx-head .sx-lead,
 .mcap {
   text-wrap: balance;

@@ -204,8 +204,6 @@ const layout = useLayoutCache(
   margin: 22px auto 32px;
 }
 
-.sx-lead,
-.hnote,
 .nterm .ln.c {
   word-break: keep-all;
   overflow-wrap: anywhere;

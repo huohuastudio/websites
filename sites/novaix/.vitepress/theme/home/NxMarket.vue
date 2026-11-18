@@ -108,8 +108,6 @@ const groups = [
   color: var(--sx-text-2);
   font-size: 14px;
   line-height: 1.5;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
 }
 
 .meta {

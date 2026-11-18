@@ -9,6 +9,7 @@ export default defineSiteConfig({
   description: '面向中小型 VPS 服务商的 IDC 管理系统',
   dir: 'sites/novaix',
   logo: '/logo.svg',
+  googleAnalyticsId: 'G-QK0XF8CE4M',
   ogImage: { src: '/og.png', width: 1200, height: 630, alt: 'Novaix 标识和“面向中小型 VPS 服务商的一站式 IDC 管理系统”' },
   app: { category: 'BusinessApplication', os: 'Linux' },
   mermaid: true,

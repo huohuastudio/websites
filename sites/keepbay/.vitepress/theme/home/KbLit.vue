@@ -3,13 +3,14 @@ import { isFlat, pinProgress, seg, useScrollFrame } from '@huohuastudio/theme/sh
 import { ref } from 'vue'
 
 // 隐私的几句话：黑底大字（浅色、深色下都是黑底），随滚动逐句点亮。舞台不固定时全部点亮
+// 比一行长的句子用零宽空格（\u200b）标出可断处，免得在词语中间断开
 const sentences = [
-  '文件只在您自己的设备和存储上。',
+  '文件只在您自己的\u200b设备和存储上。',
   '不用注册我们的帐号，',
   '没有统计、遥测和崩溃上报。',
-  '本地模型在您的设备上运行；',
+  '本地模型\u200b在您的设备上运行；',
   '使用云端 AI 由您决定，每次调用都有记录。',
-  '家人只看得到授权给他的文件夹。',
+  '家人只看得到\u200b授权给他的文件夹。',
 ]
 
 const root = ref<HTMLElement>()
@@ -25,7 +26,7 @@ useScrollFrame((still) => {
   <section ref="root" class="sx-pin lit">
     <div class="sx-stage">
       <div class="sx-wrap">
-        <p><span v-for="(s, i) in sentences" :key="s" :class="{ on: i < lit }">{{ s }}</span></p>
+        <p class="sx-phrase"><span v-for="(s, i) in sentences" :key="s" :class="{ on: i < lit }">{{ s }}</span></p>
       </div>
     </div>
   </section>

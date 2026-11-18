@@ -123,12 +123,6 @@ useScrollFrame((still) => {
   flex-direction: column;
 }
 
-.sx-lead,
-.fpane p {
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-}
-
 .sx-head .sx-lead {
   text-wrap: balance;
 }

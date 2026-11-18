@@ -155,8 +155,6 @@ onBeforeUnmount(() => observer?.disconnect())
 .s p {
   margin: 16px 0 0;
   color: var(--sx-text-2);
-  word-break: keep-all;
-  overflow-wrap: anywhere;
 }
 
 .legend {

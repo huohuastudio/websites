@@ -203,6 +203,7 @@ const on = (i: number) => field.value < 0 || field.value === i
 
 .status {
   padding: 3px 11px;
+  white-space: nowrap;
   border-radius: 980px;
   box-shadow: inset 0 0 0 1px var(--sx-line);
   color: var(--sx-text-3);

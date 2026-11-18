@@ -90,14 +90,14 @@ useScrollFrame((still) => {
             <h3>IP 池</h3>
             <p>IPv4 和 IPv6 的分配与回收，支持纯 IPv6 套餐。</p>
           </div>
-          <div class="k">IPv4<br />IPv6</div>
+          <div class="k sx-phrase">IPv4<br />IPv6</div>
         </div>
         <div class="cell s2 word">
           <div class="txt">
             <h3>资源超开</h3>
             <p>CPU、内存、磁盘分别设置超开比例。例如 32 核的服务器，CPU 超开 300% 后：</p>
           </div>
-          <div class="k">可分配<br />128 核</div>
+          <div class="k sx-phrase">可分配<br />128 核</div>
         </div>
         <div class="cell s3 shot">
           <div class="txt">
@@ -131,14 +131,14 @@ useScrollFrame((still) => {
             <h3>共享 IP 和 NAT<span class="sx-badge sm">授权版</span></h3>
             <p>多个实例共享公网 IP，用户可以自助购买独享的出口 IP。端口有两种分配方式：</p>
           </div>
-          <div class="k">固定端口段<br />按需选端口</div>
+          <div class="k sx-phrase">固定端口段<br />按需选端口</div>
         </div>
         <div class="cell s6 word">
           <div class="txt">
             <h3>告警通知<span class="sx-badge sm">授权版</span></h3>
             <p>节点离线，或 CPU、内存、磁盘超过阈值时发出告警。CPU、内存、磁盘的默认阈值都是 90%。</p>
           </div>
-          <div class="row6"><div class="k">Telegram　钉钉　企业微信　Webhook</div></div>
+          <div class="row6"><div class="k sx-phrase">Telegram　钉钉　企业微信　Webhook</div></div>
         </div>
       </div>
 
@@ -153,13 +153,6 @@ useScrollFrame((still) => {
 </template>
 
 <style scoped>
-.sx-lead,
-.cell p,
-.it span {
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-}
-
 .sx-head .sx-lead {
   text-wrap: balance;
 }

@@ -11,7 +11,7 @@ const cellEls = new Set<HTMLElement>()
 const words = [
   { title: '收集文件', text: '对方不用登录即可上传到指定的文件夹。', word: ['看不到', '已有的内容'] },
   { title: '撤销和历史版本', text: '移动、改名、删除都能撤销，编辑过的文件保留旧版本。', word: ['可以', '恢复'] },
-  { title: '离线下载', text: '由服务器下载网址、磁力链接；安装 yt-dlp 后还可以下载视频网站的视频。', word: ['关机也', '继续下载'] },
+  { title: '离线下载', text: '由服务器下载网址、磁力链接；安装 yt‑dlp 后还可以下载视频网站的视频。', word: ['关机也', '继续下载'] },
   { title: '标签和智能文件夹', text: '手动打标签，把常用的搜索条件存成智能文件夹。', word: ['点一下', '就是结果'] },
 ]
 
@@ -32,7 +32,7 @@ useScrollFrame((still) => {
   <section ref="root" class="sx-sec">
     <div class="sx-wrap">
       <div class="sx-head">
-        <h2 class="sx-title">免费版就是完整的网盘</h2>
+        <h2 class="sx-title">免费版<wbr />就是完整的网盘</h2>
         <p class="sx-lead">不限文件夹和文件数量。下面这些功能都不收费。</p>
       </div>
       <div class="bento">
@@ -59,14 +59,14 @@ useScrollFrame((still) => {
             <h3>{{ w.title }}</h3>
             <p>{{ w.text }}</p>
           </div>
-          <div class="k">{{ w.word[0] }}<br />{{ w.word[1] }}</div>
+          <div class="k sx-phrase">{{ w.word[0] }}<br />{{ w.word[1] }}</div>
         </div>
         <div :ref="cell" class="cell s6 word">
           <div class="txt">
             <h3>安全功能不收费</h3>
             <p>两步验证、通行密钥，以及用 Authentik、Keycloak、Google、Microsoft、GitHub 等外部帐号登录，都在免费版中。</p>
           </div>
-          <div class="k" style="padding-top: 24px">两步验证　通行密钥　外部帐号</div>
+          <div class="k sx-phrase" style="padding-top: 24px">两步验证　通行密钥　外部帐号</div>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import KbShot from '../visuals/KbShot.vue'
 
 // 了解亮点：横向排开的卡片，指示条按时间填满后自动换下一张；离开视口、标签页隐藏或点了暂停时停下。
-// 减少动态效果时不自动换，指示条直接填满
+// 减少动态效果时不自动换，指示条直接填满。触摸屏上可以左右滑动切换
 const items = [
   { name: 'viewer', title: '查看器。', text: '照片、视频、PDF、Office 文档，直接在网页中预览。', alt: '查看器：显示京都伏见稻荷鸟居的照片' },
   { name: 'music', title: '音乐。', text: '封面和滚动歌词，播完自动播放下一首。', alt: '音乐播放器正在播放，显示封面和滚动的歌词' },
@@ -24,7 +24,9 @@ const cycle = ref(0)
 const userPaused = ref(false)
 const visible = ref(false)
 const pageHidden = ref(false)
-const paused = computed(() => userPaused.value || !visible.value || pageHidden.value)
+// 拖动中也暂停，免得拖动期间自动换下一张、松手后再换一张
+const dragging = ref(false)
+const paused = computed(() => userPaused.value || !visible.value || pageHidden.value || dragging.value)
 
 /** 把第 i 张卡片移到左侧与版心对齐的位置。 */
 function position() {
@@ -37,6 +39,49 @@ function show(i: number) {
   index.value = i
   cycle.value++
   nextTick(position)
+}
+
+// 触摸左右滑动：横向拖动时卡片跟手，松开时超过 48px 换到相邻的一张，否则回到原位。
+// 纵向滑动仍交给页面滚动（轨道设了 touch-action: pan-y）；鼠标仍用点击切换
+// dx 是最后一次移动时的横向偏移，松手时按它判断（不依赖 pointerup 带的坐标）
+let start: { x: number; y: number; id: number; dx: number } | null = null
+// 滑动结束后浏览器可能补发一次点击，不当作点卡片
+let swiped = false
+
+function onDown(e: PointerEvent) {
+  // 已有一根手指在滑动时，忽略其他手指
+  if (start) return
+  swiped = false
+  if (e.pointerType === 'mouse') return
+  start = { x: e.clientX, y: e.clientY, id: e.pointerId, dx: 0 }
+}
+
+function onMove(e: PointerEvent) {
+  if (!start || e.pointerId !== start.id) return
+  const dx = e.clientX - start.x
+  if (!dragging.value) {
+    if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(e.clientY - start.y)) return
+    dragging.value = true
+    track.value!.setPointerCapture(e.pointerId)
+  }
+  start.dx = dx
+  track.value!.style.setProperty('--drag', `${dx}px`)
+}
+
+function onEnd(e: PointerEvent) {
+  if (!start || e.pointerId !== start.id) return
+  const dx = e.type === 'pointerup' ? start.dx : 0
+  start = null
+  if (!dragging.value) return
+  dragging.value = false
+  swiped = true
+  track.value!.style.setProperty('--drag', '0px')
+  const next = index.value + (dx < -48 ? 1 : dx > 48 ? -1 : 0)
+  if (next !== index.value && next >= 0 && next < items.length) show(next)
+}
+
+function onCard(i: number) {
+  if (!swiped && i !== index.value) show(i)
 }
 
 const onVisibility = () => (pageHidden.value = document.hidden)
@@ -62,16 +107,16 @@ onBeforeUnmount(() => {
 <template>
   <section ref="root" class="sx-alt highlights">
     <div class="sx-wrap sx-head"><h2 class="sx-title">了解亮点</h2></div>
-    <div ref="track" class="track">
+    <div ref="track" class="track" :class="{ drag: dragging }" @pointerdown="onDown" @pointermove="onMove" @pointerup="onEnd" @pointercancel="onEnd">
       <div
         v-for="(item, i) in items"
         :key="item.name"
         :ref="(el) => (cards[i] = el as HTMLElement)"
         class="card"
         :class="{ on: i === index }"
-        @click="i !== index && show(i)"
+        @click="onCard(i)"
       >
-        <div class="cap">{{ item.title }}<span>{{ item.text }}</span></div>
+        <div class="cap sx-phrase">{{ item.title }}<span>{{ item.text }}</span></div>
         <div class="img sx-fade-b"><KbShot :name="item.name" size="wide" fit :alt="item.alt" /></div>
       </div>
     </div>
@@ -104,8 +149,14 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 24px;
   padding-inline: max(24px, calc((100vw - 1080px) / 2 + 24px));
-  transform: translateX(var(--hx, 0px));
+  transform: translateX(calc(var(--hx, 0px) + var(--drag, 0px)));
   transition: transform 0.9s var(--sx-ease);
+  touch-action: pan-y;
+}
+
+/* 拖动中跟手，不要过渡 */
+.track.drag {
+  transition: none;
 }
 
 .card {

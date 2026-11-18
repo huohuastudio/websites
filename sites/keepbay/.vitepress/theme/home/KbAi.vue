@@ -166,7 +166,7 @@ useScrollFrame((still) => {
   }
 
   .frame {
-    width: min(1000px, 84vw);
+    width: min(1000px, calc(100vw - 48px));
     aspect-ratio: auto;
     overflow: visible;
   }
@@ -188,12 +188,11 @@ useScrollFrame((still) => {
   }
 }
 
-/* 手机：换用手机截图 */
+/* 手机：换用手机截图，与其他版块一样铺满内容宽度 */
 @media (max-width: 760px) {
   .slot {
     width: 100%;
-    max-width: 300px;
-    margin: 0 auto 16px;
+    margin: 0 0 16px;
     aspect-ratio: 1170 / 2100;
     border-radius: 28px;
   }
