@@ -81,7 +81,7 @@ useScrollFrame((still) => {
   object-position: top;
 }
 
-/* 访问密码框：跨在截图底边上，伸出底板。底色掺品牌色，与白色截图、浅灰底板、白底都分得开 */
+/* 访问密码框：跨在截图底边上，伸出底板。浅色下掺的品牌色比底板（--sx-panel）多一倍，与白色截图、底板、白底都分得开；深色下底板透明，直接用 --sx-panel */
 .lock {
   position: absolute;
   right: calc(var(--sx-plate-pad) + 16px);
@@ -89,10 +89,14 @@ useScrollFrame((still) => {
   width: 260px;
   padding: 18px 20px;
   border-radius: 18px;
-  background: var(--sx-panel);
+  background: color-mix(in srgb, var(--vp-c-brand-3) 18%, #f5f5f7);
   font-size: 14px;
   opacity: var(--lo, 1);
   transform: translateY(calc((1 - var(--lo, 1)) * 20px));
+}
+
+.dark .lock {
+  background: var(--sx-panel);
 }
 
 .lock b {
@@ -126,7 +130,7 @@ useScrollFrame((still) => {
 .lock small {
   display: block;
   margin-top: 10px;
-  color: var(--sx-text-3);
+  color: var(--sx-text-2);
   font-size: 12px;
 }
 

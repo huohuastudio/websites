@@ -282,6 +282,12 @@ W23 留下的素材，只改 Keepbay：
 - **报价**：取首页 frontmatter 的 plans，价格写成"¥数字"的才算（Novaix 授权版"订阅制"不写）；Lsky 开源版是另一个程序，标 `offer: false` 不写
 - **描述和分享图**：Novaix、Lsky 首页补了 description（119、103 字）；Lsky 新增 `scripts/og.mjs`（`pnpm --filter ./sites/lsky og`，版式与 Keepbay 相同，右侧是图片页深色截图）；站点配置的 `ogImage` 改为 `{ src, width, height, alt }`，输出 og:image:width、height、alt
 
+**W28c 截图底板改用面板色**（2026-11-18 用户反映，用户定"按 Apple 的做法，由 Claude 决定"）：
+
+- 白色截图放在 #f5f5f7 的底板上，截图、底板、白色页面三层颜色太接近，截图边缘看起来与背景连成一片。Apple 把白色窗口放在有颜色的桌面壁纸上，靠颜色差别托出轮廓。共用的 `.sx-plate` 在浅色下改用掺品牌色的 `--sx-panel`（与卡片一致），深色下仍透明
+- Lsky 相册的访问密码框原本用 `--sx-panel`，跨在底板上会同色：浅色下改为品牌色 18%（比底板多一倍），底部小字改用 `--sx-text-2`
+- 用 DOM 检查过三个首页（宽屏和手机宽度）：卡片中碰到右边、底边的截图都已渐隐到面板色，没有遗漏
+
 ## W24 Novaix、Lsky 首页补截图（2026-11-18 用户定）
 
 用户要求在本机搭建 Novaix 和 Lsky Pro+，填充测试数据，自己决定截哪些图（"自己截你想要的图"），补上 W23 留下的素材缺口。两个项目都在 ~/Develop/Projects 下。
