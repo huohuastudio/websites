@@ -38,7 +38,7 @@ Keepbay 由一个程序和一个 `lib/` 目录组成，解压即可运行，无�
 |---|---|
 | `keepbay_linux_amd64.tar.gz` | x86_64 的安装包 |
 | `keepbay_linux_arm64.tar.gz` | arm64 的安装包 |
-| `keepbay_checksums.txt` | 两个安装包的 SHA256 |
+| `checksums.txt` | 两个安装包的 SHA256 |
 
 文件名不带版本号，固定地址 `https://github.com/huohuastudio/keepbay-releases/releases/latest/download/<文件名>` 总是指向最新版本；指定版本时，把 `latest/download` 换成 `download/v<版本>`。
 
@@ -85,10 +85,10 @@ Keepbay 创建的全部目录和文件，包括在您的文件夹中和远程存
 ```bash
 # 下载最新版本和 SHA256 清单
 curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/keepbay_linux_amd64.tar.gz
-curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/keepbay_checksums.txt
+curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/checksums.txt
 
 # 显示 keepbay_linux_amd64.tar.gz: OK 才继续
-sha256sum -c --ignore-missing keepbay_checksums.txt
+sha256sum -c --ignore-missing checksums.txt
 
 sudo mkdir -p /opt/keepbay/versions
 sudo tar -xzf keepbay_linux_amd64.tar.gz -C /opt/keepbay/versions --no-same-owner

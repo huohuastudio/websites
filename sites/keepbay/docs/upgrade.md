@@ -92,8 +92,8 @@ flowchart TD
 ```bash
 # 下载新版本：最新版本用 latest/download，指定版本用 download/v<新版本>，核对方法见安装页的第 1 步
 curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/keepbay_linux_amd64.tar.gz
-curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/keepbay_checksums.txt
-sha256sum -c --ignore-missing keepbay_checksums.txt
+curl -fLO https://github.com/huohuastudio/keepbay-releases/releases/latest/download/checksums.txt
+sha256sum -c --ignore-missing checksums.txt
 
 sudo tar -xzf keepbay_linux_amd64.tar.gz -C /opt/keepbay/versions --no-same-owner
 sudo ln -sfn versions/keepbay_<新版本>_linux_amd64 /opt/keepbay/current
