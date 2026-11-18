@@ -2,13 +2,14 @@
 import { isFlat, pinProgress, seg, smooth, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 import KbShot from '../visuals/KbShot.vue'
-import { focus } from './zoom'
+import { detailBox, focus } from './zoom'
 
 // 揭开对照：先是终端中 ls 列出的磁盘文件夹，滚动时从右向左擦去，露出 Keepbay 中的同一个文件夹，再推近到侧栏的文件夹列表。
-// 舞台不固定时只做擦去（随元素在视口中的位置），不推近
+// 舞台不固定时只做擦去（随元素在视口中的位置），不推近。推近的区域和高清图由截图脚本生成
 const names = 'IMG_20250104_100913 IMG_20250104_120959 IMG_20250111_100327 IMG_20250115_101359 IMG_20250115_142315 IMG_20250118_105237 IMG_20250118_131814 IMG_20250201_120553 IMG_20250201_181826 IMG_20250201_213203 IMG_20250208_130648 IMG_20250208_185428 IMG_20250222_190544 IMG_20250317_134345 IMG_20250317_162005 IMG_20250320_120413 IMG_20250320_161248 IMG_20250326_093836 IMG_20250326_141004 IMG_20250405_104250 IMG_20250405_111422 IMG_20250405_141423 IMG_20250408_100731 IMG_20250408_110825 IMG_20250412_164021 IMG_20250420_122746 IMG_20250420_150648 IMG_20250502_065925 IMG_20250502_110433 IMG_20250507_101115 IMG_20250507_114916 IMG_20250514_114503 IMG_20250514_162757 IMG_20250602_140819 IMG_20250602_162501 IMG_20250606_192015 IMG_20250609_132850 IMG_20250609_143059 IMG_20250626_140036 IMG_20250626_140114 IMG_20250701_091851 IMG_20250701_100544 IMG_20250701_122824 IMG_20250713_164432 IMG_20250713_170533 IMG_20250721_144650 IMG_20250721_153921 IMG_20250806_114937'.split(' ')
 const captions = ['磁盘上的文件夹', 'Keepbay 中的同一个文件夹', '侧栏中是您已有的文件夹，名称和层级保持原样']
 
+const box = detailBox('files')
 const root = ref<HTMLElement>()
 const frame = ref<HTMLElement>()
 const zoom = ref<HTMLElement>()
@@ -24,8 +25,7 @@ useScrollFrame((still) => {
     ;[w, z] = [smooth(seg(p, 0.1, 0.5)), smooth(seg(p, 0.62, 0.92))]
   }
   frame.value!.style.setProperty('--w', String(w))
-  // 侧栏中文件夹列表的位置（占截图的百分比），由看图标出
-  focus(zoom.value!, [0, 35, 24, 24], z)
+  focus(zoom.value!, box, z)
   caption.value = z > 0.5 ? 2 : w > 0.5 ? 1 : 0
 }, root)
 </script>
@@ -39,7 +39,7 @@ useScrollFrame((still) => {
       </div>
       <div ref="frame" class="frame">
         <div ref="zoom" class="zoom">
-          <KbShot name="files" size="wide" fit alt="Keepbay 中的同一个文件夹：日常相册中的照片排成网格，左侧是文件夹列表" />
+          <KbShot name="files" size="wide" fit detail alt="Keepbay 中的同一个文件夹：日常相册中的照片排成网格，左侧是文件夹列表" />
         </div>
         <div class="disk" aria-hidden="true">
           <div class="cmd"><b>$</b> ls /srv/nas/家庭相册/2025/日常</div>

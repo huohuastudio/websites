@@ -1,6 +1,16 @@
 {
-  "folders": [
-    1200,
-    1100
-  ]
+  "folders": {
+    "size": [
+      1200,
+      1100
+    ],
+    "light": {
+      "enter": 1.95,
+      "appear": 5.99
+    },
+    "dark": {
+      "enter": 1.95,
+      "appear": 5.81
+    }
+  }
 }

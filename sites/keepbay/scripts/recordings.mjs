@@ -1,9 +1,9 @@
 // 首页「文件留在原来的文件夹里」的短录屏：在 Keepbay 的文件页面上叠一个终端样式的面板，逐字打出命令，
-// 回车时在本机真正执行这条命令（把手机相册中的三张照片移进这个文件夹），Keepbay 监听到文件夹的变化后，页面上随即出现这三张照片。
+// 回车时在本机真正执行这条命令（把手机相册中的三张照片移进这个文件夹），终端面板随即移出画面，Keepbay 监听到文件夹的变化后，页面上出现这三张照片。
 // 浅色、深色各录一段，先合成一段原始录屏，再转出首页随滚动播放用的 folders-<主题>-scrub.webm（VP9）和 .mp4（H.264）：
 // 宽 960px，每 6 帧一个关键帧，拖动时能很快跳到任一位置。首帧（加载前显示）和照片出现后的结果帧（减少动态效果时显示）存成 WebP，
-// 都存到 public/recordings/；宽高写进 .vitepress/theme/recordings.json（首页的 KbScrub.vue 按它预留位置）。
-// 重录后照片出现的时间会变，要按新的录屏重新测 KbScrub.vue 中滚动进度和录屏时间的对应关系（keys）。
+// 都存到 public/recordings/；宽高、各主题回车和照片出现的时间（秒）写进 .vitepress/theme/recordings.json
+// （首页的 KbScrub.vue 按宽高预留位置，按时间换算滚动进度对应的录屏时间）。
 // Keepbay 的界面改了以后重新运行（W10d，docs/plan.md）。在本机运行，不进 Cloudflare 的构建。
 //
 // 用法：KEEPBAY_DEMO_URL=http://127.0.0.1:18903 pnpm --filter ./sites/keepbay recordings
@@ -17,7 +17,7 @@ import { tmpdir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
 import { promisify } from 'node:util'
 import { chromium } from 'playwright'
-import { folderId, imagesLoaded, mount, newContext, onDemo, open, site } from './keepbay.mjs'
+import { folderId, folderItems, imagesLoaded, mount, newContext, onDemo, open, site } from './keepbay.mjs'
 
 const execFileAsync = promisify(execFile)
 const out = join(site, 'public/recordings')
@@ -35,16 +35,19 @@ const command = 'mv ~/手机相册/*.jpg .'
 const LEAD = 600
 const KEY = 60
 const ENTER = 300
+// 命令执行完、显示新的提示符后停 LEAVE，终端面板用 SLIDE 移出画面
+const LEAVE = 600
+const SLIDE = 500
 const HOLD = 1500
 const FADE = 500
 const FPS = 30
 
-/** 等 Keepbay 把文件夹同步成 count 项（监听到变化后，目录 3 秒没有新变化才核对）。 */
+/** 等 Keepbay 把文件夹同步成 count 项（监听到变化后，目录 3 秒没有新变化才核对），返回其中的各项。 */
 async function waitForCount(request, id, count) {
   const start = Date.now()
   for (;;) {
-    const { items } = await (await request.get(`/api/v1/folders/${id}/items`)).json()
-    if (items.length === count) return
+    const items = await folderItems(request, id)
+    if (items.length === count) return items
     if (Date.now() - start > 30000) throw new Error(`文件夹 ${folder.join('/')} 30 秒内没有同步成 ${count} 项（现在 ${items.length} 项）`)
     await new Promise((resolve) => setTimeout(resolve, 200))
   }
@@ -60,13 +63,15 @@ function move(from, to) {
   }
 }
 
-/** 终端面板：逐字打出命令，回车时调用 Node 中的 keepbayRun 执行，再显示新的提示符。在页面中运行 */
-function terminal({ prompt, command, lead, key, enter }) {
+/** 终端面板：逐字打出命令，回车时调用 Node 中的 keepbayRun 执行，显示新的提示符后移出画面。在页面中运行 */
+function terminal({ prompt, command, lead, key, enter, leave, slide }) {
   const style = document.createElement('style')
   style.textContent = `
     #kb-term { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 2147483647; overflow: hidden;
       border: 1px solid rgb(255 255 255 / 0.1); border-radius: 10px; background: #1f2328; color: #e6edf3;
-      box-shadow: 0 12px 32px rgb(0 0 0 / 0.3); font: 16px/26px Menlo, monospace; }
+      box-shadow: 0 12px 32px rgb(0 0 0 / 0.3); font: 16px/26px Menlo, monospace;
+      transition: transform ${slide}ms cubic-bezier(0.4, 0, 0.2, 1); }
+    #kb-term.out { transform: translateY(calc(100% + 60px)); }
     #kb-term .bar { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; background: #2d333b;
       font: 12px/1 -apple-system, sans-serif; color: #9198a1; }
     #kb-term .bar i { width: 10px; height: 10px; border-radius: 50%; background: #545d68; }
@@ -108,6 +113,8 @@ function terminal({ prompt, command, lead, key, enter }) {
     await window.keepbayRun()
     line('').after(caret)
     caret.classList.add('blink')
+    await sleep(leave)
+    panel.classList.add('out')
   }
 }
 
@@ -158,39 +165,55 @@ async function encode(frames, end, file) {
   }
 }
 
+/** 录一段，返回回车和照片出现的时间（从录屏开头算起的秒数）。 */
 async function record(browser, scheme, id, dir, home) {
   const context = await newContext(browser, { viewport, scale, scheme, view })
   try {
     // 照片先放回手机相册，等 Keepbay 同步后再打开页面
     move(dir, join(home, '手机相册'))
-    const { items } = await (await context.request.get(`/api/v1/folders/${id}/items`)).json()
+    const items = await folderItems(context.request, id)
     const before = items.filter((it) => !photos.includes(it.name)).length
     await waitForCount(context.request, id, before)
     const page = await context.newPage()
+    const frames = []
+    // 回车的时间。按收到的帧算不准：回车前停顿的 ENTER 中画面没有变化，收不到帧；帧的时间戳是从 1970 年起的秒数，可以直接比较
+    let entered
     await page.exposeFunction('keepbayRun', () => {
+      entered = Date.now() / 1000
       execFileSync('/bin/sh', ['-c', command], { cwd: dir, env: { ...process.env, HOME: home } })
     })
     await open(page, `/files/${id}`, scheme)
-    const run = await page.evaluateHandle(terminal, { prompt: `${basename(dir)} % `, command, lead: LEAD, key: KEY, enter: ENTER })
+    const run = await page.evaluateHandle(terminal, {
+      prompt: `${basename(dir)} % `, command, lead: LEAD, key: KEY, enter: ENTER, leave: LEAVE, slide: SLIDE,
+    })
     await page.mouse.move(0, viewport.height - 1)
     await page.waitForTimeout(300)
 
-    // 页面上已显示的缩略图数量，不到 min 时返回 false（供 waitForFunction 判断）
-    const thumbs = (min) => {
-      const count = [...document.querySelectorAll('img[src*="/thumb"]')].filter((img) => img.complete && img.naturalWidth > 0).length
-      return count >= min && count
-    }
-    const shown = await page.evaluate(thumbs, 0)
     const cdp = await context.newCDPSession(page)
-    const frames = []
     cdp.on('Page.screencastFrame', ({ data, metadata, sessionId }) => {
       frames.push({ data, time: metadata.timestamp })
       cdp.send('Page.screencastFrameAck', { sessionId }).catch(() => {})
     })
     await cdp.send('Page.startScreencast', { format: 'png', maxWidth: viewport.width * scale, maxHeight: viewport.height * scale })
     await page.evaluate((run) => run(), run)
-    // 新照片的缩略图都显示出来后再停 HOLD
-    await page.waitForFunction(thumbs, shown + photos.length, { timeout: 30000 })
+    // Keepbay 收进这三张照片后，等它们的缩略图在画面中显示出来，再停 HOLD。
+    // 只数页面上的缩略图不可靠：画面外的缩略图陆续加载也会让数量增加
+    const added = (await waitForCount(context.request, id, before + photos.length)).filter((it) => photos.includes(it.name)).map((it) => it.id)
+    await page
+      .waitForFunction(
+        (ids) =>
+          ids.every((id) =>
+            [...document.querySelectorAll(`img[src*="/files/${id}/thumb"]`)].some((img) => {
+              const r = img.getBoundingClientRect()
+              return img.complete && img.naturalWidth > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth
+            }),
+          ),
+        added,
+        { timeout: 30000 },
+      )
+      .catch(() => {
+        throw new Error('新照片的缩略图 30 秒内没有显示在画面中')
+      })
     await imagesLoaded(page)
     const appeared = frames.at(-1).time
     // 多录 200 毫秒，保证 end 之前的帧都收到
@@ -200,7 +223,10 @@ async function record(browser, scheme, id, dir, home) {
     const kept = frames.filter((frame) => frame.time < end)
     const file = `${name}-${scheme}`
     await encode(kept, end, file)
-    console.log(`${file}：${(end - kept[0].time).toFixed(1)} 秒，${kept.length} 帧，照片在第 ${(appeared - kept[0].time).toFixed(1)} 秒出现`)
+    const at = (time) => Math.round((time - kept[0].time) * 100) / 100
+    const times = { enter: at(entered), appear: at(appeared) }
+    console.log(`${file}：${at(end)} 秒，${kept.length} 帧，第 ${times.enter} 秒回车，照片在第 ${times.appear} 秒出现`)
+    return times
   } finally {
     await context.close()
   }
@@ -232,9 +258,10 @@ try {
       process.exit(130)
     })
   }
-  for (const scheme of ['light', 'dark']) await record(browser, scheme, id, dir, home)
   const manifest = existsSync(manifestFile) ? JSON.parse(readFileSync(manifestFile, 'utf8')) : {}
-  manifest[name] = [viewport.width * scale, viewport.height * scale]
+  const entry = { size: [viewport.width * scale, viewport.height * scale] }
+  for (const scheme of ['light', 'dark']) entry[scheme] = await record(browser, scheme, id, dir, home)
+  manifest[name] = entry
   writeFileSync(manifestFile, `${JSON.stringify(manifest, null, 2)}\n`)
 } finally {
   await browser.close()

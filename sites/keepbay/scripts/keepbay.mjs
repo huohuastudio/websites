@@ -57,11 +57,16 @@ export async function mount(request, name) {
   return found
 }
 
+/** 文件夹 id 中的各项。 */
+export async function folderItems(request, id) {
+  return (await (await request.get(`/api/v1/folders/${id}/items`)).json()).items
+}
+
 /** 按名称路径找到文件夹的 ID。 */
 export async function folderId(request, names) {
   let id = (await mount(request, names[0])).rootFolder
   for (const name of names.slice(1)) {
-    const { items } = await (await request.get(`/api/v1/folders/${id}/items`)).json()
+    const items = await folderItems(request, id)
     const item = items.find((it) => it.dir && it.name === name)
     if (!item) throw new Error(`没有文件夹 ${names.join('/')}`)
     id = item.id

@@ -3,8 +3,8 @@ import { isFlat, pinProgress, seg, useScrollFrame } from '@huohuastudio/theme/sh
 import { ref } from 'vue'
 import KbShot from '../visuals/KbShot.vue'
 
-// 搜索：随滚动逐字输入，先输入拼音首字母 ht 找到合同，再输入"京都的寺庙"按画面搜照片；左侧的搜索方式清单随之高亮。
-// 舞台不固定时直接显示第二步的结果
+// 搜索：随滚动逐字输入，先输入拼音首字母 ht 找到合同，再输入"京都的寺庙"按画面搜照片，显示结果列表后在查看器中打开其中一张；
+// 左侧的搜索方式清单随之高亮。舞台不固定时直接显示查看器中的照片
 const kinds = [
   { text: '文件名，支持拼音', plan: '免费版', phase: 0 },
   { text: '文档全文：Word、Excel、PowerPoint、PDF', plan: '免费版', phase: 0 },
@@ -19,21 +19,25 @@ const q2 = '京都的寺庙'
 const root = ref<HTMLElement>()
 const query = ref(q2)
 const phase = ref(1)
+// 第二步在查看器中打开了照片
+const opened = ref(true)
 
 useScrollFrame((still) => {
   if (still || isFlat()) {
     query.value = q2
     phase.value = 1
+    opened.value = true
     return
   }
   const p = pinProgress(root.value!)
-  if (p < 0.45) {
-    query.value = q1.slice(0, Math.round(seg(p, 0.05, 0.2) * q1.length))
+  if (p < 0.42) {
+    query.value = q1.slice(0, Math.round(seg(p, 0.04, 0.16) * q1.length))
     phase.value = 0
   } else {
-    query.value = q2.slice(0, Math.round(seg(p, 0.5, 0.75) * q2.length))
+    query.value = q2.slice(0, Math.round(seg(p, 0.46, 0.62) * q2.length))
     phase.value = 1
   }
+  opened.value = p >= 0.78
 }, root)
 </script>
 
@@ -68,8 +72,11 @@ useScrollFrame((still) => {
             <div class="hit"><span>劳动<mark>合同</mark>.pdf</span><small>林海的工作/合同</small></div>
             <div class="hit"><span>房屋租赁<mark>合同</mark>.docx</span><small>家庭文档/房屋</small></div>
           </div>
-          <div :class="{ on: phase === 1 && query === q2 }">
+          <div :class="{ on: phase === 1 && query === q2 && !opened }">
             <KbShot name="search" alt="搜索“京都的寺庙”，只看图片，找到京都相册中的照片，每项标明画面相符" />
+          </div>
+          <div :class="{ on: phase === 1 && opened }">
+            <KbShot name="search-viewer" alt="在查看器中打开第 2 项搜索结果：京都相册中的一张照片，下方的缩略图条列出全部 7 项结果" />
           </div>
         </div>
       </div>
@@ -79,7 +86,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .find {
-  --sx-run: 210vh;
+  --sx-run: 250vh;
 }
 
 .sx-stage {

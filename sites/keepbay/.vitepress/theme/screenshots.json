@@ -1,9 +1,10 @@
 {
-  "files": {"wide":[2048,1280],"mobile":[1170,2100]},
+  "files": {"wide":[2048,1280],"mobile":[1170,2100],"detail":[0,25.333,50,50]},
   "viewer": {"wide":[2048,1280],"mobile":[1170,2100]},
-  "desk": {"wide":[2048,1280],"mobile":[1170,2100]},
-  "reminders": {"wide":[2048,1280],"mobile":[1170,2100]},
+  "desk": {"wide":[2048,1280],"mobile":[1170,2100],"detail":[25.182,8.583,68.073,68.083]},
+  "reminders": {"wide":[2048,1280],"mobile":[1170,2100],"detail":[19.557,9.542,79.323,79.333]},
   "search": {"compact":[1200,1290]},
+  "search-viewer": {"panel":[1440,1200]},
   "members": {"compact":[1200,1290]},
   "photos": {"wide":[2048,1280],"mobile":[1170,2100]},
   "music": {"wide":[2048,1280],"mobile":[1170,2100]},
@@ -14,5 +15,5 @@
   "share": {"wide":[2048,1280],"mobile":[1170,2100]},
   "member-features": {"wide":[2048,1280],"mobile":[1170,2100]},
   "local-models": {"wide":[2048,1280],"mobile":[1170,2100]},
-  "ai-calls": {"wide":[2048,1280],"mobile":[1170,2100]}
+  "ai-calls": {"wide":[2048,1280],"mobile":[1170,2100],"detail":[37.057,0,61.823,61.833]}
 }

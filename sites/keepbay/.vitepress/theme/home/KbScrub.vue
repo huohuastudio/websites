@@ -4,18 +4,20 @@ import { useData, withBase } from 'vitepress'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import manifest from '../recordings.json'
 
-// 录屏随滚动播放：在终端中移动三张照片，Keepbay 发现变化，照片出现在页面中。左侧三段说明随进度切换。
+// 录屏随滚动播放：在终端中移动三张照片（终端随后移出画面），Keepbay 发现变化，照片出现在页面中。左侧三段说明随进度切换。
 // 录屏由 scripts/recordings.mjs 生成：folders-<主题>-scrub.webm（VP9）和 .mp4（H.264），每 6 帧一个关键帧，拖动时跳得快；
 // 浅色、深色随网站的主题切换。舞台不固定时循环播放；减少动态效果时只显示照片出现后的结果帧
 const { isDark } = useData()
-const [width, height] = manifest.folders
+const [width, height] = manifest.folders.size
 
-// 滚动进度和录屏时间（秒）的对应关系，沿用原型 E：由逐帧比较测得，深色 2.0 秒回车、6.8 秒照片出现、7.83 秒起淡回首帧；
-// 浅色 1.97、5.97、6.97 秒。最后停在结果画面，不播淡出。重录后要重新测
-const keys = {
-  dark: [[0, 0], [0.34, 2.1], [0.62, 6.7], [0.8, 7.1], [1, 7.5]],
-  light: [[0, 0], [0.34, 2.1], [0.62, 5.9], [0.8, 6.3], [1, 6.7]],
-}
+// 滚动进度和录屏时间（秒）的对应关系：0.34 时刚回车，0.62 时照片即将出现，之后停在结果画面（照片出现 1.5 秒后录屏淡回首帧，不播淡出）。
+// 回车和照片出现的时间由录屏脚本记下，浅色、深色各一组
+const keys = Object.fromEntries(
+  (['light', 'dark'] as const).map((scheme) => {
+    const { enter, appear } = manifest.folders[scheme]
+    return [scheme, [[0, 0], [0.34, enter + 0.1], [0.62, appear - 0.1], [0.8, appear + 0.3], [1, appear + 0.7]]]
+  }),
+) as Record<'light' | 'dark', number[][]>
 
 const steps = [
   { title: '在终端中移动三张照片', text: 'NAS 的共享、Syncthing 或其他程序对文件夹做的改动，同样会被发现。' },

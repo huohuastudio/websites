@@ -2,34 +2,31 @@
 import { isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 import KbShot from '../visuals/KbShot.vue'
-import { focus } from './zoom'
+import { detailBox, focus } from './zoom'
 
 // AI：三张截图，每张先完整显示，再推近到关键处，停一会儿，然后横向换到下一张；上方的分段标签和下方的说明随之切换。
-// 舞台不固定时三张竖排，不推近
+// 舞台不固定时三张竖排，不推近。推近的区域（关键处）和高清图由截图脚本生成
 const slides = [
   {
     name: 'desk',
     tab: 'AI 桌面',
     alt: 'AI 桌面：问家里哪些电器还在保修期内，回答列出四件电器的保修期限和对应的文件',
-    // 推近的区域（占截图的百分比），由看图标出：保修期限表
-    box: [26, 23, 35, 35],
     captions: ['用聊天的方式查资料，回答附上相关的文件', '回答列出四件电器的保修期限，每一项都附上对应的文件'],
   },
   {
     name: 'reminders',
     tab: '日期提醒',
     alt: '日期提醒：从发票、保单、保修卡中找出的到期日，每条附原文摘录',
-    box: [21, 0, 77, 77],
     captions: ['从证件、合同、保修卡中找出到期日', '每条提醒附原文摘录，经您确认后按时提醒'],
   },
   {
     name: 'ai-calls',
     tab: '调用记录',
     alt: 'AI 调用记录：语义搜索和按画面搜图都在本地处理，未发送到云端',
-    box: [38, 0, 60, 60],
     captions: ['每一次 AI 调用都有记录', '本地处理的调用标明"未发送到云端"'],
   },
 ] as const
+const boxes = slides.map((s) => detailBox(s.name))
 
 const root = ref<HTMLElement>()
 const row = ref<HTMLElement>()
@@ -47,7 +44,7 @@ useScrollFrame((still) => {
   const i = Math.min(slides.length - 1, Math.floor(p))
   const f = p - i
   // 每张占一段：0–0.15 完整显示，0.15–0.5 推近，0.5–0.8 停留，0.8–1 滑到下一张（最后一张不滑）
-  zooms.forEach((z, j) => focus(z, slides[j].box, j === i ? smooth(seg(f, 0.15, 0.5)) : j < i ? 1 : 0))
+  zooms.forEach((z, j) => focus(z, boxes[j], j === i ? smooth(seg(f, 0.15, 0.5)) : j < i ? 1 : 0))
   const slide = i < slides.length - 1 ? smooth(seg(f, 0.8, 1)) : 0
   row.value!.style.setProperty('--x', `${-(i + slide) * 100}%`)
   const cur = Math.round(i + slide)
@@ -70,7 +67,7 @@ useScrollFrame((still) => {
         <div ref="row" class="row">
           <div v-for="(s, i) in slides" :key="s.name" class="slot">
             <div :ref="(el) => (zooms[i] = el as HTMLElement)" class="zoom">
-              <KbShot :name="s.name" fit :alt="s.alt" />
+              <KbShot :name="s.name" fit detail :alt="s.alt" />
             </div>
           </div>
         </div>

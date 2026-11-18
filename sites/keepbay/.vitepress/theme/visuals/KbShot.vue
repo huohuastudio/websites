@@ -6,17 +6,24 @@ import manifest from '../screenshots.json'
 // 有手机截图（mobile）时，首页舞台不固定的手机宽度下（≤760px，与 showcase.css 一致）换用手机截图；compact 是放在窄格子里的截图，各种宽度都用它。
 // size 指定只用其中一种（如只用宽屏截图、只用手机截图），不随页面宽度切换；fit 时铺满容器（object-fit: cover，位置用 style 中的 object-position 调）。
 // 浅色、深色和两种尺寸都渲染出来，由 CSS 按 <html> 上的 dark 类和页面宽度显示其中一张：服务端渲染与客户端一致，不会水合不一致。
-// 都懒加载：不显示的那几张不会下载。class、style 等属性加到每一张图片上
+// 都懒加载：不显示的那几张不会下载。class、style 等属性加到每一张图片上。
+// detail 时叠上推近用的高清图（清单中有 detail 的截图才有，见 zoom.ts），只在首页舞台固定时显示
 defineOptions({ inheritAttrs: false })
 
-type Size = 'wide' | 'mobile' | 'compact'
+type Size = 'wide' | 'mobile' | 'compact' | 'panel'
 
-const props = defineProps<{ name: keyof typeof manifest; alt: string; size?: Exclude<Size, 'compact'>; fit?: boolean }>()
+const props = defineProps<{ name: keyof typeof manifest; alt: string; size?: 'wide' | 'mobile'; fit?: boolean; detail?: boolean }>()
 
-const sizes: Partial<Record<Size, number[]>> = manifest[props.name]
+const { detail: region, ...sizes }: Partial<Record<Size, number[]>> & { detail?: number[] } = manifest[props.name]
 const variants = Object.entries(sizes)
   .filter(([size]) => !props.size || size === props.size)
   .map(([size, [width, height]]) => ({ size, width, height }))
+const detailStyle = region && {
+  left: `${region[0]}%`,
+  top: `${region[1]}%`,
+  width: `${region[2]}%`,
+  height: `${region[3]}%`,
+}
 // 宽屏和手机两种都有、又没有指定时才按页面宽度二选一
 const responsive = !props.size && !!sizes.mobile
 </script>
@@ -35,6 +42,17 @@ const responsive = !props.size && !!sizes.mobile
       loading="lazy"
     />
   </template>
+  <template v-if="detail && detailStyle">
+    <img
+      v-for="scheme in ['light', 'dark']"
+      :key="scheme"
+      :class="['kb-shot-detail', `kb-shot-${scheme}`]"
+      :src="withBase(`/screenshots/${name}-detail-${scheme}.webp`)"
+      :style="detailStyle"
+      alt=""
+      loading="lazy"
+    />
+  </template>
 </template>
 
 <style>
@@ -48,6 +66,18 @@ const responsive = !props.size && !!sizes.mobile
 .kb-shot.kb-shot-fit {
   height: 100%;
   object-fit: cover;
+}
+
+/* 高清图叠在主图上同样的位置（父元素要定位），与主图的内容完全重合 */
+.kb-shot-detail {
+  position: absolute;
+  max-width: none;
+}
+
+@media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
+  :root .kb-shot-detail {
+    display: none;
+  }
 }
 
 :root.dark .kb-shot-light,

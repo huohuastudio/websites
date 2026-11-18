@@ -1,5 +1,6 @@
 // 首页用的界面截图：登录演示站，按 shots 中的设置打开页面，每种尺寸各截浅色、深色两张，转成 WebP 存到 public/screenshots/，
 // 截了哪几种尺寸、宽高多少写进 .vitepress/theme/screenshots.json（KbShot.vue 按它渲染）。
+// 首页要推近的截图（标了 zoom）另存推近后看到的区域的高清图，区域写进清单（见 detailRegion）。
 // Keepbay 的界面改了以后重新运行（W10，docs/plan.md）。在本机运行，不进 Cloudflare 的构建。
 //
 // 用法：pnpm --filter ./sites/keepbay shots [名称...]
@@ -14,7 +15,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { chromium } from 'playwright'
-import { folderId, imagesLoaded, newContext, onDemo, open, site } from './keepbay.mjs'
+import { folderId, folderItems, imagesLoaded, newContext, onDemo, open, site } from './keepbay.mjs'
 
 const out = join(site, 'public/screenshots')
 const manifestFile = join(site, '.vitepress/theme/screenshots.json')
@@ -24,14 +25,21 @@ const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 // - mobile：390 × 700 按 3 倍截，得到 1170 × 2100，在官网的手机宽度下换用这张，整页缩小后的宽屏截图看不清
 // - compact：400 × 430 按 3 倍截，得到 1200 × 1290，放在首页三列的格子里（只有 300–520px 宽），界面按手机布局显示，文字接近原大。
 //   高度正好放下搜索的前三条结果、成员的三个文件夹和「授权文件夹」按钮
+// - panel：480 × 400 按 3 倍截，得到 1440 × 1200，放在首页搜索一节的结果区（宽屏下约 480 × 396），界面按手机布局显示
 const sizes = {
   wide: { suffix: '', viewport: { width: 1280, height: 800 }, scale: 1.6 },
   mobile: { suffix: '-mobile', viewport: { width: 390, height: 700 }, scale: 3 },
   compact: { suffix: '', viewport: { width: 400, height: 430 }, scale: 3 },
+  panel: { suffix: '', viewport: { width: 480, height: 400 }, scale: 3 },
 }
+
+// 首页推近时最多放大 2 倍（zoom.ts），宽度 1000px 的截图框在 2 倍屏上推近后要约 4000 像素宽的图才清晰：
+// 标了 zoom 的截图，宽屏按 3 倍截一次，缩成宽屏的尺寸作主图，推近后看到的区域从同一张图中裁出，主图和高清图出自同一个画面
+const detailScale = 3
 
 /**
  * 要截的页面。path：按接口查到 ID 后返回页面地址；sizes：截哪几种尺寸；prepare：页面加载完、截图前的操作；
+ * zoom：首页推近到哪一部分，返回它在页面上的范围（见 bounds）；
  * view：文件夹的视图（Keepbay 存在浏览器本地，键为 keepbay.views.<用户 ID>）；storage：写进 localStorage 的项；session：按接口查到后写进 sessionStorage 的项；
  * local：只在本机实例上截。
  */
@@ -45,6 +53,8 @@ const shots = [
     view: { view: 'grid', sort: 'name', desc: true, dirsFirst: true, iconSize: 160, square: false },
     // 宽屏右侧的信息栏关掉（开关记在浏览器本地），照片占满宽度
     storage: { 'keepbay.infoPanel': 'false' },
+    // 首页揭开对照一节推近到侧栏的文件夹列表（「文件夹」标题和其下的各个文件夹）
+    zoom: (page) => bounds(page.getByRole('navigation', { name: '导航' }).getByText('文件夹', { exact: true }).locator('..')),
   },
   {
     // 查看器中的照片（京都伏见稻荷的鸟居）
@@ -60,12 +70,16 @@ const shots = [
     session: async (request) => ({ 'keepbay.chat': await conversationId(request, '家里哪些电器还在保修期内') }),
     // 输入框处演示站专有的说明不进截图（本机实例上没有这一行）
     prepare: (page) => onDemo && page.getByText('演示站点不能和 AI 对话').evaluate((el) => el.remove()),
+    // 推近到回答中的保修期限表（电器、剩余保修期限和对应的文件）
+    zoom: (page) => bounds(page.locator('table')),
   },
   {
     // 重要日期提醒（快照中预先找好的）。收件箱的 AI 建议在快照中写成了"虚构的样本"，不用
     name: 'reminders',
     sizes: ['wide', 'mobile'],
     path: async () => '/reminders',
+    // 推近到最前面的三条提醒（到期日和原文摘录）
+    zoom: (page) => bounds(page.getByRole('list').first().locator(':scope > li:nth-child(-n+3)')),
   },
   {
     // 按画面搜照片，只看图片
@@ -86,6 +100,28 @@ const shots = [
         if (hidden.length < 3 || hidden.some((el) => !el)) throw new Error('搜索页上找不到要隐藏的按钮或大小列')
         for (const el of hidden) el.style.visibility = 'hidden'
       }),
+  },
+  {
+    // 按画面搜照片后，在结果页上打开一张横向的照片：照片占画面的大部分，下方的缩略图条列出全部结果。
+    // 结果页上打开的查看器按结果的顺序翻页，标题栏显示第几项
+    name: 'search-viewer',
+    local: true,
+    sizes: ['panel'],
+    path: async (request) => {
+      const params = { q: '京都的寺庙', kind: 'image' }
+      const res = await request.get(`/api/v1/search?${new URLSearchParams(params)}`)
+      if (!res.ok()) throw new Error(`搜索失败：${res.status()}`)
+      const item = (await res.json()).items?.find((it) => it.name === 'IMG_20241004_100844.jpg')
+      if (!item) throw new Error('搜索结果中没有 IMG_20241004_100844.jpg')
+      return `/search?${new URLSearchParams({ ...params, view: item.id })}`
+    },
+    prepare: async (page) => {
+      // 缩略图条在手机布局下默认收起
+      await page.getByRole('button', { name: '显示缩略图' }).click()
+      await page.getByRole('button', { name: '隐藏缩略图' }).waitFor()
+      await imagesLoaded(page)
+      await hideFileNav(page)
+    },
   },
   {
     // 成员 family（周晴）的授权：两个文件夹读写、一个只读，没授权的看不到
@@ -233,8 +269,35 @@ const shots = [
       return '/settings/ai/calls'
     },
     prepare: (page) => scrollToHeading(page, '调用记录'),
+    // 推近到最前面的三条记录（两次搜索和一条后台处理，标明本地处理、未发送到云端）
+    zoom: (page) => bounds(page.locator('section').filter({ has: page.getByRole('heading', { name: '调用记录', exact: true }) }).locator('ul > li:nth-child(-n+3)')),
   },
 ]
+
+/** locator 选中的元素合起来在页面上的范围（CSS 像素）。一个也没有选中时报错（Keepbay 的界面改了） */
+async function bounds(locator) {
+  const rects = await locator.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().toJSON()))
+  if (!rects.length) throw new Error('页面上找不到要推近的部分')
+  const x = Math.min(...rects.map((r) => r.left))
+  const y = Math.min(...rects.map((r) => r.top))
+  return { x, y, width: Math.max(...rects.map((r) => r.right)) - x, height: Math.max(...rects.map((r) => r.bottom)) - y }
+}
+
+/**
+ * 推近后看到的区域：要推近的部分 rect 放在中间，四周各留画面的 2%，宽高占画面的百分比相同（与画面同比例），
+ * 至少占画面的一半（最多放大 2 倍），不超出画面。返回裁剪 width × height 的截图用的像素范围 [x, y, 宽, 高]
+ */
+function detailRegion(rect, viewport, width, height) {
+  const pct = (v, total) => (v / total) * 100
+  const size = Math.min(100, Math.max(50, pct(rect.width, viewport.width) + 4, pct(rect.height, viewport.height) + 4))
+  const start = (from, length, total) => Math.min(Math.max(pct(from + length / 2, total) - size / 2, 0), 100 - size)
+  return [
+    Math.round((start(rect.x, rect.width, viewport.width) / 100) * width),
+    Math.round((start(rect.y, rect.height, viewport.height) / 100) * height),
+    Math.round((size / 100) * width),
+    Math.round((size / 100) * height),
+  ]
+}
 
 /** 把设置页中的一节滚到顶部，标题上方留一点空（name 是这一节的标题，页面顶部的标题栏不算）。 */
 function scrollToHeading(page, name) {
@@ -283,7 +346,7 @@ async function hideFileNav(page) {
 
 /** 按文件名找到文件夹中文件的 ID。 */
 async function fileId(request, folder, name) {
-  const { items } = await (await request.get(`/api/v1/folders/${folder}/items`)).json()
+  const items = await folderItems(request, folder)
   const item = items.find((it) => !it.dir && it.name === name)
   if (!item) throw new Error(`文件夹 ${folder} 中没有文件 ${name}`)
   return item.id
@@ -315,8 +378,12 @@ function seed(context, kind, items) {
   )
 }
 
-async function shoot(browser, shot, size, scheme) {
-  const context = await newContext(browser, { viewport: size.viewport, scale: size.scale, scheme, view: shot.view })
+/** 截一张。返回文件名；推近用的高清图另存为 <名称>-detail-<主题>.webp，同时返回推近后看到的区域占画面的百分比 [x, y, 宽, 高] */
+async function shoot(browser, shot, sizeName, scheme) {
+  const size = sizes[sizeName]
+  const detail = shot.zoom && sizeName === 'wide'
+  const scale = detail ? detailScale : size.scale
+  const context = await newContext(browser, { viewport: size.viewport, scale, scheme, view: shot.view })
   try {
     const path = await shot.path(context.request)
     if (shot.storage) await seed(context, 'localStorage', shot.storage)
@@ -329,9 +396,23 @@ async function shoot(browser, shot, size, scheme) {
     await page.mouse.move(0, size.viewport.height - 1)
     await page.waitForTimeout(300)
     const file = `${shot.name}${size.suffix}-${scheme}`
+    const png = await page.screenshot()
     // PNG 从标准输入交给 cwebp
-    execFileSync('cwebp', ['-quiet', '-q', '82', '-o', join(out, `${file}.webp`), '--', '-'], { input: await page.screenshot() })
-    return file
+    const webp = (name, args = []) => execFileSync('cwebp', ['-quiet', '-q', '82', ...args, '-o', join(out, `${name}.webp`), '--', '-'], { input: png })
+    if (!detail) {
+      webp(file)
+      return { file }
+    }
+    // 按 k 倍截图的宽高（像素）
+    const pixels = (k) => [size.viewport.width, size.viewport.height].map((v) => Math.round(v * k))
+    const [width, height] = pixels(scale)
+    const crop = detailRegion(await shot.zoom(page), size.viewport, width, height)
+    webp(file, ['-resize', ...pixels(size.scale).map(String)])
+    webp(`${shot.name}-detail-${scheme}`, ['-crop', ...crop.map(String)])
+    // 按裁剪的像素换算回百分比（保留三位小数），与高清图的范围完全一致
+    const [x, y, w, h] = crop
+    const region = [x / width, y / height, w / width, h / height].map((v) => Math.round(v * 1e5) / 1e3)
+    return { file, region }
   } finally {
     await context.close()
   }
@@ -350,11 +431,20 @@ async function browserFor(shot) {
   browsers[key] ??= await chromium.launch(shot.chrome ? { channel: 'chrome' } : {})
   return browsers[key]
 }
+// 推近后看到的区域（按名称）：浅色、深色的界面布局相同，两次算出的区域不同时报错
+const regions = {}
 try {
   for (const shot of selected) {
     for (const size of shot.sizes) {
       for (const scheme of ['light', 'dark']) {
-        console.log(`${await shoot(await browserFor(shot), shot, sizes[size], scheme)}.webp`)
+        const { file, region } = await shoot(await browserFor(shot), shot, size, scheme)
+        console.log(`${file}.webp`)
+        if (!region) continue
+        if (regions[shot.name] && `${regions[shot.name]}` !== `${region}`) {
+          throw new Error(`${shot.name} 浅色、深色推近的区域不同：${regions[shot.name]}、${region}`)
+        }
+        regions[shot.name] = region
+        console.log(`  推近区域 ${region.join(', ')}`)
       }
     }
   }
@@ -362,7 +452,7 @@ try {
   await Promise.all(Object.values(browsers).map((b) => b.close()))
 }
 
-// 尺寸清单：只更新这次截了的，按 shots 中的顺序排列，去掉 shots 中已经没有的
+// 尺寸清单：只更新这次截了的，按 shots 中的顺序排列，去掉 shots 中已经没有的。推近的区域记在 detail 中
 const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'))
 for (const shot of selected) {
   manifest[shot.name] = Object.fromEntries(
@@ -371,6 +461,7 @@ for (const shot of selected) {
       return [name, [Math.round(viewport.width * scale), Math.round(viewport.height * scale)]]
     }),
   )
+  if (regions[shot.name]) manifest[shot.name].detail = regions[shot.name]
 }
 const lines = shots.filter((s) => manifest[s.name]).map((s) => `  ${JSON.stringify(s.name)}: ${JSON.stringify(manifest[s.name])}`)
 writeFileSync(manifestFile, `{\n${lines.join(',\n')}\n}\n`)
