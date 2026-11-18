@@ -2,92 +2,10 @@
 layout: home
 title: Lsky Pro+
 titleTemplate: 图床和云端相册程序
-# 首页不套文档正文样式，版式由共用主题的首页版块组件负责
+# 首页不套文档正文样式，版式由首页组件（.vitepress/theme/home/）负责
 markdownStyles: false
 
-# 不用 hero、features 这两个键名：默认主题见到它们会渲染自带的首屏和卡片
-heroActions:
-  - theme: brand
-    text: 购买授权
-    link: https://huohuastudio.com/products/lsky-pro#plans
-  - theme: alt
-    text: 在线演示
-    link: https://v2.lskypro.com
-  - theme: alt
-    text: 阅读文档
-    link: /docs/guide/introduce
-
-screenshots:
-  - src: /screenshots/upload.webp
-    title: 上传
-    desc: 批量上传和上传队列
-    width: 1600
-    height: 1000
-  - src: /screenshots/photos.webp
-    title: 图片管理
-    desc: 按日期分组浏览图片
-    width: 1600
-    height: 1000
-  - src: /screenshots/albums.webp
-    title: 相册
-    desc: 相册管理
-    width: 1600
-    height: 1000
-  - src: /screenshots/storage.webp
-    title: 储存
-    desc: 多个储存：本地、OSS、COS、S3 等
-    width: 1600
-    height: 1000
-  - src: /screenshots/dashboard.webp
-    title: 管理后台
-    desc: 管理后台的仪表盘
-    width: 1600
-    height: 1000
-
-featureGroups:
-  - title: 上传与管理
-    items:
-      - name: 多种上传方式
-        desc: 批量上传、拖拽上传、粘贴上传，带上传队列
-      - name: 相册
-        desc: 按相册整理图片，相册可以设置访问密码
-      - name: 分享
-        desc: 分享相册或图片，分享链接可以加密码
-      - name: 广场和用户主页
-        desc: 展示公开的图片和相册
-      - name: 打包下载
-        desc: 管理员可以把指定用户的全部图片打包下载
-  - title: 储存与处理
-    items:
-      - name: 储存
-        desc: 一个站点可以创建多个储存，每个储存选择一种驱动
-      - name: 图片处理
-        desc: 缩放、裁剪、水印、格式转换，支持 Imagick 和 libvips；上传时同步或异步处理，已有图片可以重新处理
-      - name: 云处理
-        desc: 在图片地址后加参数，按需生成不同尺寸、裁剪和滤镜效果
-      - name: AI
-        desc: 图片润色、自动打标签、自动生成描述，对接多家大模型服务
-  - title: 安全与审核
-    items:
-      - name: 图片审核
-        desc: 支持阿里云、腾讯云、百度、NSFW.js、ModerateContent 和 AI 大模型审核，违规图片可以删除或标记
-      - name: 社会化登录
-        desc: GitHub、QQ，以及通用 OAuth2 / OIDC（Keycloak、Authentik、Gitea 等）
-      - name: 短信和邮件
-        desc: 国内外 30 多种短信服务；邮件支持 SMTP、Mailgun、Postmark 和 Amazon SES
-  - title: 运营
-    items:
-      - name: 套餐和订单
-        desc: 出售会员（角色组）套餐和容量套餐，支持优惠券
-      - name: 在线支付
-        desc: 支付宝、微信支付、银联、PayPal、Stripe 和易支付
-      - name: 工单和反馈
-        desc: 工单、意见反馈、举报管理和违规记录
-      - name: 站内内容
-        desc: 公告和独立页面
-      - name: 开放接口
-        desc: 100 多个接口，可以开发客户端或对接其他系统
-
+# 价格、对比表和常见问题的数据，由首页组件读取
 plans:
   - name: 开源版
     price: ¥0
@@ -117,9 +35,6 @@ plans:
       link: https://huohuastudio.com/products/lsky-pro#plans
 
 pricing:
-  plans:
-    - name: 开源版
-    - name: 付费版
   rows:
     - { name: 多用户、角色组和多种储存, values: [true, true] }
     - { name: 相册和接口, values: [true, true] }
@@ -152,93 +67,21 @@ faq:
     a: 开源版已经停止更新和支持，现有站点可以继续使用。付费版内置的数据导入只适用于付费版 1.7.x，详见<a href="/docs/guide/import">从旧版本导入</a>。
 ---
 
-<HomeHero
-  title="自己搭建的图床和云端相册"
-  text="基于 Laravel 开发。图片可以存到本地或各家对象储存，带多用户、角色组、图片处理、内容审核、套餐和在线支付。"
-  :actions="$frontmatter.heroActions"
->
-<template #visual>
-<HomeWindow>
-  <img src="/screenshots/photos.webp" alt="Lsky Pro+ 的图片管理页" width="1600" height="1000" fetchpriority="high" />
-</HomeWindow>
-</template>
-</HomeHero>
+<script setup>
+import LsHome from './.vitepress/theme/home/LsHome.vue'
+</script>
 
-<HomeSection id="why">
-<HomeCells :columns="3">
-<HomeCell title="多种储存" wide :level="2">
+<LsHome>
+<template #faq>
 
-本地、AWS S3、阿里云 OSS、腾讯云 COS、七牛云、又拍云、多吉云、SFTP、FTP、WebDAV，兼容 S3 接口的 MinIO、Backblaze B2 也能接入。
-
-<template #visual>
-<HomeWindow>
-  <img src="/screenshots/storage.webp" alt="后台的储存管理页" width="1600" height="1000" loading="lazy" />
-</HomeWindow>
-</template>
-</HomeCell>
-<HomeCell title="角色组" :level="2">
-
-按角色组分配可用的储存、容量、上传频率和各项功能，不同用户使用不同的规则。
-
-</HomeCell>
-<HomeCell title="图片处理" :level="2">
-
-上传时缩放、裁剪、加水印、转换格式；云处理通过地址参数取得同一张图片的不同尺寸和效果。
-
-</HomeCell>
-<HomeCell title="运营功能" :level="2">
-
-套餐、订单、优惠券、在线支付、工单、公告和举报管理，可以直接对外提供图床服务。
-
-</HomeCell>
-</HomeCells>
-</HomeSection>
-
-<HomeSection id="screenshots" title="界面一览">
-<div class="home-pad">
-<HomeShowcase :items="$frontmatter.screenshots" />
-</div>
-</HomeSection>
-
-<HomeSection id="features" title="功能">
-<HomeFeatureList :groups="$frontmatter.featureGroups" variant="cells" :columns="2" />
-</HomeSection>
-
-<HomeSection id="themes" title="主题">
-<template #header>
-
-付费版从 V 2.3.0 起支持主题，可以替换前台界面，也可以自己开发。已收录的主题见[主题列表](./themes)，开发方法见[主题](./docs/advanced/theme)。
+更多问题见文档中的[常见问题](./docs/guide/faq)。
 
 </template>
-</HomeSection>
+<template #links>
 
-<HomeSection
-  id="pricing"
-  title="价格"
-  lead="开源版已经停止更新；付费版一次付费、永久使用，购买后可以免费升级到之后的所有版本。"
->
-<HomePlans :plans="$frontmatter.plans" />
-<div class="home-pad line">
-<HomePricing :plans="$frontmatter.pricing.plans" :rows="$frontmatter.pricing.rows" />
-</div>
-</HomeSection>
-
-<HomeSection id="faq" title="常见问题" layout="side">
-<template #header>
-
-更多问题见[常见问题](./docs/guide/faq)。
+[许可与免责声明](./docs/guide/declaration)
+[正版查询](https://huohuastudio.com/verify)
+[授权中心](https://huohuastudio.com/dashboard)
 
 </template>
-<HomeFaq :items="$frontmatter.faq" />
-</HomeSection>
-
-<HomeSection id="start" title="开始使用" layout="center">
-<HomeActions :actions="[
-  { text: '购买授权', link: 'https://huohuastudio.com/products/lsky-pro#plans' },
-  { text: '阅读文档', link: '/docs/guide/introduce', theme: 'alt' },
-]">
-
-[许可与免责声明](./docs/guide/declaration) · [正版查询](https://huohuastudio.com/verify) · [授权中心](https://huohuastudio.com/dashboard)
-
-</HomeActions>
-</HomeSection>
+</LsHome>

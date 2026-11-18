@@ -1,7 +1,9 @@
 // 首页「文件留在原来的文件夹里」的短录屏：在 Keepbay 的文件页面上叠一个终端样式的面板，逐字打出命令，
 // 回车时在本机真正执行这条命令（把手机相册中的三张照片移进这个文件夹），Keepbay 监听到文件夹的变化后，页面上随即出现这三张照片。
-// 浅色、深色各录一段，编码成 WebM（VP9）和 MP4（H.264），首帧（加载前显示）和照片出现后的结果帧（减少动态效果时显示）存成 WebP，存到 public/recordings/；
-// 宽高写进 .vitepress/theme/recordings.json（KbClip.vue 按它预留位置）。
+// 浅色、深色各录一段，先合成一段原始录屏，再转出首页随滚动播放用的 folders-<主题>-scrub.webm（VP9）和 .mp4（H.264）：
+// 宽 960px，每 6 帧一个关键帧，拖动时能很快跳到任一位置。首帧（加载前显示）和照片出现后的结果帧（减少动态效果时显示）存成 WebP，
+// 都存到 public/recordings/；宽高写进 .vitepress/theme/recordings.json（首页的 KbScrub.vue 按它预留位置）。
+// 重录后照片出现的时间会变，要按新的录屏重新测 KbScrub.vue 中滚动进度和录屏时间的对应关系（keys）。
 // Keepbay 的界面改了以后重新运行（W10d，docs/plan.md）。在本机运行，不进 Cloudflare 的构建。
 //
 // 用法：KEEPBAY_DEMO_URL=http://127.0.0.1:18903 pnpm --filter ./sites/keepbay recordings
@@ -107,7 +109,7 @@ function terminal({ prompt, command, lead, key, enter }) {
   }
 }
 
-/** 按时间戳把帧合成固定帧率，结尾淡回首帧，编码成 WebM 和 MP4；首帧、最后一帧（照片已出现）存成 WebP。 */
+/** 按时间戳把帧合成固定帧率，结尾淡回首帧，编码成原始录屏，再转出拖动用的 WebM 和 MP4；首帧、最后一帧（照片已出现）存成 WebP。 */
 function encode(frames, end, file) {
   const dir = mkdtempSync(join(tmpdir(), 'keepbay-frames-'))
   try {
@@ -126,14 +128,20 @@ function encode(frames, end, file) {
     const filter = [
       '-filter_complex',
       `[0]fps=${FPS},format=yuv420p,settb=AVTB[a];[1]fps=${FPS},format=yuv420p,settb=AVTB[b];` +
-        `[a][b]xfade=transition=fade:duration=${FADE / 1000}:offset=${(length - FADE / 1000).toFixed(3)},split[webm][mp4]`,
+        `[a][b]xfade=transition=fade:duration=${FADE / 1000}:offset=${(length - FADE / 1000).toFixed(3)}[v]`,
     ]
-    // 一次合成，分成两路分别编码。输出指定 yuv420p：PNG 是 RGB，不指定时编码成 4:4:4，Safari 等浏览器播不了
-    const output = (stream, ...args) => ['-map', stream, '-an', '-pix_fmt', 'yuv420p', ...args]
+    // 原始录屏只作为中间文件，留在临时目录。输出指定 yuv420p：PNG 是 RGB，不指定时编码成 4:4:4，Safari 等浏览器播不了
+    const master = join(dir, `${file}.mp4`)
     execFileSync('ffmpeg', [
       '-v', 'error', '-y', ...input, ...filter,
-      ...output('[webm]', '-c:v', 'libvpx-vp9', '-crf', '28', '-b:v', '0', '-row-mt', '1', join(out, `${file}.webm`)),
-      ...output('[mp4]', '-c:v', 'libx264', '-crf', '20', '-preset', 'slow', '-movflags', '+faststart', join(out, `${file}.mp4`)),
+      '-map', '[v]', '-an', '-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-crf', '20', '-preset', 'slow', master,
+    ])
+    // 拖动用的版本：缩到 960px 宽，每 6 帧一个关键帧（-g 6），MP4 不用 B 帧，跳转时少解码几帧
+    const scrub = ['-v', 'error', '-y', '-i', master, '-an', '-vf', 'scale=960:-2', '-g', '6']
+    execFileSync('ffmpeg', [...scrub, '-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '40', '-row-mt', '1', '-deadline', 'good', join(out, `${file}-scrub.webm`)])
+    execFileSync('ffmpeg', [
+      ...scrub, '-c:v', 'libx264', '-preset', 'slow', '-crf', '28', '-bf', '0', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
+      join(out, `${file}-scrub.mp4`),
     ])
     for (const [name, frame] of [[file, first], [`${file}-end`, last]]) {
       execFileSync('cwebp', ['-quiet', '-q', '82', '-o', join(out, `${name}.webp`), '--', frame])

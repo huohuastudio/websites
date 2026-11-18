@@ -2,116 +2,8 @@
 layout: home
 title: Novaix
 titleTemplate: 面向中小型 VPS 服务商的 IDC 管理系统
-# 首页不套文档正文样式，版式由共用主题的首页版块组件负责
+# 首页不套文档正文样式，各版块由 .vitepress/theme/home 中的组件负责
 markdownStyles: false
-
-# 不用 hero、features 这两个键名：默认主题见到它们会渲染自带的首屏和卡片
-heroActions:
-  - theme: brand
-    text: 下载安装
-    link: https://github.com/huohuastudio/novaix-releases/releases/latest
-  - theme: alt
-    text: 在线演示
-    link: https://novaix.huohuastudio.com
-  - theme: alt
-    text: 阅读文档
-    link: /docs/introduce
-
-screenshots:
-  - src: /screenshots/dashboard.webp
-    title: 仪表盘
-    desc: 管理面板首页：收入、订单、实例和节点的概况
-    width: 2048
-    height: 1280
-  - src: /screenshots/instance.webp
-    title: 实例详情
-    desc: 单个实例的运行状态、资源用量和常用操作
-    width: 2048
-    height: 1280
-  - src: /screenshots/node-stats.webp
-    title: 节点监控
-    desc: 节点的 CPU、内存、磁盘、网络和负载曲线
-    width: 2048
-    height: 1280
-  - src: /screenshots/orders.webp
-    title: 订单
-    desc: 新购、续费、升级订单的列表和筛选
-    width: 2048
-    height: 1280
-  - src: /screenshots/users.webp
-    title: 用户
-    desc: 用户列表、余额、实名状态和分组
-    width: 2048
-    height: 1280
-  - src: /screenshots/vpc.webp
-    title: 私有网络
-    desc: VPC 私有网络和子网
-    width: 2048
-    height: 1280
-  - src: /screenshots/cms.webp
-    title: 内容管理
-    desc: 公告、文章、帮助中心、FAQ 等前台内容
-    width: 2048
-    height: 1280
-  - src: /screenshots/plugins.webp
-    title: 插件
-    desc: 已安装的插件和插件市场
-    width: 2048
-    height: 1280
-
-featureGroups:
-  - title: 基础设施
-    items:
-      - name: VPC 私有网络
-        desc: 基于 OVN 的二层隔离网络，支持子网划分和安全组
-      - name: IP 池
-        desc: IPv4 和 IPv6 的分配与回收，支持纯 IPv6 套餐
-      - name: 共享 IP 和 NAT
-        desc: 普通和独享两种模式，用户可以自助购买独立出口 IP
-      - name: 资源超开
-        desc: CPU、内存、磁盘分别设置超开比例
-      - name: 动态内存
-        desc: 容器可以使用宿主机的空闲内存，提高利用率
-      - name: 高可用
-        desc: 节点故障时，开启了高可用保护的实例自动疏散到同组的健康节点
-  - title: 用户运营
-    items:
-      - name: 内容管理
-        desc: 公告、文章、帮助中心、FAQ、数据中心等前台内容
-      - name: 发票
-        desc: 用户自助申请，管理员审核、录入，用户在线查看和下载
-      - name: 实例转移
-        desc: 用户之间凭转移码转移实例，可以收费、要求实名或人工审批
-      - name: 优惠券
-        desc: 适用于新购、续费和升级订单，可以设置使用条件
-      - name: 代理分销
-        desc: 按代理商分组设置返佣比例和分销折扣
-      - name: 供应商转售
-        desc: 对接上游服务商，把上游的产品作为自己的套餐出售
-  - title: 运维工具
-    items:
-      - name: 在线更新
-        desc: 在管理面板一键升级并自动迁移数据库；使用 SQLite 时自动备份，失败时自动回滚
-      - name: 命令行工具
-        desc: 重置密码，管理插件、主题和设置，查看系统信息
-      - name: 任务中心
-        desc: 按状态筛选任务，查看实时日志
-      - name: 监控与告警
-        desc: 节点资源监控，告警可推送到 Telegram、钉钉、企业微信或 Webhook
-      - name: 操作日志
-        desc: 记录所有操作，可以按用户和类型筛选
-  - title: 开放集成
-    items:
-      - name: 开放接口
-        desc: RESTful 接口，附 Swagger 和 Scalar 文档
-      - name: Webhook
-        desc: 实例操作和任务状态变化时主动推送
-      - name: 前端源码开放
-        desc: 前端在 novaix-ui 仓库中开源，可以在此基础上开发主题
-      - name: 三种数据库
-        desc: SQLite 无需配置；MySQL 和 PostgreSQL 适合较大规模和多实例部署
-      - name: 邮件
-        desc: 支持 SMTP、Mailgun 和 Resend 三种发送方式
 
 plans:
   - name: 免费版
@@ -143,9 +35,6 @@ plans:
       link: https://huohuastudio.com/products/novaix#plans
 
 pricing:
-  plans:
-    - name: 免费版
-    - name: 授权版
   rows:
     - { name: 节点数, values: [最多 2 个, 不限] }
     - { name: 实例管理, values: [true, true] }
@@ -191,127 +80,46 @@ faq:
 ---
 
 <script setup>
-// 首页的示意图只在这一页引入，不进主题入口
-import Market from './.vitepress/theme/Market.vue'
-import NxInstall from './.vitepress/theme/visuals/NxInstall.vue'
-import { data as market } from './.vitepress/theme/market.data'
+import { SxCta, SxFaq, SxPlans } from '@huohuastudio/theme/showcase'
+import { NxDb, NxExt, NxFeatures, NxFlow, NxHa, NxHero, NxModes } from './.vitepress/theme/home'
 </script>
 
-<HomeHero
-  title="开箱即用的 IDC 管理系统"
-  text="面向中小型 VPS 服务商。单个可执行文件部署，内置数据库。容器和虚拟机统一管理，自带计费、工单和内容管理。"
-  :actions="$frontmatter.heroActions"
->
-<template #visual>
-<HomeWindow>
-  <img src="/screenshots/dashboard.webp" alt="Novaix 管理面板的仪表盘" width="2048" height="1280" fetchpriority="high" />
-</HomeWindow>
-</template>
-</HomeHero>
-
-<HomeSection id="why">
-<HomeCells :columns="3">
-<HomeCell id="deploy" title="一个文件完成部署" wide :level="2">
-
-前端、接口和命令行工具编译在一个可执行文件里，不需要另外安装 Docker、Node.js 或数据库。下载、解压、运行即可。
-
-默认使用内置的 SQLite，也支持 MySQL 和 PostgreSQL。首次运行会在当前目录生成默认的 `config.yaml`，并在终端输出初始管理员密码。生产环境的守护进程和反向代理配置见[安装](./docs/install)。
-
-之后可以在管理面板中一键在线更新。使用 SQLite 时更新前自动备份；使用 MySQL 或 PostgreSQL 时，请在大版本更新前自行备份数据库。
-
-<template #visual><NxInstall /></template>
-</HomeCell>
-<HomeCell title="容器和虚拟机" :level="2">
-
-同时管理 LXC 容器和 QEMU/KVM 虚拟机，支持 Windows 虚拟机的 TPM、双 ISO 挂载和密码重置。
-
-<template #visual>
-<HomeWindow>
-  <img src="/screenshots/instance.webp" alt="实例详情页" width="2048" height="1280" loading="lazy" />
-</HomeWindow>
-</template>
-</HomeCell>
-<HomeCell title="完整的业务流程" :level="2">
-
-套餐、订单、计费、支付、工单、实名认证和发票，覆盖从用户下单到售后的全过程。
-
-<template #visual>
-<HomeWindow>
-  <img src="/screenshots/orders.webp" alt="订单列表页" width="2048" height="1280" loading="lazy" />
-</HomeWindow>
-</template>
-</HomeCell>
-<HomeCell title="插件和主题" :level="2">
-
-支付、登录、短信、通知、人机验证都可以用插件扩展；前端源码开放，可以自己做主题。
-
-<template #visual>
-<HomeWindow>
-  <img src="/screenshots/plugins.webp" alt="插件管理页" width="2048" height="1280" loading="lazy" />
-</HomeWindow>
-</template>
-</HomeCell>
-</HomeCells>
-</HomeSection>
-
-<HomeSection id="screenshots" title="界面一览">
-<div class="home-pad">
-<HomeShowcase :items="$frontmatter.screenshots" />
-</div>
-</HomeSection>
-
-<HomeSection id="features" title="功能">
-<HomeFeatureList :groups="$frontmatter.featureGroups" variant="cells" :columns="2" />
-</HomeSection>
-
-<HomeSection v-if="market.plugins.length || market.themes.length" id="market" title="插件和主题">
-<template #header>
-
-在管理面板的「插件管理」和「主题管理」页面切换到市场，点击「安装」即可。开发者可以向 [novaix-releases](https://github.com/huohuastudio/novaix-releases) 提交自己的插件和主题。
-
-</template>
-<div class="home-pad">
-<Market />
-</div>
-</HomeSection>
-
-<HomeSection
-  id="pricing"
-  title="价格"
+<div class="sx">
+<NxHero />
+<NxFlow />
+<NxHa />
+<NxModes />
+<NxFeatures />
+<NxExt />
+<NxDb />
+<SxPlans
   lead="免费版部署即可使用，适合小规模运营；授权版按订阅计费，不限节点数，解锁全部功能。"
+  :plans="$frontmatter.plans"
+  :rows="$frontmatter.pricing.rows"
 >
-<HomePlans :plans="$frontmatter.plans" />
-<div class="home-pad line">
-<div class="home-prose home-note">
 
 免费版升级为授权版不用重新部署，在管理面板中输入激活码即可，详见[免费版与授权版](./docs/getting-started#editions)。
 
-</div>
-<HomePricing :plans="$frontmatter.pricing.plans" :rows="$frontmatter.pricing.rows" />
-</div>
-</HomeSection>
+Novaix 目前处于公测阶段，用于生产环境前请做好数据备份。
 
-<HomeSection id="faq" title="常见问题" layout="side">
+</SxPlans>
+<SxFaq :items="$frontmatter.faq">
 <template #header>
 
-更多问题见[常见问题](./docs/faq)。
+更多问题见文档中的[常见问题](./docs/faq)。
 
 </template>
-<HomeFaq :items="$frontmatter.faq" />
-</HomeSection>
-
-<HomeSection
-  id="start"
+</SxFaq>
+<SxCta
   title="开始使用"
   lead="免费版部署即可使用，无需注册。"
-  layout="center"
+  :actions="[
+    { text: '下载安装', link: 'https://github.com/huohuastudio/novaix-releases/releases/latest' },
+    { text: '阅读文档', link: './docs/introduce', theme: 'alt' },
+  ]"
 >
-<HomeActions :actions="[
-  { text: '下载安装', link: 'https://github.com/huohuastudio/novaix-releases/releases/latest' },
-  { text: '阅读文档', link: '/docs/introduce', theme: 'alt' },
-]">
 
-[许可协议](./license) · [服务条款](./terms) · [隐私政策](./privacy)
+[许可协议](./license) [服务条款](./terms) [隐私政策](./privacy)
 
-</HomeActions>
-</HomeSection>
+</SxCta>
+</div>

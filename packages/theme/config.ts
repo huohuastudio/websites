@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfigWithTheme, type DefaultTheme, type HeadConfig } from 'vitepress'
 import { mermaidMarkdown } from './mermaid-markdown.ts'
 
@@ -116,6 +117,21 @@ export function defineSiteConfig(options: SiteOptions) {
     description,
     cleanUrls: true,
     lastUpdated: true,
+    // 默认浅色，不跟随系统；访客切换后记住选择。
+    // VitePress 的类型只允许 initialValue 为 'dark'，但首屏脚本和客户端（useDark）都支持 'light'，构建产物中已确认生效
+    appearance: { initialValue: 'light' as 'dark' },
+
+    // 浅色/深色开关换成图标按钮（默认主题的组件按文件名替换）
+    vite: {
+      resolve: {
+        alias: [
+          {
+            find: /^.*\/VPSwitchAppearance\.vue$/,
+            replacement: fileURLToPath(new URL('./components/AppearanceButton.vue', import.meta.url)),
+          },
+        ],
+      },
+    },
     sitemap: {
       hostname,
       transformItems: (items) => items.filter((item) => !noindex.has('/' + item.url)),

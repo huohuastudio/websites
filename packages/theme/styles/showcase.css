@@ -1,0 +1,300 @@
+/*
+ * 官网首页的配色、版式和通用样式（参照 Apple 产品页：简约，白底和浅灰底交替，不用光晕、渐变底和阴影）。
+ * 首页内容包在 .sx 中；文档页不受影响。品牌色取各站点 brand.css 中的 --vp-c-brand-3（浅色、深色下相同），
+ * 只用于按钮、链接和掺进截图面板的底色。
+ * 截图的处理：独立的截图框只带很淡的细边（.sx-win）；卡片中的截图延伸到卡片右边和底边，
+ * 最后 32px 渐隐到卡片底色（.sx-fade-rb、.sx-fade-b），卡片底色用 --sx-panel，免得白色截图与白色背景融在一起
+ */
+.sx {
+  --sx-bg: #ffffff;
+  --sx-alt: #f5f5f7;
+  --sx-tile: #ffffff;
+  --sx-text: #1d1d1f;
+  --sx-text-2: #6e6e73;
+  --sx-text-3: #86868b;
+  --sx-line: rgba(0, 0, 0, 0.1);
+  --sx-edge: rgba(0, 0, 0, 0.12);
+  --sx-panel: color-mix(in srgb, var(--vp-c-brand-3) 9%, #f5f5f7);
+  --sx-link: var(--vp-c-brand-1);
+  --sx-btn: var(--vp-c-brand-3);
+  --sx-btn-hover: var(--vp-button-brand-hover-bg);
+  --sx-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* 舞台钉住的位置：默认主题的导航栏在宽度 ≥960px 时才固定在顶部，固定时舞台钉在它下方，可用高度扣掉它 */
+  --sx-nav: 0px;
+  --sx-vh: calc(100vh - var(--sx-nav));
+
+  background: var(--sx-bg);
+  color: var(--sx-text);
+  font-size: 17px;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+@media (min-width: 960px) {
+  .sx {
+    --sx-nav: var(--vp-nav-height);
+  }
+}
+
+.dark .sx {
+  --sx-bg: #000000;
+  --sx-alt: #101011;
+  --sx-tile: #1c1c1e;
+  --sx-text: #f5f5f7;
+  /* 次要文字比 Apple 的默认值亮一些，在纯黑底和面板上的小字也清楚 */
+  --sx-text-2: #b8b8bd;
+  --sx-text-3: #9d9da3;
+  --sx-line: rgba(255, 255, 255, 0.14);
+  --sx-edge: rgba(255, 255, 255, 0.12);
+  --sx-panel: color-mix(in srgb, var(--vp-c-brand-3) 22%, #1c1c1e);
+}
+
+/* 首页深色用纯黑底，导航栏和页脚跟着变；首页底部不留默认主题的空白 */
+.dark:has(.sx) {
+  --vp-c-bg: #000000;
+}
+
+.VPHome:has(.sx) {
+  margin-bottom: 0;
+}
+
+.sx :where(h1, h2, h3, h4) {
+  margin: 0;
+  text-wrap: balance;
+}
+
+.sx :where(p, li, figcaption, .sx-lead) {
+  text-wrap: pretty;
+}
+
+.sx a {
+  color: var(--sx-link);
+}
+
+.sx a:hover {
+  text-decoration: underline;
+}
+
+.sx :where(img, video) {
+  display: block;
+  max-width: 100%;
+}
+
+.sx-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-inline: 24px;
+}
+
+.sx-sec {
+  padding-block: clamp(100px, 12vw, 150px);
+}
+
+.sx-alt {
+  background: var(--sx-alt);
+}
+
+/* 标题层级 */
+.sx-display {
+  font-size: clamp(44px, 7vw, 88px);
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.sx-title {
+  font-size: clamp(34px, 4.6vw, 56px);
+  line-height: 1.08;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.sx-lead {
+  margin: 0;
+  font-size: clamp(18px, 1.7vw, 21px);
+  line-height: 1.5;
+  color: var(--sx-text-2);
+}
+
+.sx-muted {
+  color: var(--sx-text-2);
+}
+
+.sx-head {
+  max-width: 760px;
+  margin-bottom: 56px;
+}
+
+.sx-head .sx-lead {
+  margin-top: 18px;
+}
+
+.sx-head.center {
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* 专业版、授权版之类的标记 */
+.sx-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 9px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  color: var(--sx-link);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.5;
+  vertical-align: 0.35em;
+}
+
+/* 按钮：实心胶囊和描边胶囊 */
+.sx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.sx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 22px;
+  border: 1px solid transparent;
+  border-radius: 980px;
+  font-size: 17px;
+  line-height: 1.2;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.sx .sx-btn:hover {
+  text-decoration: none;
+}
+
+.sx .sx-btn.primary {
+  background: var(--sx-btn);
+  color: #fff;
+}
+
+.sx .sx-btn.primary:hover {
+  background: var(--sx-btn-hover);
+}
+
+.sx .sx-btn.ghost {
+  border-color: var(--sx-link);
+  color: var(--sx-link);
+}
+
+.sx .sx-btn.ghost:hover {
+  background: var(--sx-link);
+  color: var(--sx-bg);
+}
+
+/* 独立的截图框：圆角和很淡的细边，没有阴影 */
+.sx-win {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--sx-alt);
+  box-shadow: 0 0 0 1px var(--sx-edge);
+}
+
+.sx-win > :where(img, video) {
+  width: 100%;
+  height: auto;
+}
+
+/* 卡片中的截图：右边和底边最后 32px 渐隐到卡片底色 */
+.sx-fade-rb,
+.sx-fade-b {
+  --sx-fade-x: linear-gradient(to right, #000 calc(100% - 32px), rgba(0, 0, 0, 0.75) calc(100% - 20px), rgba(0, 0, 0, 0.3) calc(100% - 8px), transparent);
+  --sx-fade-y: linear-gradient(to bottom, #000 calc(100% - 32px), rgba(0, 0, 0, 0.75) calc(100% - 20px), rgba(0, 0, 0, 0.3) calc(100% - 8px), transparent);
+}
+
+.sx-fade-rb {
+  -webkit-mask-image: var(--sx-fade-x), var(--sx-fade-y);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--sx-fade-x), var(--sx-fade-y);
+  mask-composite: intersect;
+}
+
+.sx-fade-b {
+  -webkit-mask-image: var(--sx-fade-y);
+  mask-image: var(--sx-fade-y);
+}
+
+/* 固定舞台：外层给出滚动距离，内层钉在导航栏下方 */
+.sx-pin {
+  position: relative;
+}
+
+.sx-stage {
+  position: sticky;
+  top: var(--sx-nav);
+  height: var(--sx-vh);
+  overflow: hidden;
+}
+
+/* 窄屏、视口太矮或减少动态效果时，舞台不固定，内容按顺序排下来（与 motion.ts 的 isFlat 一致）。
+   各版块在同样的条件下把外层高度设为 auto，并显示最终状态 */
+@media (max-width: 760px), (max-height: 640px) {
+  .sx-pin {
+    overflow-x: clip;
+  }
+
+  .sx-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding-block: 72px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sx-stage {
+    position: static;
+    height: auto;
+    overflow: visible;
+    padding-block: 96px;
+  }
+}
+
+/* 首屏入场：一次编排好的序列 */
+.sx-enter {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: sx-enter 1.1s var(--sx-ease) forwards;
+}
+
+.sx-enter.d1 {
+  animation-delay: 0.1s;
+}
+
+.sx-enter.d2 {
+  animation-delay: 0.25s;
+}
+
+.sx-enter.d3 {
+  animation-delay: 0.45s;
+}
+
+.sx-enter.d4 {
+  animation-delay: 0.65s;
+  animation-duration: 1.4s;
+}
+
+@keyframes sx-enter {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sx-enter {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

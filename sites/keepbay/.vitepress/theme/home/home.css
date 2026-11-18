@@ -1,0 +1,13 @@
+/* Keepbay 首页中跨版块的规则（各版块自己的样式在组件的 scoped 样式中） */
+
+/* 矮视口：固定舞台中的标题区收紧，把高度留给截图 */
+@media (max-height: 820px) and (min-width: 761px) {
+  .kb-home .sx-stage .sx-title {
+    font-size: clamp(30px, 5.4vh, 44px);
+  }
+
+  .kb-home .sx-stage .sx-head .sx-lead {
+    margin-top: 10px;
+    font-size: 17px;
+  }
+}
