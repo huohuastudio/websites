@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { easeOut, seg, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { SxShot, easeOut, seg, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 import NxMarket from './NxMarket.vue'
 
@@ -50,7 +50,7 @@ useScrollFrame((still) => {
           </div>
         </div>
         <div ref="shot" class="ext-shot" :style="{ '--ci': `${clip}%` }">
-          <img class="sx-fade-rb" src="/screenshots/plugins.webp" width="2048" height="1280" alt="插件管理：已安装的插件和插件市场" loading="lazy" />
+          <SxShot class="sx-fade-rb" src="/screenshots/plugins" :width="2048" :height="1280" alt="插件管理：已安装的插件和插件市场" />
         </div>
       </div>
       <div class="ext-note">
@@ -124,7 +124,7 @@ useScrollFrame((still) => {
   clip-path: inset(var(--ci, 0%) round 22px);
 }
 
-.ext-shot img {
+.ext-shot :deep(img) {
   width: 100%;
   height: auto;
   border-radius: 14px 0 0 0;

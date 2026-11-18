@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { easeOut, seg, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { SxShot, easeOut, seg, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 
 // 相册和分享：截图随滚动放大到原大，右侧要点依次出现，访问密码逐位填入
@@ -38,7 +38,7 @@ useScrollFrame((still) => {
       <div class="grid">
         <div ref="fig" class="fig">
           <div class="sx-win">
-            <img src="/screenshots/albums.webp" width="1600" height="1000" alt="相册页面" loading="lazy" />
+            <SxShot src="/screenshots/albums" :width="1600" :height="1000" alt="相册页面" />
           </div>
           <div ref="lock" class="lock" aria-hidden="true">
             <b>输入访问密码</b>
@@ -72,7 +72,7 @@ useScrollFrame((still) => {
   transform-origin: 50% 100%;
 }
 
-.sx-win img {
+.sx-win :deep(img) {
   aspect-ratio: 16 / 10;
   object-fit: cover;
   object-position: top;

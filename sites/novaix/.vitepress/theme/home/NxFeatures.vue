@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { easeOut, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { SxShot, easeOut, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 
 // 基础设施、运营和集成：上面是格子（截图格和大字格），下面是按四组列出的全部功能。
@@ -82,7 +82,7 @@ useScrollFrame((still) => {
             <p>基于 OVN 的二层隔离网络。同一 VPC 内的实例通过内网 IP 互相通信，不同 VPC 之间完全隔离。支持子网划分和安全组。</p>
           </div>
           <div class="img sx-fade-rb" style="--top: 190px; --zw: 125%">
-            <img src="/screenshots/vpc.webp" width="2048" height="1280" alt="VPC 私有网络和子网" loading="lazy" />
+            <SxShot src="/screenshots/vpc" :width="2048" :height="1280" alt="VPC 详情：子网和接入的实例" />
           </div>
         </div>
         <div class="cell s2 word">
@@ -105,7 +105,7 @@ useScrollFrame((still) => {
             <p>节点的 CPU、内存、磁盘、网络和负载曲线。</p>
           </div>
           <div class="img sx-fade-rb" style="--top: 140px; --zw: 150%">
-            <img src="/screenshots/node-stats.webp" width="2048" height="1280" alt="节点的 CPU、内存、磁盘、网络和负载曲线" loading="lazy" />
+            <SxShot src="/screenshots/node-stats" :width="2048" :height="1280" alt="节点的 CPU、内存、磁盘、网络和负载曲线" />
           </div>
         </div>
         <div class="cell s3 shot">
@@ -114,7 +114,7 @@ useScrollFrame((still) => {
             <p>用户列表、余额、实名状态和分组。实名认证支持二要素验证和人脸识别。</p>
           </div>
           <div class="img sx-fade-rb" style="--top: 170px; --zw: 150%">
-            <img src="/screenshots/users.webp" width="2048" height="1280" alt="用户列表、余额、实名状态和分组" loading="lazy" />
+            <SxShot src="/screenshots/users" :width="2048" :height="1280" alt="用户列表、余额、实名状态和分组" />
           </div>
         </div>
         <div class="cell s4 shot">
@@ -123,7 +123,7 @@ useScrollFrame((still) => {
             <p>公告、文章、帮助中心、FAQ、数据中心等前台内容，默认主题内置对应的页面。</p>
           </div>
           <div class="img sx-fade-rb" style="--top: 170px; --zw: 125%">
-            <img src="/screenshots/cms.webp" width="2048" height="1280" alt="内容管理：公告、文章、帮助中心、FAQ" loading="lazy" />
+            <SxShot src="/screenshots/cms" :width="2048" :height="1280" alt="内容管理：公告、文章、帮助中心、FAQ" />
           </div>
         </div>
         <div class="cell s2 word">
@@ -221,7 +221,7 @@ useScrollFrame((still) => {
   transform: translateY(calc((1 - var(--o, 1)) * 36px));
 }
 
-.img img {
+.img :deep(img) {
   width: var(--zw, 100%);
   max-width: none;
   height: auto;

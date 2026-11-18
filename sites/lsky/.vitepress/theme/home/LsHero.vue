@@ -1,20 +1,18 @@
 <script setup lang="ts">
-import { easeOut, isFlat, pinProgress, seg, smooth, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { SxShot, easeOut, isFlat, pinProgress, seg, smooth, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
-import LsScene from './LsScene.vue'
 import { BUY_URL, DEMO_URL } from './links'
-import { miniScene } from './scenes'
 import { lerp } from './util'
 
 // 首屏：文件卡片飞进上传页，再由按日期分组的图片管理页从下方推上来
 
-// 文件名、格式、出现在截图的哪一侧（-1 左、1 右）、纵向位置（占截图高度的比例）
+// 文件名、格式、缩略图（public/photos 中的照片）、出现在截图的哪一侧（-1 左、1 右）、纵向位置（占截图高度的比例）
 const files = [
-  { name: 'IMG_0412.jpg', fmt: 'JPEG', side: -1, yf: 0.14 },
-  { name: '截图 2026-03-14.png', fmt: 'PNG', side: 1, yf: 0.22 },
-  { name: 'banner-home.webp', fmt: 'WebP', side: -1, yf: 0.58 },
-  { name: 'IMG_0415.jpg', fmt: 'JPEG', side: 1, yf: 0.66 },
-  { name: 'animation.gif', fmt: 'GIF', side: -1, yf: 0.9 },
+  { name: 'IMG_0412.jpg', fmt: 'JPEG', img: 'sunset', side: -1, yf: 0.14 },
+  { name: 'camels.png', fmt: 'PNG', img: 'camels', side: 1, yf: 0.22 },
+  { name: 'castle-night.webp', fmt: 'WebP', img: 'castle', side: -1, yf: 0.58 },
+  { name: 'IMG_0415.jpg', fmt: 'JPEG', img: 'paella', side: 1, yf: 0.66 },
+  { name: 'cat.gif', fmt: 'GIF', img: 'cat', side: -1, yf: 0.9 },
 ]
 const captions = ['批量上传、拖拽上传、粘贴上传，带上传队列', '上传的图片在图片管理中按日期分组']
 const capIndex = ref(0)
@@ -100,17 +98,17 @@ useScrollFrame((still) => {
         <div class="sx-enter d4">
           <div ref="frame" class="sx-win stack2">
             <div class="layer up">
-              <img src="/screenshots/upload.webp" width="1600" height="1000" alt="上传页面：批量选择的图片排在上传队列中" fetchpriority="high" />
+              <SxShot src="/screenshots/upload" :width="1600" :height="1000" alt="上传页面：批量选择的图片排在上传队列中" priority />
             </div>
             <div class="layer ph">
-              <img src="/screenshots/photos.webp" width="1600" height="1000" alt="图片管理页面：图片按日期分组排列" />
+              <SxShot src="/screenshots/photos" :width="1600" :height="1000" alt="图片管理页面：图片按日期分组排列" />
             </div>
           </div>
         </div>
       </div>
       <div aria-hidden="true">
         <div v-for="(f, i) in files" :key="f.name" :ref="(el) => (flies[i] = el as HTMLElement)" class="fly">
-          <LsScene :scene="miniScene(i)" />
+          <img :src="`/photos/${f.img}.webp`" alt="" />
           <div>{{ f.name }}<small>{{ f.fmt }}</small></div>
         </div>
       </div>
@@ -193,7 +191,7 @@ useScrollFrame((still) => {
   overflow: hidden;
 }
 
-.layer img {
+.layer :deep(img) {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -232,11 +230,12 @@ useScrollFrame((still) => {
   pointer-events: none;
 }
 
-.fly svg {
+.fly img {
   flex: none;
   width: 44px;
   height: 33px;
   border-radius: 6px;
+  object-fit: cover;
 }
 
 .fly small {

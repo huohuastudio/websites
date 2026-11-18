@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { easeOut, isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { SxShot, easeOut, isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { computed, ref } from 'vue'
 
 // 首屏：终端随滚动逐行输入下载、解压、运行三条命令，然后缩小退到左下并淡出，仪表盘从后面放大。
@@ -138,7 +138,7 @@ useScrollFrame((still) => {
       <div ref="scene" class="scene">
         <div class="dash">
           <div class="sx-win">
-            <img src="/screenshots/dashboard.webp" width="2048" height="1280" alt="Novaix 管理面板的仪表盘：收入、订单、实例和节点的概况" fetchpriority="high" />
+            <SxShot src="/screenshots/dashboard" :width="2048" :height="1280" alt="Novaix 管理面板的仪表盘：收入、订单、实例和节点的概况" priority />
           </div>
         </div>
         <div
@@ -247,7 +247,7 @@ useScrollFrame((still) => {
   height: 100%;
 }
 
-.dash img {
+.dash :deep(img) {
   height: 100%;
   object-fit: cover;
   object-position: left top;
@@ -395,7 +395,7 @@ useScrollFrame((still) => {
   }
 
   .dash .sx-win,
-  .dash img {
+  .dash :deep(img) {
     height: auto;
   }
 

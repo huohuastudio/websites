@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
-import LsScene from './LsScene.vue'
-import { scenes } from './scenes'
 import { typed } from './util'
 
 // AI：标签逐个出现，描述逐字写出，按文字要求润色图片
 
-const tags = ['海边', '小岛', '傍晚', '风景', '户外']
-const DESC = '傍晚的海面上有一座小岛，太阳低垂在海平线附近，水面映出光带。'
-const PROMPT = '将背景替换为蓝天白云'
+const tags = ['蜜蜂', '花朵', '花蕊', '微距', '植物']
+const DESC = '一只蜜蜂停在粉色花朵上采蜜，背景是虚化的绿色。'
+const PROMPT = '提高亮度，让花朵的颜色更鲜艳'
 const statuses = ['等待中', '处理中', '已完成']
 
 const sec = ref<HTMLElement>()
@@ -28,7 +26,7 @@ useScrollFrame((still) => {
   desc.value = typed(DESC, seg(p, 0.34, 0.54))
   prompt.value = typed(PROMPT, seg(p, 0.6, 0.72))
   status.value = p < 0.74 ? 0 : p < 0.86 ? 1 : 2
-  pic.value!.style.setProperty('--sky', String(smooth(seg(p, 0.78, 0.9))))
+  pic.value!.style.setProperty('--fx', String(smooth(seg(p, 0.78, 0.9))))
   field.value = done ? -1 : p < 0.32 ? 0 : p < 0.57 ? 1 : 2
 })
 
@@ -45,8 +43,8 @@ const on = (i: number) => field.value < 0 || field.value === i
       <div class="card">
         <div ref="pic" class="pic" aria-hidden="true">
           <div class="img">
-            <LsScene :scene="scenes.dusk" />
-            <LsScene class="after" :scene="scenes.blue" />
+            <img src="/photos/bee.webp" alt="" loading="lazy" />
+            <img class="after" src="/photos/bee.webp" alt="" loading="lazy" />
           </div>
         </div>
         <div class="fields">
@@ -124,15 +122,18 @@ const on = (i: number) => field.value < 0 || field.value === i
   border-radius: 6px;
 }
 
-.img svg {
+.img img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
+/* 润色后的效果：同一张照片调亮、提高饱和度，随进度淡入 */
 .img .after {
-  opacity: var(--sky, 0);
+  opacity: var(--fx, 0);
+  filter: brightness(1.12) saturate(1.5) contrast(1.04);
 }
 
 /* 右边的字段 */

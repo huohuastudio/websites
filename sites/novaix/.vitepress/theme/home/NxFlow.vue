@@ -1,103 +1,69 @@
 <script setup lang="ts">
-import { isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { SxShot, isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 
-// 从下单到售后：流程线随滚动画出，到哪一步点亮哪一步，下方的说明和示意随之切换。
+// 从下单到售后：流程线随滚动画出，到哪一步点亮哪一步，下方的说明和截图随之切换。
 // 不固定舞台时隐藏流程线，七个步骤按顺序排下来
-
-interface Board {
-  /** 面板的小标题 */
-  k: string
-  /** 大字的一组词；cycle 时依次高亮 */
-  big?: string[]
-  cycle?: boolean
-  /** 状态流转 */
-  chain?: string[]
-  /** 第二个小标题，跟在状态流转后面 */
-  k2?: string
-  /** 两列的说明行 */
-  rows?: [string, string][]
-  /** 底部的补充说明，一项一行 */
-  foot?: string[]
-}
 
 interface Step {
   /** 流程线上的名称 */
   n: string
   h: string
   p: string
-  shot?: { src: string; alt: string }
-  board?: Board
+  /** 截图（public/screenshots 中的文件名，不含 -light.webp、-dark.webp） */
+  shot: string
+  alt: string
 }
 
 const STEPS: Step[] = [
   {
     n: '套餐',
     h: '创建套餐',
-    p: '设定 CPU、内存、磁盘、带宽和流量，选择可用节点后上架。套餐分为虚拟机和容器两种类型。',
-    board: { k: '计费周期', big: ['按小时', '月付', '季付', '年付'], foot: ['按小时计费的实例，按使用时长从余额实时扣费。'] },
+    p: '设定 CPU、内存、磁盘、带宽和流量，选择可用节点后上架。套餐分为虚拟机和容器两种类型，可以按小时、月、季、年计费；按小时计费的实例从余额实时扣费。',
+    shot: 'plans',
+    alt: '套餐列表：配置、价格、库存和地区',
   },
   {
     n: '订单',
     h: '用户下单',
     p: '新购、续费、升级、附加 IP 和流量包都会生成订单。管理员可以按类型和状态筛选订单，也可以在后台代客下单。',
-    shot: { src: '/screenshots/orders.webp', alt: '订单：新购、续费、升级订单的列表和筛选' },
+    shot: 'orders',
+    alt: '订单：新购、续费、升级订单的列表和筛选',
   },
   {
     n: '支付',
     h: '在线支付',
     p: '支持支付宝、微信支付、Stripe、PayPal 和易支付，也可以用余额支付。其他渠道可以用插件接入。',
-    board: {
-      k: '支付渠道',
-      big: ['支付宝', '微信支付', 'Stripe', 'PayPal', '易支付'],
-      cycle: true,
-      foot: ['易支付兼容彩虹易支付和 ZPAY。手续费可以设为不收取、固定金额或按比例。'],
-    },
+    shot: 'payments',
+    alt: '支付记录：各渠道的支付流水',
   },
   {
     n: '开通实例',
     h: '自动开通',
     p: '支付成功后，系统创建异步任务：创建实例、配置网络、分配 IP。用户在实例详情页的第一屏就能看到 IP、用户名、密码和 SSH 命令。',
-    shot: { src: '/screenshots/instance.webp', alt: '实例详情：运行状态、资源用量和常用操作' },
+    shot: 'instance',
+    alt: '实例详情：运行状态、资源用量和常用操作',
   },
   {
     n: '续费和升级',
     h: '续费和升级',
-    p: '用户可以自助续费和升级配置。开启自动续费后，余额充足时系统在到期前 1 天自动续费。',
-    board: {
-      k: '到期处理',
-      rows: [
-        ['到期前 3 天', '发送邮件，提醒用户续费'],
-        ['到期前 1 天', '余额充足时自动续费'],
-        ['到期后', '按暂停宽限天数冻结实例，默认 0 天'],
-        ['冻结之后', '超过删除宽限天数自动删除，默认 7 天'],
-      ],
-    },
+    p: '用户可以自助续费和升级配置。开启自动续费后，余额充足时系统在到期前 1 天自动续费；到期未续费的实例按设置的宽限天数先冻结、再删除。',
+    shot: 'lifecycle',
+    alt: '到期处理设置：提醒、冻结和删除的宽限天数',
   },
   {
     n: '工单',
     h: '工单',
-    p: '用户提交工单时可以关联一个实例，管理员在工单详情中直接看到实例的运行状态和 IP。支持部门分类、指派和邮件回复。',
-    board: {
-      k: '工单状态',
-      chain: ['待处理', '已回复', '用户回复', '已关闭'],
-      k2: 'SLA 默认响应时限',
-      rows: [
-        ['高优先级', '60 分钟'],
-        ['中优先级', '4 小时'],
-        ['低优先级', '24 小时'],
-      ],
-    },
+    p: '用户提交工单时可以关联一个实例，管理员在工单详情中直接看到实例的运行状态和 IP。支持部门分类、指派、SLA 响应时限和邮件回复。',
+    shot: 'ticket',
+    alt: '工单详情：对话、关联的实例和工单属性',
   },
   {
     n: '发票',
     h: '发票',
     p: '用户自助申请，管理员审核后在外部系统开票，再上传电子发票。用户在线查看和下载。',
-    board: {
-      k: '发票状态',
-      chain: ['待审核', '待开票', '已开票'],
-      foot: ['审核未通过时为「已驳回」，用户可以查看驳回原因。', '最低开票金额默认 100 元，可以修改。'],
-    },
+    shot: 'invoices',
+    alt: '发票：待审核、待开票、已开票和已驳回的申请',
   },
 ]
 
@@ -136,33 +102,9 @@ useScrollFrame((still) => {
             <h3>{{ s.h }}</h3>
             <p>{{ s.p }}</p>
           </div>
-          <div class="fvis" :class="{ tall: !s.shot }">
-            <div v-if="s.shot" class="crop sx-fade-rb">
-              <img :src="s.shot.src" width="2048" height="1280" :alt="s.shot.alt" loading="lazy" />
-            </div>
-            <div v-else-if="s.board" class="board">
-              <div class="k">{{ s.board.k }}</div>
-              <div v-if="s.board.big" class="big" :class="{ cyc: s.board.cycle }">
-                <span
-                  v-for="(w, n) in s.board.big"
-                  :key="w"
-                  :class="{ k1: !s.board.cycle }"
-                  :style="s.board.cycle ? { animationDelay: `${n * 1.2}s` } : undefined"
-                >{{ w }}</span>
-              </div>
-              <div v-if="s.board.chain" class="chain">
-                <template v-for="(c, n) in s.board.chain" :key="c">
-                  <em v-if="n > 0" />
-                  <span>{{ c }}</span>
-                </template>
-              </div>
-              <div v-if="s.board.k2" class="k k2">{{ s.board.k2 }}</div>
-              <div v-if="s.board.rows" class="rows">
-                <div v-for="[b, t] in s.board.rows" :key="b"><b>{{ b }}</b><span>{{ t }}</span></div>
-              </div>
-              <div v-if="s.board.foot" class="foot2">
-                <template v-for="(t, n) in s.board.foot" :key="n"><br v-if="n > 0" />{{ t }}</template>
-              </div>
+          <div class="fvis">
+            <div class="crop sx-fade-rb">
+              <SxShot :src="`/screenshots/${s.shot}`" :width="2048" :height="1280" :alt="s.alt" />
             </div>
           </div>
         </div>
@@ -187,14 +129,12 @@ useScrollFrame((still) => {
 }
 
 .sx-lead,
-.fpane p,
-.foot2 {
+.fpane p {
   word-break: keep-all;
   overflow-wrap: anywhere;
 }
 
-.sx-head .sx-lead,
-.foot2 {
+.sx-head .sx-lead {
   text-wrap: balance;
 }
 
@@ -309,7 +249,7 @@ useScrollFrame((still) => {
   color: var(--sx-text-2);
 }
 
-/* 示意面板：16:10，截图左、上留边，延伸到右边和底边 */
+/* 截图面板：16:10，截图左、上留边，延伸到右边和底边 */
 .fvis {
   position: relative;
   justify-self: end;
@@ -327,125 +267,11 @@ useScrollFrame((still) => {
   border-radius: 14px 0 0 0;
 }
 
-.crop img {
-  width: 118%;
+/* 截图放大取景，显示左上部分（窄屏放得更大），文字才看得清 */
+.crop :deep(img) {
+  width: var(--zw, 150%);
   max-width: none;
   height: auto;
-}
-
-/* 没有截图的步骤：文字面板至少 16:10，内容多时撑高，不裁切（较窄的宽屏上标签会换行） */
-.fvis.tall {
-  display: flex;
-  overflow: visible;
-}
-
-.fvis.tall .board {
-  position: relative;
-  flex: 1;
-}
-
-.board {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  padding: 7% 8%;
-}
-
-.k {
-  margin-bottom: 10px;
-  color: var(--sx-text-2);
-  font-size: 14px;
-}
-
-.k2 {
-  margin-top: 22px;
-}
-
-.big {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.15em 0.55em;
-  font-size: clamp(26px, 3.4vw, 44px);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
-}
-
-.big span {
-  color: var(--sx-text-3);
-}
-
-.big span.k1 {
-  color: var(--sx-text);
-}
-
-.cyc span {
-  animation: cyc 6s infinite;
-}
-
-@keyframes cyc {
-  0%,
-  18% {
-    color: var(--sx-text);
-  }
-
-  22%,
-  100% {
-    color: var(--sx-text-3);
-  }
-}
-
-.foot2 {
-  margin-top: 18px;
-  color: var(--sx-text-2);
-  font-size: 15px;
-}
-
-.rows > div {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  gap: 16px;
-  padding: 11px 0;
-  border-top: 1px solid color-mix(in srgb, var(--sx-text) 12%, transparent);
-  font-size: 16px;
-  line-height: 1.45;
-}
-
-.rows > div:first-child {
-  border-top: 0;
-}
-
-.rows b {
-  font-weight: 600;
-}
-
-.rows span {
-  color: var(--sx-text-2);
-}
-
-.chain {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 0;
-}
-
-.chain span {
-  padding: 8px 16px;
-  border-radius: 980px;
-  background: var(--sx-tile);
-  font-size: 16px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.chain em {
-  width: 22px;
-  height: 1px;
-  background: color-mix(in srgb, var(--sx-text) 30%, transparent);
 }
 
 /* 矮视口：标题区收紧，面板改用较小的留边 */
@@ -477,29 +303,7 @@ useScrollFrame((still) => {
   }
 }
 
-/* 较窄的宽屏（示意面板只有约 440px 宽）：文字面板收紧内边距和字号，内容放得进 16:10 */
-@media (max-width: 1100px) and (min-width: 761px) {
-  .board {
-    padding: 4% 6%;
-  }
-
-  .rows > div {
-    gap: 12px;
-    padding: 6px 0;
-    font-size: 14px;
-  }
-
-  .chain span {
-    padding: 5px 12px;
-    font-size: 14px;
-  }
-
-  .chain em {
-    width: 12px;
-  }
-}
-
-/* 平板竖屏等较窄的宽度：文字在上、示意在下 */
+/* 平板竖屏等较窄的宽度：文字在上、截图在下 */
 @media (max-width: 1000px) and (min-width: 761px) and (min-height: 833px) {
   .fpane {
     grid-template-columns: 1fr;
@@ -516,10 +320,6 @@ useScrollFrame((still) => {
   .fvis {
     justify-self: center;
     width: min(100%, calc((var(--sx-vh) - 608px) * 1.6));
-  }
-
-  .board {
-    text-align: left;
   }
 }
 
@@ -557,6 +357,7 @@ useScrollFrame((still) => {
 @media (max-width: 760px) {
   .fvis {
     --gut: 20px;
+    --zw: 190%;
   }
 
   .fpane {
@@ -567,48 +368,6 @@ useScrollFrame((still) => {
   .fpane h3 {
     font-size: 28px;
   }
-
-  .board {
-    padding: 6% 7%;
-  }
-
-  .big {
-    font-size: clamp(22px, 7vw, 30px);
-  }
-
-  .rows > div {
-    gap: 10px;
-    padding: 7px 0;
-    font-size: 14px;
-  }
-
-  .k {
-    margin-bottom: 4px;
-    font-size: 13px;
-  }
-
-  .foot2 {
-    margin-top: 10px;
-    font-size: 13px;
-  }
-
-  .chain span {
-    padding: 5px 11px;
-    font-size: 13px;
-  }
-
-  .chain em {
-    width: 10px;
-  }
-
-  .fvis.tall {
-    aspect-ratio: auto;
-    min-height: 230px;
-  }
-
-  .fvis.tall .board {
-    position: relative;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -616,11 +375,6 @@ useScrollFrame((still) => {
   .rs,
   .rs i {
     transition: none;
-  }
-
-  .cyc span {
-    animation: none;
-    color: var(--sx-text);
   }
 }
 </style>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
-import LsScene from './LsScene.vue'
-import { scenes } from './scenes'
 import { typed } from './util'
 
 // 云处理：网址中的参数逐字输入，输出随参数变化，原图不变
@@ -101,11 +99,11 @@ useScrollFrame((still) => {
         </div>
         <div class="panels" aria-hidden="true">
           <figure>
-            <div class="box"><div class="src"><LsScene :scene="scenes.sea" /></div></div>
+            <div class="box"><div class="src"><img src="/photos/autumn.webp" alt="" loading="lazy" /></div></div>
             <figcaption>原图 <code>1600 × 1200</code><code>JPEG</code></figcaption>
           </figure>
           <figure>
-            <div class="box"><div ref="out" class="out"><LsScene :scene="scenes.sea" /></div></div>
+            <div class="box"><div ref="out" class="out"><img src="/photos/autumn.webp" alt="" loading="lazy" /></div></div>
             <figcaption>输出 <code>{{ odim }}</code><code>{{ ofmt }}</code></figcaption>
           </figure>
         </div>
@@ -240,10 +238,11 @@ figure {
   height: 100%;
 }
 
-.box svg {
+.box img {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
 .out {

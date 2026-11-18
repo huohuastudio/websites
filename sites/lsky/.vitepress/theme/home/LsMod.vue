@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { isFlat, pinProgress, seg, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { computed, ref } from 'vue'
-import LsTile from './LsTile.vue'
 
 // 内容审核：扫描线扫过一组图片，违规和疑似违规的被标出
 
 const services = ['阿里云', '腾讯云', '百度', 'NSFW.js', 'ModerateContent', 'AI 大模型审核']
-const TILES = 12
+// 审核墙的照片（public/photos），第 7、10 张被标出
+const PHOTOS = ['barn', 'town', 'cosmos', 'dog', 'butterfly', 'lighthouse', 'bay', 'munich', 'paella', 'harbor', 'blueberries', 'sailboat']
+const TILES = PHOTOS.length
 /** 被标出的图片：键为序号，值为类型和标签 */
 const flags: Record<number, { type: 'bad' | 'warn'; label: string }> = {
   6: { type: 'bad', label: '违规' },
@@ -61,7 +62,7 @@ useScrollFrame((still) => {
       </div>
       <div ref="wall" class="wall" aria-hidden="true">
         <div v-for="i in TILES" :key="i" :ref="(el) => (tiles[i - 1] = el as HTMLElement)" class="tile" :class="[flags[i - 1]?.type, { seen: seen[i - 1] }]">
-          <LsTile :index="i - 1" />
+          <img :src="`/photos/${PHOTOS[i - 1]}.webp`" alt="" loading="lazy" />
           <em v-if="flags[i - 1]">{{ flags[i - 1].label }}</em>
         </div>
         <i ref="scan" class="scan" />
@@ -155,21 +156,22 @@ useScrollFrame((still) => {
   background: var(--sx-alt);
 }
 
-.tile svg {
+.tile img {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
   filter: saturate(0.25);
   opacity: 0.55;
   transition: filter 0.5s, opacity 0.5s;
 }
 
-.tile.seen svg {
+.tile.seen img {
   filter: none;
   opacity: 1;
 }
 
-.tile.bad.seen svg {
+.tile.bad.seen img {
   filter: blur(6px);
 }
 

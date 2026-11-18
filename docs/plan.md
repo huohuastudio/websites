@@ -216,6 +216,36 @@ W5 开工时用户定：本仓库不处理旧文档域名（docs.huohuastudio.co
 - **留到下一批**：推近用的局部高清截图、按画面搜照片的截图重截、录屏重录（命令执行后终端面板退出画面）；Novaix、Lsky 的深色截图，流程和运营中几步的界面截图；Lsky 的示意照片换成有授权的照片
 - 改版前已知的问题（2026-11-18 评估）：下半部分功能清单、价格卡片、价格对比表重复列同一批功能；照片时间线、收集文件、历史版本等免费功能只是清单中的一行，首屏和格子偏重专业版的 AI 功能；界面一览有 10 个标签
 
+## W25 Keepbay 公开下载改走 GitHub（2026-11-18 用户定）
+
+Keepbay 现在要登录授权中心才能下载安装包，与官网"不用注册我们的帐号"冲突（安装包其实已公开：Docker Hub 镜像、在线更新不登录换链接）。讨论过授权中心免登录下载（担心流量被刷、产生高额 CDN 账单）后，用户定：
+
+- **公开下载完全不经过授权中心**，只提供 GitHub 和 Docker 两种方式；国内下载慢就接受慢，不另设国内渠道
+- **GitHub**：公开仓库 huohuastudio/keepbay-releases 的 Releases。Keepbay 的 Release 工作流直接发布到这里（用 GitHub App 授权，免去令牌续期）；压缩包名不带版本号（如 keepbay_linux_amd64.tar.gz，包内目录仍是 keepbay_<版本>_linux_amd64），附 SHA256 清单；测试版在 GitHub 上不标预发布，`releases/latest/download/<文件名>` 指向最新版本（授权中心按版本号中的 beta 判断测试版，在线更新不受影响）
+- **授权中心**：Keepbay 的版本同步来源改为 keepbay-releases（公开仓库不需要令牌）；Keepbay 产品页的下载区改为指向 GitHub 和 Docker，不再要求登录。在线更新仍由授权中心提供，不改
+- 授权中心原计划的"免登录公开下载、固定公开地址"放弃，已撤回，未提交
+
+本仓库要做（等 keepbay-releases 上有第一个版本后）：Keepbay 首页和价格卡片的「下载安装」改链 GitHub Releases 或安装文档；docs/install.md 的下载步骤改为在服务器上用一条命令从 GitHub 下载并核对 SHA256；常见问题、介绍中关于下载和帐号的说法核对一遍。
+
+## W24 Novaix、Lsky 首页补截图（2026-11-18 用户定）
+
+用户要求在本机搭建 Novaix 和 Lsky Pro+，填充测试数据，自己决定截哪些图（"自己截你想要的图"），补上 W23 留下的素材缺口。两个项目都在 ~/Develop/Projects 下。
+
+- **Novaix**（~/Develop/Projects/novaix）：已有官网截图环境 `_testing/site-shots-060`（prepare.sh 用当前代码构建、seed 填演示数据、启动在 18062 端口，admin / admin123；shots.mjs 登录后截图，没有真实节点，实例状态和节点监控用 page.route 模拟数据）。在它的基础上截：现有 8 张的深色版，以及流程中用文字面板代替的几步（套餐、支付渠道、续费和到期、工单详情、发票）、高可用的节点组页面等。截图前读一遍 novaix 仓库的 CLAUDE.md、_testing/TEST_GUIDE.md；不暴露 testdata/test_server.env 中的凭据；不要改 novaix 仓库的代码，环境和脚本放 `_testing/` 或会话的 scratchpad
+- **Lsky Pro+**（~/Develop/Projects/lsky-pro-enterprise，Laravel 12，本机 PHP 8.5、Composer）：现有 `.env` 连的是用户开发用的 PostgreSQL 库 lsky_pro，**不能动**。另起一套：用环境变量把数据库指到 scratchpad 中单独的 SQLite 文件、储存目录也放 scratchpad，`php artisan serve` 在单独的端口启动，不改 .env、不跑会影响开发库的命令。填充用户、角色组、相册、图片、储存、套餐和订单、工单等演示数据。截：现有 5 张（upload、photos、albums、storage、dashboard）的新版和深色版，以及运营一段需要的套餐、订单、工单等后台页面、图片安全（审核）页面等
+- **照片素材**：Lsky 不用 Keepbay 演示数据中的照片（同一批照片出现在两个产品的官网上，会让人把两者联系起来，与"站点之间不互相链接、Keepbay 不提 Lsky"相冲突）。另从维基共享资源取一批 CC0 或公有领域的照片，在环境目录中写一份照片来源（文件、作者、授权、出处）。图片处理、云处理、AI 几段的 SVG 示意图可以换成其中一张真实照片（用 CSS 滤镜和裁切演示）
+- **深色截图**：两个产品的界面都支持深色（Novaix 跟随系统，Lsky 存在 localStorage 的 theme）。首页按 html.dark 切换浅色、深色两套（参照 Keepbay 的 KbShot），截图尺寸写进清单
+- **接入首页**：Novaix 流程中的文字面板改为截图（文字面板可保留作补充）；Lsky 运营一段的示意卡片改为截图；截图规则沿用 W23（独立截图框很淡的细边；卡片中的截图延伸到右边和底边、最后 32px 渐隐）
+- **检查**：截图交给 codex 看图挑选和确认取景（Claude 不读图）；首页改完按 W23 的方法做响应式检查、codex 代码审查、simplify，再提交推送并确认线上部署
+
+**完成情况**（2026-11-18）：
+
+- **共用主题**：新增 SxShot（浅色、深色两张截图按 html.dark 切换，文件名 `<名称>-light.webp`、`<名称>-dark.webp`），Novaix、Lsky 首页的截图都改用它
+- **Novaix 截图**：14 页 × 浅深两套，2048×1280。环境脚本在 novaix 仓库的 `_testing/site-shots-w24/`（不进 git）：site-shots-060 的 prepare.sh 之后执行 seed.sql（节点组、工单部门和关联实例、支付记录、发票、VPC）和 polish.py（公网地址换成 RFC 5737 文档网段、用户名和实例名去掉 test/demo 与机械编号、注册时间和余额错开、订单穿插和续费升级、手机号中间四位打星号），重启服务后运行 shots.mjs，再用 cwebp 缩到 2048×1280。seed 把测试服务器的真实地址写进了 1 号节点，seed.sql 中已换成内网示例地址并清空凭据
+- **Novaix 首页**：「从下单到售后」七步都用截图（套餐、订单、支付记录、实例、到期处理设置、工单详情、发票），文字面板删除，面板中的计费周期、到期处理、SLA 并入说明文字；VPC 改为 VPC 详情页。节点组页面截了但没有用：高可用一段的动画已经讲清楚
+- **Lsky 环境**：脚本在 `sites/lsky/scripts/`：setup.sh 把源码仓库复制到工作目录、写独立的 .env 和 SQLite、按安装流程初始化并填充演示数据（seed-demo.php），screenshots.mjs 截图（`pnpm --filter ./sites/lsky shots`），fetch-photos.py 下载照片，photos.md 记来源。本机 PHP 没有 Imagick，副本中的图片驱动改为 GD
+- **Lsky 首页**：上传、图片、相册、仪表板换成新截图；运营一段改为三张截图卡片（订单、支付驱动、工单详情）加一列两个小卡片（反馈和公告、短信和邮件）；后台截图只截内容区（裁掉左侧菜单），表格完整。图片处理、云处理、AI、审核墙、首屏飞过的文件卡片改用维基共享资源的 CC0 照片（`public/photos/`），SVG 示意图（LsScene、LsTile、scenes.ts）删除；AI 的润色改为同一张照片调亮、提高饱和度
+
 ## W6 首页改版（2026-11-13 用户定）
 
 用户觉得三个首页字太多太密、首屏没吸引力、各节长得一样。调研过 Laravel、Linear、Tailscale、Immich、Raycast、ente 的首页，做过四个布局原型，用户最后选定"细线框架版"：
@@ -229,6 +259,8 @@ W5 开工时用户定：本仓库不处理旧文档域名（docs.huohuastudio.co
 - **以后再看**：首页截图都是 2048 宽的原图，格子里只显示 500px 左右，可以生成小尺寸副本加 `srcset`（点击放大时仍用原图）
 
 ## 已知局限
+
+- **Novaix、Lsky 截图的演示数据**（W24）：Novaix 演示库中香港节点的 IP 池、区域和转售连接里仍有 103.200.10.x 等 seed 写入的地址，本批截的页面都不显示它们；以后截这些页面前先在 polish.py 中换成文档网段。两个产品深色界面的辅助文字偏暗、Lsky 工单回复气泡的对比度偏低，是产品界面本身的配色，本仓库不处理
 
 - **首页：页面打开后再切换系统的"减少动态效果"设置**（W23）：共用的滚动工具会随之停止或恢复，但 Keepbay 随滚动播放的录屏在挂载时读取这个设置，以减少动态效果打开后再关闭，录屏不会加载，刷新页面后正常。这种操作极少，改动需要把加载流程改成可重入，代价大于收益
 

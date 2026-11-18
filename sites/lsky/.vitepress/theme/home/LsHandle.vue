@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { computed, ref } from 'vue'
-import LsScene from './LsScene.vue'
-import { scenes } from './scenes'
 
-// 图片处理：规则按分类顺序依次作用在示意图上
+// 图片处理：规则按分类顺序依次作用在示例照片上
 
 const rules = [
   { name: '裁剪', desc: '裁剪并缩放、裁剪图片、修剪图像', done: '裁剪' },
@@ -55,12 +53,12 @@ useScrollFrame((still) => {
         </div>
         <div class="easel" aria-hidden="true">
           <figure class="orig">
-            <div class="pic"><LsScene :scene="scenes.lake" /></div>
+            <div class="pic"><img src="/photos/sailboat.webp" alt="" loading="lazy" /></div>
             <figcaption>原图<br />4032 × 3024</figcaption>
           </figure>
           <div class="easel-r">
             <div ref="art" class="art">
-              <LsScene class="rot" :scene="scenes.lake" />
+              <img class="rot" src="/photos/sailboat.webp" alt="" loading="lazy" />
               <div class="guide" />
               <img class="wm-i" src="/logo.png" alt="" />
               <span class="wm-t">© example.com</span>
@@ -177,11 +175,12 @@ useScrollFrame((still) => {
   border-radius: 4px;
 }
 
-.pic svg,
+.pic img,
 .rot {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
 .orig figcaption {

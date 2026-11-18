@@ -1,10 +1,20 @@
 <script setup lang="ts">
-import { isFlat, pinProgress, prefersReducedMotion, seg, smooth, stageTop, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { SxShot, isFlat, pinProgress, prefersReducedMotion, seg, smooth, stageTop, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 // 运营：竖向滚动推动卡片横向移动
 
-const payments = ['支付宝', '微信支付', '银联', 'PayPal', 'Stripe', '易支付']
+/** 截图卡片：public/screenshots 中的文件名（不含 -light.webp、-dark.webp） */
+const shots = [
+  { src: 'orders', h: '套餐和订单', p: '出售会员（角色组）套餐和容量套餐，支持优惠券。', alt: '后台的订单管理：套餐、金额和支付状态' },
+  {
+    src: 'payments',
+    h: '在线支付',
+    p: '支持支付宝、微信支付、银联、PayPal、Stripe 和易支付。在角色组中勾选可用的支付驱动，该组的用户下单时才能使用。',
+    alt: '后台的支付驱动列表',
+  },
+  { src: 'ticket', h: '工单', p: '用户提交工单，管理员在后台查看对话并回复。', alt: '后台的工单详情：用户与管理员的对话' },
+]
 
 const sec = ref<HTMLElement>()
 const track = ref<HTMLElement>()
@@ -62,38 +72,25 @@ useScrollFrame((still) => {
               <p>用户、角色组、储存和各类驱动，都在后台管理。</p>
             </div>
             <div class="v sx-fade-rb">
-              <img src="/screenshots/dashboard.webp" width="1600" height="1000" alt="管理后台的仪表盘" loading="lazy" />
+              <SxShot src="/screenshots/dashboard" :width="1600" :height="1000" alt="管理后台的仪表板" />
+            </div>
+          </div>
+          <div v-for="c in shots" :key="c.src" class="oc shot">
+            <div class="t">
+              <h3>{{ c.h }}</h3>
+              <p>{{ c.p }}</p>
+            </div>
+            <div class="v sx-fade-rb">
+              <SxShot :src="`/screenshots/${c.src}`" :width="1600" :height="1000" :alt="c.alt" />
             </div>
           </div>
           <div class="col">
             <div class="oc sm">
               <div class="t">
-                <h3>套餐和订单</h3>
-                <p>出售会员（角色组）套餐和容量套餐，支持优惠券。</p>
+                <h3>反馈、举报和公告</h3>
+                <p>处理意见反馈和举报，发布公告和独立页面。</p>
               </div>
-              <div class="chips"><span>会员套餐</span><span>容量套餐</span><span class="cp">优惠券</span></div>
-            </div>
-            <div class="oc sm">
-              <div class="t">
-                <h3>在线支付</h3>
-                <p>在角色组中勾选可用的支付驱动，该组的用户下单时才能使用。</p>
-              </div>
-              <div class="pay">
-                <div class="pay-row">
-                  <span v-for="name in payments" :key="name">{{ name }}</span>
-                  <!-- 重复一组，循环滚动时首尾相接 -->
-                  <span v-for="name in payments" :key="`dup-${name}`" class="dup" aria-hidden="true">{{ name }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="col">
-            <div class="oc sm">
-              <div class="t">
-                <h3>工单、反馈和公告</h3>
-                <p>处理工单、意见反馈和举报，发布公告和独立页面。</p>
-              </div>
-              <div class="chips"><span>工单</span><span>意见反馈</span><span>举报管理</span><span>违规记录</span><span>公告</span><span>独立页面</span></div>
+              <div class="chips"><span>意见反馈</span><span>举报管理</span><span>违规记录</span><span>公告</span><span>独立页面</span></div>
             </div>
             <div class="oc sm">
               <div class="t">
@@ -167,10 +164,18 @@ useScrollFrame((still) => {
   line-height: 1.55;
 }
 
-/* 管理后台：截图延伸到卡片右边和底边，卡片用面板色 */
+/* 截图卡片：截图延伸到卡片右边和底边，卡片用面板色 */
+.oc.wide,
+.oc.shot {
+  background: var(--sx-panel);
+}
+
+.oc.shot {
+  width: min(480px, 78vw);
+}
+
 .oc.wide {
   width: min(calc((var(--oh) - 80px) * 1.6 + 32px), calc(92vw - 48px));
-  background: var(--sx-panel);
 }
 
 .oc.wide .t {
@@ -197,7 +202,7 @@ useScrollFrame((still) => {
   border-radius: 14px 0 0 0;
 }
 
-.v img {
+.v :deep(img) {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -236,26 +241,16 @@ useScrollFrame((still) => {
   padding: 16px 26px 24px;
 }
 
-.chips span,
-.pay-row span {
+.chips span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 6px 13px;
   border-radius: 980px;
   background: var(--sx-tile);
   box-shadow: 0 0 0 1px var(--sx-edge);
   font-size: 14px;
   white-space: nowrap;
-}
-
-.chips span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.chips span.cp {
-  border: 1px dashed color-mix(in srgb, var(--sx-text-3) 70%, transparent);
-  background: none;
-  box-shadow: none;
 }
 
 .chips small {
@@ -268,27 +263,6 @@ useScrollFrame((still) => {
 
 .chips .y {
   color: var(--ls-ok);
-}
-
-/* 支付方式：循环横向滚动，两端淡出 */
-.pay {
-  overflow: hidden;
-  margin: 16px 0 24px;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
-}
-
-.pay-row {
-  display: flex;
-  gap: 8px;
-  width: max-content;
-  animation: payrow 16s linear infinite;
-}
-
-@keyframes payrow {
-  to {
-    transform: translateX(calc(-50% - 4px));
-  }
 }
 
 .bar {
@@ -343,14 +317,9 @@ useScrollFrame((still) => {
     padding: 12px 22px 18px;
   }
 
-  .chips span,
-  .pay-row span {
+  .chips span {
     padding: 4px 11px;
     font-size: 13px;
-  }
-
-  .pay {
-    margin: 12px 0 18px;
   }
 
   .bar {
@@ -376,6 +345,7 @@ useScrollFrame((still) => {
   }
 
   .oc,
+  .oc.shot,
   .col {
     width: auto;
     height: auto;
@@ -434,22 +404,6 @@ useScrollFrame((still) => {
 
   .track {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  }
-
-  .pay {
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-
-  .pay-row {
-    flex-wrap: wrap;
-    width: auto;
-    padding-inline: 26px;
-    animation: none;
-  }
-
-  .pay-row .dup {
-    display: none;
   }
 }
 </style>
