@@ -129,7 +129,7 @@ useScrollFrame((frameStill) => {
   seek()
   bar.value!.style.setProperty('--t', String(p))
   step.value = p < 0.34 ? 0 : p < 0.66 ? 1 : 2
-})
+}, root)
 </script>
 
 <template>
@@ -162,7 +162,7 @@ useScrollFrame((frameStill) => {
 
 <style scoped>
 .scrub {
-  height: 240vh;
+  --sx-run: 240vh;
 }
 
 .sx-stage {
@@ -224,10 +224,6 @@ useScrollFrame((frameStill) => {
 
 /* 舞台不固定：三段说明都显示，不要进度条 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .scrub {
-    height: auto;
-  }
-
   .steps {
     min-height: 0;
   }

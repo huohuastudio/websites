@@ -54,7 +54,7 @@ useScrollFrame((still) => {
   const p = smooth(seg(pinProgress(sec.value!), 0.3, 0.92))
   track.value!.style.setProperty('--tx', `${-p * dist}px`)
   bar.value!.style.setProperty('--t', String(p))
-})
+}, sec)
 </script>
 
 <template>
@@ -109,7 +109,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .ops {
-  height: 300vh;
+  --sx-run: 300vh;
 }
 
 .sx-stage {
@@ -282,22 +282,13 @@ useScrollFrame((still) => {
 }
 
 /* 矮视口：标题区和卡片收紧 */
-@media (max-height: 820px) and (min-width: 761px) {
+@media (max-height: 832px) and (min-width: 761px) {
   .sx-stage {
     padding-top: 16px;
   }
 
   .sx-head {
     margin-bottom: 18px;
-  }
-
-  .sx-title {
-    font-size: clamp(30px, 5.2vh, 42px);
-  }
-
-  .sx-head .sx-lead {
-    margin-top: 8px;
-    font-size: 16px;
   }
 
   .oc.sm p {
@@ -371,16 +362,6 @@ useScrollFrame((still) => {
   }
 }
 
-@media (max-width: 760px), (max-height: 640px) {
-  .ops {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 72px;
-  }
-}
-
 @media (max-width: 760px) {
   .oc.wide .t {
     flex-direction: column;
@@ -394,14 +375,6 @@ useScrollFrame((still) => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ops {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 96px;
-  }
-
   .track {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }

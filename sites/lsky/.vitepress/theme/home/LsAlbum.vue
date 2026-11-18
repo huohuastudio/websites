@@ -12,6 +12,7 @@ const items = [
 ]
 const DOTS = 4
 
+const root = ref<HTMLElement>()
 const fig = ref<HTMLElement>()
 const lock = ref<HTMLElement>()
 // 用函数 ref 按序号保存，保证依次出现的顺序
@@ -25,11 +26,11 @@ useScrollFrame((still) => {
   lock.value!.style.setProperty('--lo', String(seg(k, 0.35, 0.6)))
   filled.value = Math.round(seg(k, 0.55, 0.95) * DOTS)
   lis.forEach((li, i) => li.style.setProperty('--o', String(still ? 1 : easeOut(seg(k, 0.1 + i * 0.15, 0.45 + i * 0.15)))))
-})
+}, root)
 </script>
 
 <template>
-  <section id="album" class="sx-sec album">
+  <section id="album" ref="root" class="sx-sec album">
     <div class="sx-wrap">
       <div class="sx-head">
         <h2 class="sx-title">相册和分享</h2>

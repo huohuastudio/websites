@@ -40,7 +40,7 @@ useScrollFrame((still) => {
     row.style.setProperty('--rx', `${base + (p - 0.5) * 2 * amp * (i % 2 ? -1 : 1)}px`)
   })
   deck.value!.style.setProperty('--f', String(flat ? 1 : smooth(seg(p, 0.15, 0.7))))
-})
+}, root)
 </script>
 
 <template>
@@ -67,7 +67,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .formats {
-  height: 210vh;
+  --sx-run: 210vh;
   overflow-x: clip;
 }
 
@@ -144,21 +144,13 @@ figcaption {
   opacity: var(--f, 0);
 }
 
-@media (max-height: 820px) and (min-width: 761px) {
+@media (max-height: 832px) and (min-width: 761px) {
   .sx-stage {
     padding-top: 12px;
   }
 }
 
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .formats {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 72px;
-  }
-
   .deck {
     --f: 1;
   }
@@ -177,10 +169,6 @@ figcaption {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sx-stage {
-    padding-top: 96px;
-  }
-
   .deck {
     height: 46vh;
   }

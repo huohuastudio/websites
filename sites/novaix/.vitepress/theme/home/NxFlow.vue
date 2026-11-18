@@ -81,7 +81,7 @@ useScrollFrame((still) => {
   const k = i === 0 ? 1 : smooth(seg(f - i, 0, 0.3))
   line.value = i === 0 ? 0 : (i - 1 + k) / (STEPS.length - 1)
   on.value = k >= 1 ? i : i - 1
-})
+}, root)
 </script>
 
 <template>
@@ -115,7 +115,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .flow {
-  height: 490vh;
+  --sx-run: 490vh;
 }
 
 .sx-stage {
@@ -280,17 +280,8 @@ useScrollFrame((still) => {
     padding-top: 28px;
   }
 
-  .sx-title {
-    font-size: clamp(28px, 5.2vh, 42px);
-  }
-
   .sx-head {
     margin-bottom: 20px;
-  }
-
-  .sx-head .sx-lead {
-    margin-top: 10px;
-    font-size: 17px;
   }
 
   .rail {
@@ -325,10 +316,6 @@ useScrollFrame((still) => {
 
 /* 不固定舞台：隐藏流程线，步骤按顺序排下来 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .flow {
-    height: auto;
-  }
-
   .rail {
     display: none;
   }

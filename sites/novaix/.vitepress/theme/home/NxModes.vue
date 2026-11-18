@@ -23,7 +23,7 @@ useScrollFrame((still) => {
   el.style.setProperty('--ss', String(0.72 + 0.28 * m))
   el.style.setProperty('--so', String(seg(m, 0.3, 0.95)))
   el.style.setProperty('--co', String(seg(p, 0.66, 0.78)))
-})
+}, root)
 </script>
 
 <template>
@@ -67,7 +67,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .modes {
-  height: 300vh;
+  --sx-run: 300vh;
 }
 
 .sx-stage {
@@ -189,17 +189,8 @@ useScrollFrame((still) => {
     padding-top: 28px;
   }
 
-  .sx-title {
-    font-size: clamp(28px, 5.2vh, 42px);
-  }
-
   .sx-head {
     margin-bottom: 20px;
-  }
-
-  .sx-head .sx-lead {
-    margin-top: 10px;
-    font-size: 17px;
   }
 
   .mshot {
@@ -230,10 +221,6 @@ useScrollFrame((still) => {
 
 /* 不固定舞台：两张卡片并排（窄屏上下排），截图跟在下面 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .modes {
-    height: auto;
-  }
-
   .merge {
     display: grid;
     grid-template-columns: 1fr 1fr;

@@ -20,16 +20,17 @@ const folders = [
   ['网站备份', 'VPS（SFTP）'],
 ]
 
+const root = ref<HTMLElement>()
 const net = ref<HTMLElement>()
 
 useScrollFrame((still) => {
   const d = still ? 1 : smooth(seg(viewProgress(net.value!, innerHeight * 0.95, innerHeight * 0.1), 0, 0.6))
   net.value!.style.setProperty('--d', String(d))
-})
+}, root)
 </script>
 
 <template>
-  <section class="sx-sec sx-alt">
+  <section ref="root" class="sx-sec sx-alt">
     <div class="sx-wrap">
       <div class="sx-head center">
         <h2 class="sx-title">远程存储也是文件夹<span class="sx-badge">专业版</span></h2>

@@ -205,6 +205,34 @@
   height: auto;
 }
 
+/* 终端：浅色、深色下都是深底 */
+.sx-term {
+  margin: 0;
+  padding: 22px 26px;
+  overflow-x: auto;
+  border-radius: 18px;
+  background: #1d1d1f;
+  color: #f5f5f7;
+  font: 13px/1.9 var(--vp-font-family-mono);
+  letter-spacing: 0;
+}
+
+.dark .sx-term {
+  background: var(--sx-tile);
+  box-shadow: 0 0 0 1px var(--sx-edge);
+}
+
+.sx-term .c {
+  color: #8e8e93;
+}
+
+@media (max-width: 760px) {
+  .sx-term {
+    padding: 18px;
+    font-size: 12px;
+  }
+}
+
 /* 卡片中的截图：右边和底边最后 32px 渐隐到卡片底色 */
 .sx-fade-rb,
 .sx-fade-b {
@@ -224,9 +252,10 @@
   mask-image: var(--sx-fade-y);
 }
 
-/* 固定舞台：外层给出滚动距离，内层钉在导航栏下方 */
+/* 固定舞台：外层给出滚动距离（各版块用 --sx-run 设定，如 250vh），内层钉在导航栏下方 */
 .sx-pin {
   position: relative;
+  height: var(--sx-run, auto);
 }
 
 .sx-stage {
@@ -236,14 +265,15 @@
   overflow: hidden;
 }
 
-/* 窄屏、视口太矮或减少动态效果时，舞台不固定，内容按顺序排下来（与 motion.ts 的 isFlat 一致）。
-   各版块在同样的条件下把外层高度设为 auto，并显示最终状态 */
-@media (max-width: 760px), (max-height: 640px) {
-  .sx-pin {
+/* 窄屏、视口太矮（与 motion.ts 的 isFlat 一致）或减少动态效果时，舞台不固定，内容按顺序排下来，
+   各版块显示最终状态。舞台规则多一层 .sx：版块在 scoped 样式中给舞台设的 padding-top 只对固定时生效 */
+@media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
+  .sx .sx-pin {
+    height: auto;
     overflow-x: clip;
   }
 
-  .sx-stage {
+  .sx .sx-pin .sx-stage {
     position: static;
     height: auto;
     overflow: visible;
@@ -252,11 +282,20 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sx-stage {
-    position: static;
-    height: auto;
-    overflow: visible;
+  .sx .sx-pin .sx-stage {
     padding-block: 96px;
+  }
+}
+
+/* 矮视口：固定舞台中的标题区收紧，把高度留给截图。:where 压低优先级，版块自己设了标题字号的以版块为准 */
+@media (max-height: 832px) and (min-width: 761px) {
+  :where(.sx-stage) .sx-title {
+    font-size: clamp(28px, 5.2vh, 42px);
+  }
+
+  :where(.sx-stage) .sx-head .sx-lead {
+    margin-top: 8px;
+    font-size: 16px;
   }
 }
 

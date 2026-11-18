@@ -44,6 +44,7 @@ const cards = [
   },
 ] as const
 
+const root = ref<HTMLElement>()
 const cardEls: HTMLElement[] = []
 
 useScrollFrame((still) => {
@@ -54,19 +55,21 @@ useScrollFrame((still) => {
     }
     return
   }
+  // 先读完所有卡片的位置再写，避免每写一张就重新计算一次布局
+  const tops = cardEls.map((card) => card.getBoundingClientRect().top)
+  const heights = cardEls.map((card) => card.offsetHeight)
   cardEls.forEach((card, i) => {
-    const next = cardEls[i + 1]
-    if (!next) return
+    if (i + 1 >= cardEls.length) return
     // 下一张压上来的程度：两张的顶边距离从一张卡片的高度缩到 0
-    const p = clamp01(1 - (next.getBoundingClientRect().top - card.getBoundingClientRect().top) / card.offsetHeight)
+    const p = clamp01(1 - (tops[i + 1] - tops[i]) / heights[i])
     card.style.setProperty('--cs', String(1 - p * 0.08))
     card.style.setProperty('--cd', String(p * 0.08))
   })
-})
+}, root)
 </script>
 
 <template>
-  <section class="sx-alt privacy">
+  <section ref="root" class="sx-alt privacy">
     <div class="sx-wrap">
       <div class="sx-head">
         <h2 class="sx-title">隐私与安全</h2>

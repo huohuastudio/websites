@@ -11,13 +11,15 @@
 // 录屏要改动文件，只能在本机实例上录，不能用演示站：用演示站快照数据的副本（见 screenshots.mjs 开头的说明），不要用快照的源数据。
 // 照片暂存在挂载文件夹旁边的 .keepbay-recording/手机相册 中（命令中的 ~ 指 .keepbay-recording，与数据副本在一起，不留在系统临时目录），
 // 录完放回原处；出错或按 Ctrl+C 中断时也放回，没放回的下次运行会接着用
-import { execFileSync } from 'node:child_process'
+import { execFile, execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { basename, dirname, join } from 'node:path'
+import { promisify } from 'node:util'
 import { chromium } from 'playwright'
 import { folderId, imagesLoaded, mount, newContext, onDemo, open, site } from './keepbay.mjs'
 
+const execFileAsync = promisify(execFile)
 const out = join(site, 'public/recordings')
 const manifestFile = join(site, '.vitepress/theme/recordings.json')
 const name = 'folders'
@@ -109,8 +111,8 @@ function terminal({ prompt, command, lead, key, enter }) {
   }
 }
 
-/** 按时间戳把帧合成固定帧率，结尾淡回首帧，编码成原始录屏，再转出拖动用的 WebM 和 MP4；首帧、最后一帧（照片已出现）存成 WebP。 */
-function encode(frames, end, file) {
+/** 按时间戳把帧合成固定帧率，结尾淡回首帧，编码成原始录屏，再并行转出拖动用的 WebM 和 MP4；首帧、最后一帧（照片已出现）存成 WebP。 */
+async function encode(frames, end, file) {
   const dir = mkdtempSync(join(tmpdir(), 'keepbay-frames-'))
   try {
     const png = (i) => join(dir, `${String(i).padStart(4, '0')}.png`)
@@ -132,20 +134,25 @@ function encode(frames, end, file) {
     ]
     // 原始录屏只作为中间文件，留在临时目录。输出指定 yuv420p：PNG 是 RGB，不指定时编码成 4:4:4，Safari 等浏览器播不了
     const master = join(dir, `${file}.mp4`)
-    execFileSync('ffmpeg', [
+    await execFileAsync('ffmpeg', [
       '-v', 'error', '-y', ...input, ...filter,
       '-map', '[v]', '-an', '-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-crf', '20', '-preset', 'slow', master,
     ])
     // 拖动用的版本：缩到 960px 宽，每 6 帧一个关键帧（-g 6），MP4 不用 B 帧，跳转时少解码几帧
     const scrub = ['-v', 'error', '-y', '-i', master, '-an', '-vf', 'scale=960:-2', '-g', '6']
-    execFileSync('ffmpeg', [...scrub, '-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '40', '-row-mt', '1', '-deadline', 'good', join(out, `${file}-scrub.webm`)])
-    execFileSync('ffmpeg', [
-      ...scrub, '-c:v', 'libx264', '-preset', 'slow', '-crf', '28', '-bf', '0', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
-      join(out, `${file}-scrub.mp4`),
+    // 等全部结束再删临时目录：一个失败时，其余的可能还在读其中的文件
+    const results = await Promise.allSettled([
+      execFileAsync('ffmpeg', [...scrub, '-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '40', '-row-mt', '1', '-deadline', 'good', join(out, `${file}-scrub.webm`)]),
+      execFileAsync('ffmpeg', [
+        ...scrub, '-c:v', 'libx264', '-preset', 'slow', '-crf', '28', '-bf', '0', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',
+        join(out, `${file}-scrub.mp4`),
+      ]),
+      ...[[file, first], [`${file}-end`, last]].map(([name, frame]) =>
+        execFileAsync('cwebp', ['-quiet', '-q', '82', '-o', join(out, `${name}.webp`), '--', frame]),
+      ),
     ])
-    for (const [name, frame] of [[file, first], [`${file}-end`, last]]) {
-      execFileSync('cwebp', ['-quiet', '-q', '82', '-o', join(out, `${name}.webp`), '--', frame])
-    }
+    const failed = results.find((r) => r.status === 'rejected')
+    if (failed) throw failed.reason
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }
@@ -192,7 +199,7 @@ async function record(browser, scheme, id, dir, home) {
     const end = appeared + HOLD / 1000
     const kept = frames.filter((frame) => frame.time < end)
     const file = `${name}-${scheme}`
-    encode(kept, end, file)
+    await encode(kept, end, file)
     console.log(`${file}：${(end - kept[0].time).toFixed(1)} 秒，${kept.length} 帧，照片在第 ${(appeared - kept[0].time).toFixed(1)} 秒出现`)
   } finally {
     await context.close()

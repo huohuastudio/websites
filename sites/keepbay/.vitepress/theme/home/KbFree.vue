@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { easeOut, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { ref } from 'vue'
 import KbShot from '../visuals/KbShot.vue'
 
 // 免费版的功能：格子，每格进入视口时淡入、上移，格子中的截图从 1.15 倍收拢到原大
+const root = ref<HTMLElement>()
 // 用 Set：函数形式的 ref 在组件更新时会再次调用
 const cellEls = new Set<HTMLElement>()
 
@@ -23,11 +25,11 @@ useScrollFrame((still) => {
     c.style.setProperty('--o', String(0.1 + p * 0.9))
     c.style.setProperty('--z', String(1.15 - p * 0.15))
   }
-})
+}, root)
 </script>
 
 <template>
-  <section class="sx-sec">
+  <section ref="root" class="sx-sec">
     <div class="sx-wrap">
       <div class="sx-head">
         <h2 class="sx-title">免费版就是完整的网盘</h2>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SxShot, easeOut, isFlat, pinProgress, seg, smooth, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { SxShot, easeOut, isFlat, pinProgress, seg, smooth, useLayoutCache, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 import { BUY_URL, DEMO_URL } from './links'
 import { lerp } from './util'
@@ -26,15 +26,7 @@ const frame = ref<HTMLElement>()
 // 用函数 ref 按序号保存，与 files 一一对应
 const flies: HTMLElement[] = []
 
-/** 截图起始的下移量：让缩放后的截图顶边落在按钮下方 40px 处，至少下移舞台高度的 18% */
-function startOffset(stageH: number) {
-  const bottom = head.value!.offsetTop + actions.value!.offsetTop + actions.value!.offsetHeight
-  const r = rig.value!
-  // .rig 用 translate(-50%, -50%) 居中，offsetTop 即截图中线的位置
-  return Math.max(stageH * 0.18, bottom + 40 - (r.offsetTop - (r.offsetHeight * 0.86) / 2))
-}
-
-useScrollFrame((still) => {
+const refresh = useScrollFrame((still) => {
   // 减少动态效果时由样式直接排出两张截图
   if (still) return
   const sec = hero.value!
@@ -48,27 +40,26 @@ useScrollFrame((still) => {
     return
   }
   const st = stage.value!
+  const { offset, vw, sizes } = layout()
   const p = pinProgress(sec)
   const a = easeOut(seg(p, 0, 0.34))
   sec.style.setProperty('--fade', String(1 - seg(p, 0, 0.16)))
-  rig.value!.style.setProperty('--dy', `${(1 - a) * startOffset(st.clientHeight)}px`)
+  rig.value!.style.setProperty('--dy', `${(1 - a) * offset}px`)
   rig.value!.style.setProperty('--s', String(0.86 + a * 0.14))
   const b = smooth(seg(p, 0.7, 0.92))
   fr.style.setProperty('--b', String(b))
   sec.style.setProperty('--co', String(seg(p, 0.2, 0.3)))
   capIndex.value = b > 0.5 ? 1 : 0
 
-  // 文件卡片：先在截图两侧出现，再依次飞进截图中央并淡出。坐标相对舞台
+  // 文件卡片：先在截图两侧出现，再依次飞进截图中央并淡出。坐标相对舞台；截图的位置含缩放，每帧读取
   const sr = st.getBoundingClientRect()
   const r = fr.getBoundingClientRect()
   const left = r.left - sr.left
   const right = r.right - sr.left
   const top = r.top - sr.top
-  const vw = st.clientWidth
   flies.forEach((c, i) => {
     const { side, yf } = files[i]
-    const w = c.offsetWidth
-    const h = c.offsetHeight
+    const [w, h] = sizes[i]
     const appear = easeOut(seg(p, 0.16 + i * 0.025, 0.26 + i * 0.025))
     const t = smooth(seg(p, 0.3 + i * 0.05, 0.46 + i * 0.05))
     const x0 = Math.min(vw - w - 16, Math.max(16, (side < 0 ? left - w * 0.55 : right - w * 0.45) + side * (1 - appear) * 60))
@@ -80,7 +71,21 @@ useScrollFrame((still) => {
     c.style.setProperty('--sc', String(1 - t * 0.45))
     c.style.setProperty('--o', String(appear * (1 - seg(t, 0.7, 1))))
   })
-})
+}, hero)
+
+/** 只随尺寸变化的布局值：截图起始的下移量、舞台宽度、文件卡片的宽高 */
+const layout = useLayoutCache(
+  () => [stage.value, head.value, rig.value, ...flies],
+  () => {
+    // 截图起始的下移量：让缩放后的截图顶边落在按钮下方 40px 处，至少下移舞台高度的 18%
+    const bottom = head.value!.offsetTop + actions.value!.offsetTop + actions.value!.offsetHeight
+    const r = rig.value!
+    // .rig 用 translate(-50%, -50%) 居中，offsetTop 即截图中线的位置
+    const offset = Math.max(stage.value!.clientHeight * 0.18, bottom + 40 - (r.offsetTop - (r.offsetHeight * 0.86) / 2))
+    return { offset, vw: stage.value!.clientWidth, sizes: flies.map((c) => [c.offsetWidth, c.offsetHeight] as const) }
+  },
+  refresh,
+)
 </script>
 
 <template>
@@ -119,7 +124,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .hero {
-  height: 270vh;
+  --sx-run: 270vh;
 }
 
 /* 截图宽度：同时受视口宽度和舞台高度限制，四周留出标题区和说明的位置。
@@ -259,10 +264,6 @@ useScrollFrame((still) => {
 
 /* 不固定舞台：窄屏，或视口太矮 */
 @media (max-width: 760px), (max-height: 640px) {
-  .hero {
-    height: auto;
-  }
-
   .head {
     position: static;
     padding-top: 24px;
@@ -292,10 +293,6 @@ useScrollFrame((still) => {
 
 /* 减少动态效果：两张截图上下排列 */
 @media (prefers-reduced-motion: reduce) {
-  .hero {
-    height: auto;
-  }
-
   .head {
     position: static;
   }

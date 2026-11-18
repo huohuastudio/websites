@@ -34,7 +34,7 @@ useScrollFrame((still) => {
     query.value = q2.slice(0, Math.round(seg(p, 0.5, 0.75) * q2.length))
     phase.value = 1
   }
-})
+}, root)
 </script>
 
 <template>
@@ -79,7 +79,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .find {
-  height: 210vh;
+  --sx-run: 210vh;
 }
 
 .sx-stage {
@@ -230,10 +230,6 @@ useScrollFrame((still) => {
 
 /* 舞台不固定：两步的说明都显示 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .find {
-    height: auto;
-  }
-
   .steps {
     min-height: 0;
   }

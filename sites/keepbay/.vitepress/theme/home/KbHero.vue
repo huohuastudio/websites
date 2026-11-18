@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { easeOut, isFlat, pinProgress, seg, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { easeOut, isFlat, pinProgress, seg, useLayoutCache, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 import KbShot from '../visuals/KbShot.vue'
 import { links } from './links'
@@ -15,16 +15,7 @@ const head = ref<HTMLElement>()
 const actions = ref<HTMLElement>()
 const rig = ref<HTMLElement>()
 
-/** 截图起始的下移量：让缩小后的截图顶边落在按钮下方 40px 处，至少下移舞台高度的 18%。 */
-function startOffset() {
-  const height = stage.value!.clientHeight
-  const bottom = actions.value!.offsetTop + actions.value!.offsetHeight + head.value!.offsetTop
-  const shot = rig.value!.offsetHeight * 0.8
-  // offsetTop 不含 transform，就是截图中心的位置（见样式中 .rig 的 top）
-  return Math.max(height * 0.18, bottom + 40 - (rig.value!.offsetTop - shot / 2))
-}
-
-useScrollFrame((still) => {
+const refresh = useScrollFrame((still) => {
   if (still || isFlat()) return
   const el = root.value!
   const p = pinProgress(el)
@@ -37,7 +28,20 @@ useScrollFrame((still) => {
   rig.value!.style.setProperty('--tilt', `${(1 - a) * 16}deg`)
   rig.value!.style.setProperty('--dy', `${(1 - a) * startOffset()}px`)
   rig.value!.style.setProperty('--s', String(0.8 + a * 0.2 - b * 0.18))
-})
+}, root)
+
+/** 截图起始的下移量：让缩小后的截图顶边落在按钮下方 40px 处，至少下移舞台高度的 18%。只随尺寸变化，缓存起来 */
+const startOffset = useLayoutCache(
+  () => [stage.value, head.value, rig.value],
+  () => {
+    const height = stage.value!.clientHeight
+    const bottom = actions.value!.offsetTop + actions.value!.offsetHeight + head.value!.offsetTop
+    const shot = rig.value!.offsetHeight * 0.8
+    // offsetTop 不含 transform，就是截图中心的位置（见样式中 .rig 的 top）
+    return Math.max(height * 0.18, bottom + 40 - (rig.value!.offsetTop - shot / 2))
+  },
+  refresh,
+)
 </script>
 
 <template>
@@ -75,7 +79,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .hero {
-  height: 220vh;
+  --sx-run: 220vh;
 }
 
 /* 标题区随滚动淡出、上移；顶部留白已扣除导航栏 */
@@ -170,10 +174,6 @@ useScrollFrame((still) => {
 
 /* 舞台不固定（视口太矮或减少动态效果）的宽屏：按顺序排下来，手机和说明直接显示 */
 @media (max-height: 640px) and (min-width: 761px), (prefers-reduced-motion: reduce) and (min-width: 761px) {
-  .hero {
-    height: auto;
-  }
-
   .head {
     position: static;
     opacity: 1;
@@ -216,10 +216,6 @@ useScrollFrame((still) => {
 
 /* 窄屏：只放一张手机截图 */
 @media (max-width: 760px) {
-  .hero {
-    height: auto;
-  }
-
   .head {
     position: static;
     padding-top: 24px;

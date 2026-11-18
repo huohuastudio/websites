@@ -34,7 +34,7 @@ useScrollFrame((still) => {
   el.style.setProperty('--wi', String(k[5]))
   done.value = k.filter((v) => v > 0.5).length
   dims.value = k[1] > 0.5 ? '1200 × 1200' : k[0] > 0.5 ? '3024 × 3024' : '4032 × 3024'
-})
+}, sec)
 </script>
 
 <template>
@@ -73,7 +73,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .handle {
-  height: 270vh;
+  --sx-run: 270vh;
 }
 
 .sx-stage {
@@ -256,22 +256,13 @@ useScrollFrame((still) => {
 }
 
 /* 矮视口：标题区收紧 */
-@media (max-height: 820px) and (min-width: 761px) {
+@media (max-height: 832px) and (min-width: 761px) {
   .sx-stage {
     padding-top: 16px;
   }
 
   .sx-head {
     margin-bottom: 18px;
-  }
-
-  .sx-title {
-    font-size: clamp(30px, 5.2vh, 42px);
-  }
-
-  .sx-head .sx-lead {
-    margin-top: 8px;
-    font-size: 16px;
   }
 
   .rules li {
@@ -281,14 +272,6 @@ useScrollFrame((still) => {
 
 /* 不固定舞台：规则列表在上，示意图在下，显示全部规则生效后的结果 */
 @media (max-width: 760px), (max-height: 640px) {
-  .handle {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 72px;
-  }
-
   .hd {
     grid-template-columns: 1fr;
     gap: 28px;
@@ -321,16 +304,6 @@ useScrollFrame((still) => {
 
   .orig figcaption {
     margin: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .handle {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 96px;
   }
 }
 </style>

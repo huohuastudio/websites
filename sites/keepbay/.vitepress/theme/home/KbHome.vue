@@ -16,7 +16,6 @@ import KbScrub from './KbScrub.vue'
 import KbSetup from './KbSetup.vue'
 import KbWipe from './KbWipe.vue'
 import { links } from './links'
-import './home.css'
 
 // Keepbay 官网首页：各版块按顺序排列；价格和常见问题的数据在 index.md 的 frontmatter 中
 const { frontmatter } = useData()

@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
           role="tabpanel"
           :aria-labelledby="`dbt${i}`"
         >
-          <div class="nx-term">
+          <div class="sx-term">
             <div v-for="(l, j) in db.conf" :key="j" :style="{ '--i': j }">{{ l.code }}<span v-if="l.note" class="c">{{ l.note }}</span></div>
           </div>
           <dl class="dbfacts">
@@ -252,7 +252,7 @@ dd {
   visibility: visible;
 }
 
-.dbpane .nx-term {
+.dbpane .sx-term {
   padding: 26px 28px;
   font-size: 13.5px;
   line-height: 1.9;
@@ -260,13 +260,13 @@ dd {
   word-break: break-all;
 }
 
-.nx-term div,
+.sx-term div,
 .dbfacts div {
   opacity: 0;
   transform: translateY(6px);
 }
 
-.dbpane.on .nx-term div {
+.dbpane.on .sx-term div {
   animation: lnin 0.5s var(--sx-ease) forwards;
   animation-delay: calc(var(--i) * 70ms);
 }
@@ -334,7 +334,7 @@ dd {
     display: none;
   }
 
-  .nx-term div,
+  .sx-term div,
   .dbfacts div {
     opacity: 1;
     transform: none;

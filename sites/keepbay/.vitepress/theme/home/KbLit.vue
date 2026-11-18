@@ -18,7 +18,7 @@ const lit = ref(sentences.length)
 useScrollFrame((still) => {
   const p = still || isFlat() ? 1 : seg(pinProgress(root.value!), 0.05, 0.85)
   lit.value = Math.max(1, Math.ceil(p * sentences.length))
-})
+}, root)
 </script>
 
 <template>
@@ -33,7 +33,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .lit {
-  height: 190vh;
+  --sx-run: 190vh;
   background: #000;
   color: #f5f5f7;
 }
@@ -59,12 +59,6 @@ span {
 
 span.on {
   color: #f5f5f7;
-}
-
-@media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .lit {
-    height: auto;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

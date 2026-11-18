@@ -41,7 +41,7 @@ useScrollFrame((still) => {
   scan.value!.style.setProperty('--sy', String(y))
   scan.value!.style.setProperty('--so', String(done ? 0 : Math.min(seg(y, 0, 0.03), 1 - seg(y, 0.97, 1))))
   if (next.some((s, i) => s !== seen.value[i])) seen.value = next
-})
+}, sec)
 </script>
 
 <template>
@@ -73,7 +73,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .mod {
-  height: 250vh;
+  --sx-run: 250vh;
 }
 
 .sx-stage {
@@ -241,11 +241,7 @@ useScrollFrame((still) => {
 }
 
 /* 矮视口：文字收紧 */
-@media (max-height: 820px) and (min-width: 761px) {
-  .sx-title {
-    font-size: clamp(30px, 5.2vh, 42px);
-  }
-
+@media (max-height: 832px) and (min-width: 761px) {
   .sx-lead {
     font-size: 16px;
   }
@@ -261,10 +257,6 @@ useScrollFrame((still) => {
 }
 
 @media (max-width: 760px), (max-height: 640px) {
-  .mod {
-    height: auto;
-  }
-
   .sx-stage {
     grid-template-columns: 1fr;
     gap: 36px;
@@ -283,10 +275,6 @@ useScrollFrame((still) => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mod {
-    height: auto;
-  }
-
   .scan {
     display: none;
   }

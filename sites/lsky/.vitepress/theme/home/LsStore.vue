@@ -27,7 +27,7 @@ useScrollFrame((still) => {
   const p = pinned ? pinProgress(sec.value!) : 0
   orb.value!.style.setProperty('--rot', `${-p * 144}deg`)
   step.value = !pinned ? 0 : p < 0.36 ? 0 : p < 0.68 ? 1 : 2
-})
+}, sec)
 </script>
 
 <template>
@@ -62,7 +62,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .store {
-  height: 250vh;
+  --sx-run: 250vh;
 }
 
 .sx-stage {
@@ -225,7 +225,7 @@ useScrollFrame((still) => {
 }
 
 /* 矮视口：标题收紧 */
-@media (max-height: 820px) and (min-width: 761px) {
+@media (max-height: 832px) and (min-width: 761px) {
   .s .sx-title {
     font-size: clamp(30px, 5.2vh, 42px);
   }
@@ -233,10 +233,6 @@ useScrollFrame((still) => {
 
 /* 不固定舞台：步骤依次排开，驱动名称排成一行行标签 */
 @media (max-width: 760px), (max-height: 640px) {
-  .store {
-    height: auto;
-  }
-
   .sx-stage {
     grid-template-columns: 1fr;
     gap: 36px;
@@ -282,12 +278,6 @@ useScrollFrame((still) => {
   .sats li {
     position: static;
     transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .store {
-    height: auto;
   }
 }
 </style>

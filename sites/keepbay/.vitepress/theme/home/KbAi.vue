@@ -53,7 +53,7 @@ useScrollFrame((still) => {
   const cur = Math.round(i + slide)
   current.value = cur
   caption.value = slides[cur].captions[cur === i && f > 0.32 ? 1 : 0]
-})
+}, root)
 </script>
 
 <template>
@@ -82,7 +82,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .ai {
-  height: 320vh;
+  --sx-run: 320vh;
 }
 
 .sx-stage {
@@ -158,7 +158,7 @@ useScrollFrame((still) => {
   color: var(--sx-text-2);
 }
 
-@media (max-height: 820px) and (min-width: 761px) {
+@media (max-height: 832px) and (min-width: 761px) {
   .sx-stage {
     padding-top: 12px;
   }
@@ -178,14 +178,6 @@ useScrollFrame((still) => {
 
 /* 舞台不固定：三张竖排，不要分段标签 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .ai {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 72px;
-  }
-
   .tabs {
     display: none;
   }
@@ -212,12 +204,6 @@ useScrollFrame((still) => {
 
   .zoom {
     transform: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sx-stage {
-    padding-top: 96px;
   }
 }
 

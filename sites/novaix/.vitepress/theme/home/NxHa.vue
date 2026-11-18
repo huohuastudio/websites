@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { isFlat, pinProgress, prefersReducedMotion, seg, smooth, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { isFlat, pinProgress, seg, smooth, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 // 高可用：节点 A 离线后，开启了高可用保护的实例沿弧线移到同组的健康节点，未开启的留在原处。
@@ -39,11 +39,13 @@ function update(still: boolean) {
   const flat = isFlat()
   const p = still ? 1 : flat ? viewProgress(grp.value!, innerHeight * 0.9, innerHeight * 0.15) : pinProgress(root.value!)
   down.value = p >= 0.24
+  // 先读完所有槽位的位置再写，避免每写一个实例就重新计算一次布局
   const base = grp.value!.getBoundingClientRect()
+  const rects = slots.map((el) => el.getBoundingClientRect())
   INSTANCES.forEach((inst, i) => {
     const el = insts[i]
-    const a = slots[inst.from].getBoundingClientRect()
-    const b = slots[inst.to].getBoundingClientRect()
+    const a = rects[inst.from]
+    const b = rects[inst.to]
     const k = MOVERS.indexOf(i)
     const t = k < 0 ? 0 : smooth(seg(p, 0.5 + k * 0.12, 0.68 + k * 0.12))
     const arc = Math.sin(t * Math.PI) * -36
@@ -56,12 +58,12 @@ function update(still: boolean) {
   caption.value = p >= 0.8 ? 2 : p >= 0.24 ? 1 : 0
 }
 
-useScrollFrame(update)
+const refresh = useScrollFrame(update, root)
 
 // 实例按槽位的像素位置摆放：示意图尺寸变化（字体载入、窗口缩放）时重新计算；减少动态效果时也要算
 let observer: ResizeObserver | undefined
 onMounted(() => {
-  observer = new ResizeObserver(() => update(prefersReducedMotion()))
+  observer = new ResizeObserver(refresh)
   observer.observe(grp.value!)
 })
 onBeforeUnmount(() => observer?.disconnect())
@@ -116,7 +118,7 @@ onBeforeUnmount(() => observer?.disconnect())
 
 <style scoped>
 .ha {
-  height: 340vh;
+  --sx-run: 340vh;
 }
 
 .sx-stage {
@@ -348,10 +350,6 @@ onBeforeUnmount(() => observer?.disconnect())
 
 /* 不固定舞台：说明和示意图上下排列，三段说明全部显示 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .ha {
-    height: auto;
-  }
-
   .sx-stage {
     grid-template-columns: 1fr;
     gap: 32px;

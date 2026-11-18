@@ -16,6 +16,7 @@ const TYPES = [
   ['扩展', 'Telegram 机器人、外部系统同步等'],
 ]
 
+const root = ref<HTMLElement>()
 const types = ref<HTMLElement>()
 const shot = ref<HTMLElement>()
 /** 每个类型的翻入进度 0–1；服务端渲染时为 1 */
@@ -33,11 +34,11 @@ useScrollFrame((still) => {
   const p = viewProgress(types.value!, innerHeight * 0.95, innerHeight * 0.4)
   turn.value = TYPES.map((_, i) => easeOut(seg(p, i * 0.06, i * 0.06 + 0.45)))
   clip.value = (1 - easeOut(viewProgress(shot.value!, innerHeight, innerHeight * 0.45))) * 12
-})
+}, root)
 </script>
 
 <template>
-  <section id="ext" class="sx-sec">
+  <section id="ext" ref="root" class="sx-sec">
     <div class="sx-wrap">
       <div class="sx-head">
         <h2 class="sx-title">插件和主题</h2>

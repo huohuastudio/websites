@@ -27,7 +27,7 @@ useScrollFrame((still) => {
   // 侧栏中文件夹列表的位置（占截图的百分比），由看图标出
   focus(zoom.value!, [0, 35, 24, 24], z)
   caption.value = z > 0.5 ? 2 : w > 0.5 ? 1 : 0
-})
+}, root)
 </script>
 
 <template>
@@ -56,7 +56,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .wipe {
-  height: 250vh;
+  --sx-run: 250vh;
 }
 
 .sx-stage {
@@ -131,7 +131,7 @@ useScrollFrame((still) => {
   color: var(--sx-text-2);
 }
 
-@media (max-height: 820px) and (min-width: 761px) {
+@media (max-height: 832px) and (min-width: 761px) {
   .sx-stage {
     padding-top: 12px;
   }
@@ -147,22 +147,8 @@ useScrollFrame((still) => {
 
 /* 舞台不固定时不受舞台高度限制 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .wipe {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 72px;
-  }
-
   .frame {
     width: min(1000px, 84vw);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sx-stage {
-    padding-top: 96px;
   }
 }
 

@@ -28,7 +28,7 @@ useScrollFrame((still) => {
   status.value = p < 0.74 ? 0 : p < 0.86 ? 1 : 2
   pic.value!.style.setProperty('--fx', String(smooth(seg(p, 0.78, 0.9))))
   field.value = done ? -1 : p < 0.32 ? 0 : p < 0.57 ? 1 : 2
-})
+}, sec)
 
 const on = (i: number) => field.value < 0 || field.value === i
 </script>
@@ -73,7 +73,7 @@ const on = (i: number) => field.value < 0 || field.value === i
 
 <style scoped>
 .ai {
-  height: 250vh;
+  --sx-run: 250vh;
 }
 
 .sx-stage {
@@ -233,7 +233,7 @@ const on = (i: number) => field.value < 0 || field.value === i
 }
 
 /* 矮视口：标题区和字段收紧 */
-@media (max-height: 820px) and (min-width: 761px) {
+@media (max-height: 832px) and (min-width: 761px) {
   .sx-stage {
     padding-top: 16px;
   }
@@ -246,11 +246,6 @@ const on = (i: number) => field.value < 0 || field.value === i
     font-size: clamp(28px, 4.4vh, 36px);
   }
 
-  .sx-head .sx-lead {
-    margin-top: 8px;
-    font-size: 16px;
-  }
-
   .fields {
     gap: 14px;
     padding: 16px 16px 8px;
@@ -258,14 +253,6 @@ const on = (i: number) => field.value < 0 || field.value === i
 }
 
 @media (max-width: 760px), (max-height: 640px) {
-  .ai {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 72px;
-  }
-
   .card {
     --ch: min(360px, calc((100vw - 76px) * 0.75 + 50px));
   }
@@ -278,14 +265,6 @@ const on = (i: number) => field.value < 0 || field.value === i
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ai {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 96px;
-  }
-
   .tags span {
     transition: none;
   }

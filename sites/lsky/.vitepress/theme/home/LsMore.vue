@@ -14,6 +14,7 @@ const fanCards = [
 
 const cards: HTMLElement[] = []
 const loginEls: HTMLElement[] = []
+const root = ref<HTMLElement>()
 const fan = ref<HTMLElement>()
 
 useScrollFrame((still) => {
@@ -23,11 +24,11 @@ useScrollFrame((still) => {
     l.style.setProperty('--lo', String(t))
   })
   fan.value!.style.setProperty('--f', String(still ? 1 : smooth(viewProgress(fan.value!, innerHeight * 0.95, innerHeight * 0.45))))
-})
+}, root)
 </script>
 
 <template>
-  <section id="more" class="sx-sec sx-alt">
+  <section id="more" ref="root" class="sx-sec sx-alt">
     <div class="sx-wrap">
       <div class="sx-head">
         <h2 class="sx-title"><span class="ph">登录、接口、</span><span class="ph">主题和安装</span></h2>
@@ -47,7 +48,7 @@ useScrollFrame((still) => {
             <h3>开放接口</h3>
             <p>100 多个接口，可以开发客户端，也可以对接其他系统。接口定义遵循 OpenAPI 规范。</p>
           </div>
-          <pre class="term v"><div class="c"># 在用户中心的「API令牌」页面创建令牌</div><div>curl https://example.com/api/v2/&lt;接口路径&gt; \</div><div>  -H "Authorization: Bearer &lt;令牌&gt;" \</div><div>  -H "Accept: application/json"</div></pre>
+          <pre class="sx-term v"><div class="c"># 在用户中心的「API令牌」页面创建令牌</div><div>curl https://example.com/api/v2/&lt;接口路径&gt; \</div><div>  -H "Authorization: Bearer &lt;令牌&gt;" \</div><div>  -H "Accept: application/json"</div></pre>
         </div>
         <div :ref="(el) => (cards[2] = el as HTMLElement)" class="q4">
           <div>
@@ -63,7 +64,7 @@ useScrollFrame((still) => {
             <h3>Docker 安装</h3>
             <p>镜像中已包含运行环境、消息队列和计划任务。也可以在 PHP 8.3 及以上的环境中直接安装。</p>
           </div>
-          <pre class="term v"><div class="c"># 数据保存在宿主机的 ~/data 目录</div><div>docker run -d --name lsky-pro -p 8000:8000 \</div><div>  -v ~/data:/app/storage/app \</div><div>  -v ~/data/themes:/app/themes \</div><div>  0xxb/lsky-pro:latest</div><div class="c"># 在浏览器中打开 http://服务器IP:8000</div></pre>
+          <pre class="sx-term v"><div class="c"># 数据保存在宿主机的 ~/data 目录</div><div>docker run -d --name lsky-pro -p 8000:8000 \</div><div>  -v ~/data:/app/storage/app \</div><div>  -v ~/data/themes:/app/themes \</div><div>  0xxb/lsky-pro:latest</div><div class="c"># 在浏览器中打开 http://服务器IP:8000</div></pre>
         </div>
       </div>
     </div>
@@ -125,28 +126,14 @@ useScrollFrame((still) => {
   transform: translateX(calc((1 - var(--lo, 1)) * -24px));
 }
 
-/* 命令行示例：浅色下也用深色底 */
-.term {
-  overflow-x: auto;
-  margin: 0;
+/* 命令行示例：卡片较窄，内边距比默认的小 */
+.sx-term {
   padding: 20px 22px;
-  border-radius: 18px;
-  background: #1d1d1f;
-  color: #f5f5f7;
-  font: 13px/1.9 var(--vp-font-family-mono);
 }
 
-.dark .term {
-  background: var(--sx-tile);
-}
-
-.term div {
+.sx-term div {
   white-space: pre-wrap;
   word-break: break-all;
-}
-
-.term .c {
-  color: #86868b;
 }
 
 /* 主题：三张卡片随滚动展开成扇形 */

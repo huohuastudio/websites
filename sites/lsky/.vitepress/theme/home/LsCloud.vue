@@ -79,7 +79,7 @@ useScrollFrame((still) => {
   ofmt.value = k[4] > 0.5 ? 'WebP' : 'JPEG'
   odim.value = k[0] < 0.5 ? '1600 × 1200' : k[1] < 0.5 ? '640 × 480' : '640 × 640'
   note.value = done ? notes.join('') : notes[isPreset ? 1 : 0]
-})
+}, sec)
 </script>
 
 <template>
@@ -115,7 +115,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .cloud {
-  height: 300vh;
+  --sx-run: 300vh;
 }
 
 .sx-stage {
@@ -277,22 +277,13 @@ code {
 }
 
 /* 矮视口：标题区和各部分收紧 */
-@media (max-height: 820px) and (min-width: 761px) {
+@media (max-height: 832px) and (min-width: 761px) {
   .sx-stage {
     padding-top: 16px;
   }
 
   .sx-head {
     margin-bottom: 18px;
-  }
-
-  .sx-title {
-    font-size: clamp(30px, 5.2vh, 42px);
-  }
-
-  .sx-head .sx-lead {
-    margin-top: 8px;
-    font-size: 16px;
   }
 
   .url {
@@ -328,14 +319,6 @@ code {
 }
 
 @media (max-width: 760px), (max-height: 640px) {
-  .cloud {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 72px;
-  }
-
   .panels {
     --ph: 260px;
   }
@@ -363,14 +346,6 @@ code {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cloud {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 96px;
-  }
-
   .q::after {
     animation: none;
   }

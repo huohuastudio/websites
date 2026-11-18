@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SxShot, easeOut, isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { SxShot, easeOut, isFlat, pinProgress, seg, smooth, useLayoutCache, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { computed, ref } from 'vue'
 
 // 首屏：终端随滚动逐行输入下载、解压、运行三条命令，然后缩小退到左下并淡出，仪表盘从后面放大。
@@ -80,33 +80,28 @@ const actions = ref<HTMLElement>()
 const scene = ref<HTMLElement>()
 const term = ref<HTMLElement>()
 
-useScrollFrame((still) => {
+const refresh = useScrollFrame((still) => {
   if (still || isFlat()) {
     typed.value = 1
     return
   }
   const el = root.value!
   const sc = scene.value!
-  const tm = term.value!
+  const { actionsBottom, H, W, th, x0, stageH } = layout()
   const p = pinProgress(el)
   const a = easeOut(seg(p, 0, 0.16))
   const b = smooth(seg(p, 0.56, 0.86))
   el.style.setProperty('--fade', String(1 - seg(p, 0, 0.14)))
 
   // 终端在场景中垂直居中；起始时它的顶边落在按钮下方 40px，随后升到舞台中央（坐标都相对舞台顶边）
-  const actionsBottom = head.value!.offsetTop + actions.value!.offsetTop + actions.value!.offsetHeight
-  const H = sc.offsetHeight
-  const W = sc.offsetWidth
-  const th = tm.offsetHeight
   const cy = Math.max(0, (H - th) / 2)
-  const termTopCentered = stage.value!.clientHeight / 2 - H / 2 - innerHeight * 0.025 + cy
+  const termTopCentered = stageH / 2 - H / 2 - innerHeight * 0.025 + cy
   const dy0 = Math.max(0, actionsBottom + 40 - termTopCentered)
   sc.style.setProperty('--dy', `${(1 - a) * dy0}px`)
   // 按 1/400 取整：字数不变时值也不变，终端不会每帧重新渲染
   typed.value = Math.round(seg(p, 0.1, 0.5) * 400) / 400
 
   // 仪表盘从后面放大；终端以左下角为原点缩小到一半，移向左下角并淡出
-  const x0 = tm.offsetLeft
   const y0 = cy + th
   sc.style.setProperty('--tx', `${b * (-0.02 * W - x0)}px`)
   sc.style.setProperty('--ty', `${cy + b * (H * 0.98 - y0)}px`)
@@ -116,7 +111,25 @@ useScrollFrame((still) => {
   sc.style.setProperty('--do', String(seg(b, 0.3, 0.75)))
   sc.style.setProperty('--dsc', String(0.9 + 0.1 * b))
   el.style.setProperty('--no', String(seg(p, 0.86, 0.94)))
-})
+}, root)
+
+/** 只随尺寸变化的布局值（终端打字时未输入的部分透明占位，高度不变），缓存起来，不必每帧读布局 */
+const layout = useLayoutCache(
+  () => [stage.value, head.value, scene.value, term.value],
+  () => {
+    const sc = scene.value!
+    const tm = term.value!
+    return {
+      actionsBottom: head.value!.offsetTop + actions.value!.offsetTop + actions.value!.offsetHeight,
+      H: sc.offsetHeight,
+      W: sc.offsetWidth,
+      th: tm.offsetHeight,
+      x0: tm.offsetLeft,
+      stageH: stage.value!.clientHeight,
+    }
+  },
+  refresh,
+)
 </script>
 
 <template>
@@ -143,7 +156,7 @@ useScrollFrame((still) => {
         </div>
         <div
           ref="term"
-          class="nx-term nterm"
+          class="sx-term nterm"
           :class="{ fadein: fadeIn }"
           role="img"
           aria-label="安装命令：下载、解压、运行"
@@ -167,7 +180,7 @@ useScrollFrame((still) => {
 
 <style scoped>
 .hero {
-  height: 320vh;
+  --sx-run: 320vh;
 }
 
 /* 标题区：舞台从导航栏下沿开始，顶部留白比原型少一个导航栏的高度 */
@@ -354,10 +367,6 @@ useScrollFrame((still) => {
 
 /* 不固定舞台：终端在上，仪表盘在下，说明文字跟在后面 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .hero {
-    height: auto;
-  }
-
   .head {
     position: static;
     padding-top: 24px;

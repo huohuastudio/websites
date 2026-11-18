@@ -65,7 +65,7 @@ useScrollFrame((still) => {
   for (const it of items) {
     it.style.setProperty('--o', still ? '1' : String(easeOut(viewProgress(it, innerHeight * 0.98, innerHeight * 0.8))))
   }
-})
+}, root)
 </script>
 
 <template>

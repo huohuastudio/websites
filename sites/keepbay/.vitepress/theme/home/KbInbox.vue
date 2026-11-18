@@ -23,33 +23,30 @@ const fromSlots: HTMLElement[] = []
 const toSlots: HTMLElement[] = []
 const rules: HTMLElement[] = []
 
-/** 按进度 p 摆放三个文件。 */
+/** 按进度 p 摆放三个文件。先读完所有槽位的位置再写，避免每写一个文件就重新计算一次布局 */
 function update(p: number) {
   const base = sort.value!.getBoundingClientRect()
+  const froms = fromSlots.map((el) => el.getBoundingClientRect())
+  const tos = toSlots.map((el) => el.getBoundingClientRect())
   chips.forEach((chip, i) => {
     const t = smooth(seg(p, 0.12 + i * 0.22, 0.3 + i * 0.22))
-    const from = fromSlots[i].getBoundingClientRect()
-    const to = toSlots[i].getBoundingClientRect()
+    const from = froms[i]
+    const to = tos[i]
     // 飞行途中向上拱起
     const arc = Math.sin(t * Math.PI) * -40
     chip.style.setProperty('--tx', `${from.left - base.left + (to.left - from.left) * t}px`)
     chip.style.setProperty('--ty', `${from.top - base.top + (to.top - from.top) * t + arc}px`)
-    chip.style.width = `${fromSlots[i].offsetWidth + (toSlots[i].offsetWidth - fromSlots[i].offsetWidth) * t}px`
+    chip.style.width = `${from.width + (to.width - from.width) * t}px`
     rules[i].style.setProperty('--ro', String(seg(t, 0.8, 1)))
   })
   undo.value!.style.setProperty('--uo', String(seg(p, 0.82, 0.92)))
 }
 
-// 减少动态效果时 useScrollFrame 只调用一次，窗口大小变化后要重新摆放
-let still = false
-const onResize = () => still && update(1)
-onMounted(() => addEventListener('resize', onResize))
-onBeforeUnmount(() => removeEventListener('resize', onResize))
+const refresh = useScrollFrame((still) => update(still || isFlat() ? 1 : pinProgress(root.value!)), root)
 
-useScrollFrame((s) => {
-  still = s
-  update(s || isFlat() ? 1 : pinProgress(root.value!))
-})
+// 减少动态效果时 useScrollFrame 只调用一次，窗口大小变化后要重新摆放
+onMounted(() => addEventListener('resize', refresh))
+onBeforeUnmount(() => removeEventListener('resize', refresh))
 </script>
 
 <template>
@@ -84,7 +81,7 @@ useScrollFrame((s) => {
 
 <style scoped>
 .inbox {
-  height: 210vh;
+  --sx-run: 210vh;
 }
 
 .sx-stage {
@@ -223,25 +220,9 @@ h4 {
   }
 }
 
-@media (max-height: 820px) and (min-width: 761px) {
+@media (max-height: 832px) and (min-width: 761px) {
   .sx-stage {
     padding-top: 12px;
-  }
-}
-
-@media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
-  .inbox {
-    height: auto;
-  }
-
-  .sx-stage {
-    padding-top: 72px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sx-stage {
-    padding-top: 96px;
   }
 }
 

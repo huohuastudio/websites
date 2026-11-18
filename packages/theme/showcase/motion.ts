@@ -1,4 +1,4 @@
-import { onBeforeUnmount, onMounted } from 'vue'
+import { onBeforeUnmount, onMounted, type Ref } from 'vue'
 
 // 首页随滚动联动的版块共用的计算。
 // 固定舞台的结构：外层 .sx-pin 给出滚动距离（高度为若干个视口），内层 .sx-stage 用 sticky 钉在视口中，
@@ -46,19 +46,32 @@ export function prefersReducedMotion() {
 
 /**
  * 挂载后在滚动和窗口大小变化时调用 fn，每帧最多一次；卸载时解除。
+ * 传入 target（版块的根元素）时，只在它进入视口上下各一屏（按挂载时的视口高度）的范围内才计算，离开后保持最后的状态。
  * 系统开了"减少动态效果"时不监听滚动，只调用一次，still 为 true，调用方直接显示最终状态；
- * 页面打开后切换这个设置时，随之停止或恢复监听
+ * 页面打开后切换这个设置时，随之停止或恢复监听。
+ * 返回 refresh：布局变化后重新计算一次（监听滚动时排到下一帧，减少动态效果时以 still 直接调用）
  */
-export function useScrollFrame(fn: (still: boolean) => void) {
+export function useScrollFrame(fn: (still: boolean) => void, target?: Ref<HTMLElement | undefined>) {
   let frame = 0
   let listening = false
+  // 观察结果出来之前按在视口附近处理，挂载时总会算一次
+  let near = true
+  let lastY = 0
+  // 门控的范围：视口上下各扩展 margin 像素；一次滚动超过它时，版块可能从范围外直接进入视口
+  let margin = 0
   let motion: MediaQueryList | undefined
-  const run = () => {
+  let observer: IntersectionObserver | undefined
+  /** force：不看门控，切换减少动态效果、布局变化时用 */
+  const run = (force = false) => {
     frame = 0
-    fn(false)
+    // 一次滚过 margin 以上（跳到锚点、按 End、拖动滚动条）时观察结果还没更新，这一帧也要算，否则会先显示一帧旧状态
+    const jump = Math.abs(scrollY - lastY) > margin
+    lastY = scrollY
+    if (near || jump || force) fn(false)
   }
+  const frameRun = () => run()
   const request = () => {
-    frame ||= requestAnimationFrame(run)
+    frame ||= requestAnimationFrame(frameRun)
   }
   const listen = (on: boolean) => {
     if (on === listening) return
@@ -73,17 +86,54 @@ export function useScrollFrame(fn: (still: boolean) => void) {
     const still = motion!.matches
     listen(!still)
     if (still) fn(true)
-    else run()
+    else run(true)
+  }
+  const refresh = () => {
+    if (listening) {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => run(true))
+    } else if (motion) fn(true)
   }
   onMounted(() => {
     motion = matchMedia(REDUCED_MOTION)
     motion.addEventListener('change', sync)
+    if (target?.value) {
+      margin = innerHeight
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          near = entry.isIntersecting
+          if (near && listening) request()
+        },
+        { rootMargin: `${margin}px 0px` },
+      )
+      observer.observe(target.value)
+    }
     sync()
   })
   onBeforeUnmount(() => {
     // 跳离首页时，已排队的一帧不能在组件卸载后执行
     cancelAnimationFrame(frame)
     motion?.removeEventListener('change', sync)
+    observer?.disconnect()
     listen(false)
   })
+  return refresh
+}
+
+/**
+ * 只随元素尺寸变化的布局值（偏移、宽高）：第一次取用时计算并缓存，免得每帧读布局。
+ * els 中任一元素尺寸变化（窗口缩放、字体载入）时清掉缓存并调用 onChange（通常是 useScrollFrame 返回的 refresh）
+ */
+export function useLayoutCache<T>(els: () => (HTMLElement | undefined)[], measure: () => T, onChange: () => void) {
+  let value: T | undefined
+  let observer: ResizeObserver | undefined
+  onMounted(() => {
+    observer = new ResizeObserver(() => {
+      value = undefined
+      onChange()
+    })
+    for (const el of els()) if (el) observer.observe(el)
+  })
+  onBeforeUnmount(() => observer?.disconnect())
+  return () => (value ??= measure())
 }
