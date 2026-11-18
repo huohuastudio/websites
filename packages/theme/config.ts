@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfigWithTheme, type DefaultTheme, type HeadConfig } from 'vitepress'
 import { mermaidMarkdown } from './mermaid-markdown.ts'
+import { structuredData, type AppInfo } from './structured-data.ts'
 
 const REPO = 'https://github.com/huohuastudio/websites'
 
@@ -33,8 +34,10 @@ export interface SiteOptions {
   dir: string
   /** public 下的标识文件，如 /logo.svg */
   logo: string
-  /** public 下的分享预览图，如 /og.png */
-  ogImage?: string
+  /** 分享预览图：src 为 public 下的文件（如 /og.png），宽高与文件一致，alt 描述图片内容 */
+  ogImage?: { src: string; width: number; height: number; alt: string }
+  /** 首页结构化数据（SoftwareApplication）中的软件类别和运行系统，不传时首页不生成这一项 */
+  app?: AppInfo
   /** 搜索引擎的关键词，页面 frontmatter 中的 keywords 优先 */
   keywords?: string
   /** Cloudflare Web Analytics 的令牌，留空时不加载统计脚本 */
@@ -100,7 +103,8 @@ function pagePath(relativePath: string): string {
 }
 
 export function defineSiteConfig(options: SiteOptions) {
-  const { hostname, title, description, dir, logo, ogImage, keywords, analyticsToken, versions, mermaid } = options
+  const { hostname, title, description, dir, logo, ogImage, app, sidebar, keywords, analyticsToken, versions, mermaid } = options
+  const image = ogImage && hostname + ogImage.src
   const year = new Date().getFullYear()
   // head 中写了 robots noindex 的页面（如跳转页），不进 sitemap。
   // 由 transformPageData 收集，生成 sitemap 时读取：构建时所有页面先渲染完才生成 sitemap
@@ -144,12 +148,19 @@ export function defineSiteConfig(options: SiteOptions) {
       ['meta', { property: 'og:type', content: 'website' }],
       ['meta', { property: 'og:site_name', content: title }],
       ['meta', { property: 'og:locale', content: 'zh_CN' }],
-      ...(ogImage ? ([['meta', { property: 'og:image', content: hostname + ogImage }]] satisfies HeadConfig[]) : []),
+      ...(ogImage
+        ? ([
+            ['meta', { property: 'og:image', content: hostname + ogImage.src }],
+            ['meta', { property: 'og:image:width', content: String(ogImage.width) }],
+            ['meta', { property: 'og:image:height', content: String(ogImage.height) }],
+            ['meta', { property: 'og:image:alt', content: ogImage.alt }],
+          ] satisfies HeadConfig[])
+        : []),
       // 嵌入模式：在首屏渲染前加上 class，避免导航栏先闪一下
       ['script', {}, `new URLSearchParams(location.search).get('embed')==='1'&&document.documentElement.classList.add('embed-mode')`],
     ],
 
-    // 每页的规范地址、描述、关键词和分享信息写进 frontmatter.head：站内跳转时客户端会随页面更新。
+    // 每页的规范地址、描述、关键词、分享信息和结构化数据写进 frontmatter.head：站内跳转时客户端会随页面更新。
     // 页面没写 description 时取正文的第一段（也用于 <meta name="description">）；页面在 frontmatter 中自己写了同名标签时以页面的为准
     transformPageData(pageData, { siteConfig }) {
       const path = pagePath(pageData.relativePath)
@@ -173,6 +184,14 @@ export function defineSiteConfig(options: SiteOptions) {
         ...(pageKeywords ? ([['meta', { name: 'keywords', content: pageKeywords }]] satisfies HeadConfig[]) : []),
       ]
       head.push(...tags.filter(([, attrs]) => !has(keyOf(attrs))))
+      head.push([
+        'script',
+        { type: 'application/ld+json' },
+        structuredData(
+          { hostname, title, description, image, app, sidebar },
+          { path, title: pageData.title || title, description: pageDescription, frontmatter: pageData.frontmatter },
+        ),
+      ])
     },
 
     // 统计只在构建产物中加载，开发时不加载
@@ -195,7 +214,7 @@ export function defineSiteConfig(options: SiteOptions) {
       logo,
       nav,
       socialLinks: options.socialLinks,
-      sidebar: options.sidebar,
+      sidebar,
       versions,
 
       search: {

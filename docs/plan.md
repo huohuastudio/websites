@@ -276,6 +276,12 @@ W23 留下的素材，只改 Keepbay：
 - **首页描述和分享图**：Novaix、Lsky 首页的 description 补到 80–120 字（现在只有"面向中小型 VPS 服务商的 IDC 管理系统""图床和云端相册程序"），写法参照 Keepbay 首页；Lsky 补分享图 og.png（参照 Keepbay 的 scripts/og.mjs）；分享图加 og:image:width、height、alt
 - 不做：百度、必应站长验证和主动推送（用户未选）；全站页面的标题、描述逐页检查（用户未选）
 
+**W28b 完成情况**（2026-11-18）：
+
+- **结构化数据**：共用主题的 `structured-data.ts` 生成每页一段 JSON-LD（`@graph`），由 transformPageData 写进 frontmatter.head，站内跳转时随页面更新。每页有 Organization（Spark Studio，只写名称）和 WebSite；首页有 SoftwareApplication（站点配置的 `app` 给出类别和系统：Keepbay UtilitiesApplication、Novaix BusinessApplication、Lsky MultimediaApplication，都是 Linux）和 FAQPage（回答去掉 HTML 标签）；文档页的面包屑为"站点首页 → 侧栏分组 → 页面"，分组没有链接时用组内第一个页面的地址，与页面相同时省略这一级。侧栏的匹配和链接归一化与 VitePress 判断当前页面的规则一致
+- **报价**：取首页 frontmatter 的 plans，价格写成"¥数字"的才算（Novaix 授权版"订阅制"不写）；Lsky 开源版是另一个程序，标 `offer: false` 不写
+- **描述和分享图**：Novaix、Lsky 首页补了 description（119、103 字）；Lsky 新增 `scripts/og.mjs`（`pnpm --filter ./sites/lsky og`，版式与 Keepbay 相同，右侧是图片页深色截图）；站点配置的 `ogImage` 改为 `{ src, width, height, alt }`，输出 og:image:width、height、alt
+
 ## W24 Novaix、Lsky 首页补截图（2026-11-18 用户定）
 
 用户要求在本机搭建 Novaix 和 Lsky Pro+，填充测试数据，自己决定截哪些图（"自己截你想要的图"），补上 W23 留下的素材缺口。两个项目都在 ~/Develop/Projects 下。
@@ -308,6 +314,8 @@ W23 留下的素材，只改 Keepbay：
 - **以后再看**：首页截图都是 2048 宽的原图，格子里只显示 500px 左右，可以生成小尺寸副本加 `srcset`（点击放大时仍用原图）
 
 ## 已知局限
+
+- **结构化数据不满足 Google 软件富媒体结果的要求**（W28b）：SoftwareApplication 必须带 aggregateRating 或 review，三个产品都没有可公开展示的真实评分，不编造，因此不会出现软件富媒体结果，数据仍作为语义信息保留。Google 自 2026 年 5 月起不再展示 FAQ 富媒体结果，FAQPage 同样只作语义标记
 
 - **Novaix、Lsky 截图的演示数据**（W24）：Novaix 演示库中香港节点的 IP 池、区域和转售连接里仍有 103.200.10.x 等 seed 写入的地址，本批截的页面都不显示它们；以后截这些页面前先在 polish.py 中换成文档网段。两个产品深色界面的辅助文字偏暗、Lsky 工单回复气泡的对比度偏低，是产品界面本身的配色，本仓库不处理
 

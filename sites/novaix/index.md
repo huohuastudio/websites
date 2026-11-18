@@ -2,6 +2,7 @@
 layout: home
 title: Novaix
 titleTemplate: 面向中小型 VPS 服务商的 IDC 管理系统
+description: Novaix 是面向中小型 VPS 服务商的 IDC 管理系统，单个可执行文件部署。LXC 容器和 KVM 虚拟机在同一套界面中管理，自带套餐、计费、在线支付和工单。免费版最多 2 个节点，授权版另有高可用、私有网络、代理商和供应商转售。
 # 首页不套文档正文样式，各版块由 .vitepress/theme/home 中的组件负责
 markdownStyles: false
 

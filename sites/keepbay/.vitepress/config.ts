@@ -10,7 +10,8 @@ export default defineSiteConfig({
   description: '自部署的私有网盘',
   dir: 'sites/keepbay',
   logo: '/logo.svg',
-  ogImage: '/og.png',
+  ogImage: { src: '/og.png', width: 1200, height: 630, alt: 'Keepbay 标识和“自部署的私有网盘”，右侧是文件页的截图' },
+  app: { category: 'UtilitiesApplication', os: 'Linux' },
   keywords: 'Keepbay,私有网盘,自部署网盘,家庭网盘,NAS 网盘,文件管理,照片管理,照片时间线,语义搜索,本地 AI,WebDAV,自托管',
   mermaid: true,
   nav: [

@@ -2,6 +2,7 @@
 layout: home
 title: Lsky Pro+
 titleTemplate: 图床和云端相册程序
+description: Lsky Pro+ 是基于 Laravel 开发的图床和云端相册程序，安装在您自己的服务器上。图片可以存到本地或各家对象储存，提供多用户和角色组、相册和分享、图片处理、内容审核，并内置套餐、订单和在线支付。
 # 首页不套文档正文样式，版式由首页组件（.vitepress/theme/home/）负责
 markdownStyles: false
 
@@ -10,6 +11,8 @@ plans:
   - name: 开源版
     price: ¥0
     note: 已停止更新
+    # 开源版是另一个程序，不写进首页结构化数据中本产品的报价
+    offer: false
     items:
       - 多用户、角色组和多种储存
       - 相册和接口

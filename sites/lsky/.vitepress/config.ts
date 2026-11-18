@@ -12,6 +12,8 @@ export default defineSiteConfig({
   description: '图床和云端相册程序',
   dir: 'sites/lsky',
   logo: '/logo.png',
+  ogImage: { src: '/og.png', width: 1200, height: 630, alt: 'Lsky Pro+ 标识和“图床和云端相册程序”，右侧是图片页的截图' },
+  app: { category: 'MultimediaApplication', os: 'Linux' },
   nav: [
     { text: '文档', link: DOCS_HOME, activeMatch: '^/docs/(?!archive/)' },
     { text: '主题', link: '/themes' },
