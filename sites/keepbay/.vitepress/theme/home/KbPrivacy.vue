@@ -21,7 +21,7 @@ const cards = [
       ['云端由您决定', '界面上写明每项功能发送什么；后台自动处理文件的三项功能，还要逐项再允许一次。'],
       ['每次调用都有记录', '发起人、功能、发送的数据类型和费用。'],
     ],
-    shot: { name: 'ai-calls', alt: 'AI 调用记录：标明本地处理、未发送到云端', style: { transform: 'scale(1.5)', transformOrigin: '62% 0' } },
+    shot: { name: 'ai-calls-card', alt: 'AI 调用记录：标明本地处理、未发送到云端' },
   },
   {
     title: '家人和访客',
@@ -40,7 +40,7 @@ const cards = [
       ['安全功能不收费', '两步验证、通行密钥、外部帐号登录都在免费版中。'],
       ['照片在隔离的进程中解码', '即使特制的图片攻破了解码器，也无法读取数据库和密钥。'],
     ],
-    shot: { name: 'member-features', alt: '成员的功能设置：会让数据离开设备的功能默认关闭', style: {} },
+    shot: { name: 'member-features', alt: '成员的功能设置：会让数据离开设备的功能默认关闭' },
   },
 ] as const
 
@@ -89,7 +89,7 @@ useScrollFrame((still) => {
           </div>
           <div class="v">
             <div v-if="'shot' in card" class="crop sx-fade-rb">
-              <KbShot :name="card.shot.name" size="wide" fit :alt="card.shot.alt" :style="card.shot.style" />
+              <KbShot :name="card.shot.name" fit :alt="card.shot.alt" />
             </div>
             <template v-else>
               <div class="n">{{ card.number }}<small v-if="'unit' in card">{{ card.unit }}</small></div>

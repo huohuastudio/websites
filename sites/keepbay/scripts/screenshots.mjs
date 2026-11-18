@@ -20,30 +20,123 @@ import { folderId, folderItems, imagesLoaded, newContext, onDemo, open, site } f
 const out = join(site, 'public/screenshots')
 const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 
-// 截图的尺寸：
-// - wide：1280 × 800 按 1.6 倍截，得到 2048 × 1280（与 Novaix 首页的截图一致）
+// 截图的尺寸（W31：首页上界面文字的显示尺寸不小于原尺寸的 0.85，Windows 1 倍屏上才看得清，见 docs/plan.md）：
+// - wide：1024 × 640 按 2 倍截，得到 2048 × 1280。首屏、揭开对照、AI 三处显示完整界面的大图（首页上约 680–1040px 宽），
+//   窗口接近显示宽度，界面文字接近原大；1024 是 Keepbay 显示完整侧栏的最小宽度
 // - mobile：390 × 700 按 3 倍截，得到 1170 × 2100，在官网的手机宽度下换用这张，整页缩小后的宽屏截图看不清
-// - compact：400 × 430 按 3 倍截，得到 1200 × 1290，放在首页三列的格子里（只有 300–520px 宽），界面按手机布局显示，文字接近原大。
-//   高度正好放下搜索的前三条结果、成员的三个文件夹和「授权文件夹」按钮
+// - compact：400 × 430 按 3 倍截，得到 1200 × 1290，放在首页搜索一节的结果区，界面按手机布局显示。高度正好放下搜索的前三条结果
 // - panel：480 × 400 按 3 倍截，得到 1440 × 1200，放在首页搜索一节的结果区（宽屏下约 480 × 396），界面按手机布局显示
+// - card：卡片中的局部图，只截与说明相关的部分。截图窗口和截取的区域在各张截图的 card 中设定（见 shots），按 2 倍截。
+//   区域与卡片中截图框的宽高比相同，宽度约为截图框最大显示宽度 ÷ 0.9（见下面的 slots）
 const sizes = {
-  wide: { suffix: '', viewport: { width: 1280, height: 800 }, scale: 1.6 },
+  wide: { suffix: '', viewport: { width: 1024, height: 640 }, scale: 2 },
   mobile: { suffix: '-mobile', viewport: { width: 390, height: 700 }, scale: 3 },
   compact: { suffix: '', viewport: { width: 400, height: 430 }, scale: 3 },
   panel: { suffix: '', viewport: { width: 480, height: 400 }, scale: 3 },
+  card: { suffix: '', scale: 2 },
+}
+
+// card 中截一小块的截图用的窗口，与原来的宽屏截图相同
+const desktop = { width: 1280, height: 800 }
+
+// 卡片中截图框的尺寸对应的截取区域（CSS 像素）：
+// - highlight：「了解亮点」轮播，截图框 816 × 510
+// - format：「在网页中直接打开」的扇形小卡片，截图框 368–464px 宽（随视口），按最窄时不小于 0.85 算
+// - privacy：「隐私与安全」卡片的右半边，截图框 484 × 515–528，顶端对齐，矮视口下裁掉底部
+const slots = {
+  highlight: { width: 906, height: 566 },
+  format: { width: 416, height: 260 },
+  privacy: { width: 538, height: 587 },
+}
+
+/** 截取区域 slot 放在侧栏（宽 side）右边：窗口宽度是侧栏加上区域，侧栏不进截图 */
+function besideSidebar(side, slot, height) {
+  return { viewport: { width: side + slot.width, height }, ...slot, at: () => ({ x: side, y: 0 }) }
 }
 
 // 首页推近时最多放大 2 倍（zoom.ts），宽度 1000px 的截图框在 2 倍屏上推近后要约 4000 像素宽的图才清晰：
-// 标了 zoom 的截图，宽屏按 3 倍截一次，缩成宽屏的尺寸作主图，推近后看到的区域从同一张图中裁出，主图和高清图出自同一个画面
-const detailScale = 3
+// 标了 zoom 的截图，宽屏按 4 倍截一次，缩成宽屏的尺寸作主图，推近后看到的区域从同一张图中裁出，主图和高清图出自同一个画面
+const detailScale = 4
+
+// 以下是几张截图共用的页面设置
+
+// 京都伏见稻荷的鸟居（查看器中的照片）
+const torii = [['家庭相册', '2024', '2024-10 京都'], 'IMG_20241003_071230.jpg']
+
+// AI 桌面中问保修期的对话（快照中预先问好的，不调用模型）
+const desk = {
+  path: async () => '/?view=desk',
+  session: async (request) => ({ 'keepbay.chat': await conversationId(request, '家里哪些电器还在保修期内') }),
+  // 输入框处演示站专有的说明不进截图（本机实例上没有这一行）
+  prepare: (page) => onDemo && page.getByText('演示站点不能和 AI 对话').evaluate((el) => el.remove()),
+}
+
+// AI 调用记录。最新的记录是后台处理，一排都一样：先以林海的身份搜索两次（真实的调用，记录发起人和耗时），
+// 列表上方就是这几条，再往下是后台处理的
+const aiCalls = {
+  local: true,
+  path: async (request) => {
+    for (const params of [{ q: '房租合同什么时候到期' }, { q: '京都的寺庙', kind: 'image' }]) {
+      const res = await request.get(`/api/v1/search?${new URLSearchParams(params)}`)
+      if (!res.ok()) throw new Error(`搜索失败：${res.status()}`)
+    }
+    return '/settings/ai/calls'
+  },
+  prepare: (page) => scrollToHeading(page, '调用记录'),
+}
+
+// 视频播放：海边的视频停在第 5 秒（浏览器原生的播放控件）。H.264 要用 Chrome 播放，Playwright 自带的 Chromium 不带这个解码器
+const video = {
+  chrome: true,
+  path: (request) => viewerPath(request, ['家庭相册', '2025', '2025-07 海边'], 'VID_20250712_161004.mp4'),
+  prepare: async (page) => {
+    // 等不到跳转完成（加载或解码出错）时报错，不截出黑屏
+    await page.locator('video').evaluate(
+      (video) =>
+        new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error('视频没有跳转到第 5 秒')), 15_000)
+          video.addEventListener('seeked', () => (clearTimeout(timer), resolve()), { once: true })
+          video.addEventListener('error', () => (clearTimeout(timer), reject(new Error('视频无法播放'))), { once: true })
+          video.muted = true
+          video.pause()
+          video.currentTime = 5
+        }),
+    )
+    await hideFileNav(page)
+  },
+}
+
+// 照片时间线：看得到的照片和视频跨文件夹按拍摄时间排列，按天分组，右侧是日期条。
+// 最前面几天是收件箱中的扫描件和票据样本，滚到 2026 年 2 月 17 日（春节的一组照片）再截
+const photoDay = '2026年2月17日'
+const photos = {
+  path: async () => '/photos',
+  // 宽屏右侧的信息栏关掉，照片占满宽度
+  storage: { 'keepbay.infoPanel': 'false' },
+  prepare: async (page) => {
+    await page.getByText(photoDay).first().waitFor({ timeout: 10_000 })
+    await page.evaluate((day) => {
+      const header = [...document.querySelectorAll('div')].find((el) => el.childElementCount === 0 && el.textContent.startsWith(day))
+      let scroller = header.parentElement
+      while (getComputedStyle(scroller).overflowY !== 'auto') scroller = scroller.parentElement
+      scroller.scrollTop += header.getBoundingClientRect().top - scroller.getBoundingClientRect().top
+    }, photoDay)
+    await page.waitForTimeout(500)
+    await imagesLoaded(page)
+  },
+}
 
 /**
  * 要截的页面。path：按接口查到 ID 后返回页面地址；sizes：截哪几种尺寸；prepare：页面加载完、截图前的操作；
+ * card：card 尺寸的截取区域的宽高（width、height）、截图窗口（viewport，不写时与区域同大）和左上角的位置（at，返回 CSS 像素的 x、y，
+ * 不写时为窗口左上角；超出窗口时移回窗口内）；
  * zoom：首页推近到哪一部分，返回它在页面上的范围（见 bounds）；
  * view：文件夹的视图（Keepbay 存在浏览器本地，键为 keepbay.views.<用户 ID>）；storage：写进 localStorage 的项；session：按接口查到后写进 sessionStorage 的项；
  * local：只在本机实例上截。
+ * 首页上同一个界面放在不同大小的格子中时，各截一张（名称不同），每张按自己的格子取景
  */
 const shots = [
+  // 以下是显示完整界面的大图：首屏、揭开对照、AI
   {
     name: 'files',
     sizes: ['wide', 'mobile'],
@@ -57,19 +150,10 @@ const shots = [
     zoom: (page) => bounds(page.getByRole('navigation', { name: '导航' }).getByText('文件夹', { exact: true }).locator('..')),
   },
   {
-    // 查看器中的照片（京都伏见稻荷的鸟居）
-    name: 'viewer',
-    sizes: ['wide', 'mobile'],
-    path: (request) => viewerPath(request, ['家庭相册', '2024', '2024-10 京都'], 'IMG_20241003_071230.jpg'),
-  },
-  {
     // AI 桌面中问保修期的对话（快照中预先问好的，不调用模型）
     name: 'desk',
     sizes: ['wide', 'mobile'],
-    path: async () => '/?view=desk',
-    session: async (request) => ({ 'keepbay.chat': await conversationId(request, '家里哪些电器还在保修期内') }),
-    // 输入框处演示站专有的说明不进截图（本机实例上没有这一行）
-    prepare: (page) => onDemo && page.getByText('演示站点不能和 AI 对话').evaluate((el) => el.remove()),
+    ...desk,
     // 推近到回答中的保修期限表（电器、剩余保修期限和对应的文件）
     zoom: (page) => bounds(page.locator('table')),
   },
@@ -80,6 +164,13 @@ const shots = [
     path: async () => '/reminders',
     // 推近到最前面的三条提醒（到期日和原文摘录）
     zoom: (page) => bounds(page.getByRole('list').first().locator(':scope > li:nth-child(-n+3)')),
+  },
+  {
+    name: 'ai-calls',
+    sizes: ['wide', 'mobile'],
+    ...aiCalls,
+    // 推近到最前面的三条记录（两次搜索和一条后台处理，标明本地处理、未发送到云端）
+    zoom: (page) => bounds(page.locator('section').filter({ has: page.getByRole('heading', { name: '调用记录', exact: true }) }).locator('ul > li:nth-child(-n+3)')),
   },
   {
     // 按画面搜照片，只看图片
@@ -123,10 +214,133 @@ const shots = [
       await hideFileNav(page)
     },
   },
+  // 以下是「了解亮点」轮播的卡片：窗口设成截取区域的大小，查看器、分享页面按这个宽度排版
   {
-    // 成员 family（周晴）的授权：两个文件夹读写、一个只读，没授权的看不到
+    // 查看器中的照片（京都伏见稻荷的鸟居）
+    name: 'viewer',
+    sizes: ['card'],
+    card: slots.highlight,
+    path: (request) => viewerPath(request, ...torii),
+  },
+  {
+    // 音乐播放器：《晚风》的封面和滚动歌词。从第 5 行歌词开始播放（点歌词的一行就跳过去播放），画面上有正在唱的一行
+    name: 'music',
+    sizes: ['card'],
+    card: slots.highlight,
+    path: (request) => viewerPath(request, ['家庭文档', '音乐'], '晚风.mp3'),
+    prepare: async (page) => {
+      const lines = page.locator('.kb-lyric').filter({ has: page.locator('.kb-lyric-text') })
+      if ((await lines.count()) < 5) throw new Error('音乐播放器上没有歌词')
+      await lines.nth(4).click()
+      await page.locator('.kb-lyric[data-on]').waitFor()
+      await hideFileNav(page)
+      // 等歌词滚动到位
+      await page.waitForTimeout(1200)
+    },
+  },
+  {
+    name: 'video',
+    sizes: ['card'],
+    card: slots.highlight,
+    ...video,
+  },
+  {
+    // 在线编辑：在 ONLYOFFICE 中编辑演示文稿。演示站没有部署编辑器，在本机实例上截（本机实例要先在系统设置中接好 ONLYOFFICE）。
+    // 截编辑区和上方的工具栏，左侧的幻灯片列表、外层的标题栏和下方的备注区不进截图（编辑器在 iframe 中，按 1280 × 800 窗口中的位置截）
+    name: 'slides',
+    local: true,
+    sizes: ['card'],
+    card: { viewport: desktop, ...slots.highlight, at: () => ({ x: 280, y: 85 }) },
+    path: (request) => viewerPath(request, ['林海的工作', '项目'], '2026 Q4 项目计划.pptx'),
+    prepare: (page) => openEditor(page, { spell: true }),
+  },
+  {
+    // 打开分享链接看到的页面（京都相册，带水印）。演示站的分享链接只给登录了演示帐号的浏览器看，页面与访客看到的相同。
+    // 从相册的标题截起，下面是两行照片，上方的页头不进截图。手机截图放在首屏的手机画面中
+    name: 'share',
+    sizes: ['card', 'mobile'],
+    card: { viewport: { width: slots.highlight.width, height: 720 }, ...slots.highlight, at: async (page) => ({ x: 0, y: (await bounds(page.locator('main'))).y }) },
+    path: async (request) => {
+      const shares = await (await request.get('/api/v1/shares')).json()
+      const share = shares.find((s) => s.title === '2024-10 京都')
+      if (!share) throw new Error('没有京都相册的分享链接')
+      return `/s/${share.token}`
+    },
+    // 链接失效、改了密码等情况下页面上没有相册，等不到时报错
+    prepare: async (page) => {
+      await page.getByText('2024-10 京都').first().waitFor({ timeout: 10_000 })
+      await page.getByRole('button', { name: '全部下载' }).waitFor({ timeout: 10_000 })
+    },
+  },
+  {
+    // AI 桌面的对话：截取区域放在侧栏（236px）右边；下方的输入框不进截图
+    name: 'desk-card',
+    sizes: ['card'],
+    card: besideSidebar(236, slots.highlight, 800),
+    ...desk,
+  },
+  // 以下是「在网页中直接打开」的五张小卡片：在 1280 × 800 的窗口中截一小块
+  {
+    // 照片时间线：从一天的日期标题截起
+    name: 'format-photos',
+    sizes: ['card'],
+    card: { viewport: desktop, ...slots.format, at: (page) => corner(page.getByText(photoDay).first(), 16, 16) },
+    ...photos,
+  },
+  {
+    // Excel 表格：从表格区的左上角（行号和列标）截起，功能区和公式栏不进截图
+    name: 'format-sheet',
+    local: true,
+    sizes: ['card'],
+    card: { viewport: desktop, ...slots.format, at: (page) => editorBox(page, '#ws-canvas') },
+    path: (request) => viewerPath(request, ['家庭文档', '家庭'], '2025 年家庭开支.xlsx'),
+    prepare: openEditor,
+  },
+  {
+    // 视频画面的左下角，带播放按钮、时间和进度条
+    name: 'format-video',
+    sizes: ['card'],
+    card: {
+      viewport: desktop,
+      ...slots.format,
+      at: async (page) => {
+        const b = await bounds(page.locator('video'))
+        return { x: b.x, y: b.y + b.height - slots.format.height }
+      },
+    },
+    ...video,
+  },
+  {
+    // Word 文档：纸张上的标题和前两节，功能区不进截图（编辑器在 iframe 中，按窗口中的位置截）。
+    // 首页扇形中这张的左半边被中间的卡片盖住，正文放在截图的右半边
+    name: 'format-doc',
+    local: true,
+    sizes: ['card'],
+    card: { viewport: desktop, ...slots.format, at: () => ({ x: 160, y: 340 }) },
+    path: (request) => viewerPath(request, ['林海的工作', '项目'], '周报-2026-第45周.docx'),
+    prepare: (page) => openEditor(page, { spell: true }),
+  },
+  {
+    // 查看器中照片的一部分（鸟居的入口），工具栏和缩略图不进截图
+    name: 'format-raw',
+    sizes: ['card'],
+    card: { viewport: desktop, ...slots.format, at: () => ({ x: 430, y: 150 }) },
+    path: (request) => viewerPath(request, ...torii),
+  },
+  // 以下是「免费版就是完整的网盘」的格子
+  {
+    // 照片时间线：截取区域放在图标栏（56px，768–1023px 宽时侧栏收成图标栏）右边。
+    // 格子约 649 × 630；手机宽度下换用手机截图（首屏的手机画面也用它）
+    name: 'photos',
+    sizes: ['card', 'mobile'],
+    card: besideSidebar(56, { width: 721, height: 700 }, 700),
+    ...photos,
+  },
+  {
+    // 成员 family（周晴）的授权：两个文件夹读写、一个只读，没授权的看不到。格子约 299 × 260，窗口设成截取区域的大小，界面按手机布局显示
     name: 'members',
-    sizes: ['compact'],
+    sizes: ['card'],
+    card: { width: 332, height: 289 },
     path: async (request) => `/settings/members/${await userId(request, 'family')}`,
     // 滚到「文件夹」一节（上面的资料一节不进截图），标题上方留一点空。
     // 突出文件夹和只读、读写：标题下的说明、服务器上的路径和复制路径的按钮不进截图（每个文件夹都要找到，否则报错）
@@ -144,143 +358,71 @@ const shots = [
         el.scrollIntoView({ block: 'start' })
       }),
   },
-  // 以下放在首页的「界面一览」：先是几项功能，后三张证明隐私一节的说法
+  // 以下证明隐私一节的说法
   {
-    // 照片时间线：看得到的照片和视频跨文件夹按拍摄时间排列，按天分组，右侧是日期条。
-    // 最前面几天是收件箱中的扫描件和票据样本，滚到 2026 年 2 月 17 日（春节的一组照片）再截
-    name: 'photos',
-    sizes: ['wide', 'mobile'],
-    path: async () => '/photos',
-    // 宽屏右侧的信息栏关掉，照片占满宽度
-    storage: { 'keepbay.infoPanel': 'false' },
-    prepare: async (page) => {
-      const day = '2026年2月17日'
-      await page.getByText(day).first().waitFor({ timeout: 10_000 })
-      await page.evaluate((day) => {
-        const header = [...document.querySelectorAll('div')].find((el) => el.childElementCount === 0 && el.textContent.startsWith(day))
-        let scroller = header.parentElement
-        while (getComputedStyle(scroller).overflowY !== 'auto') scroller = scroller.parentElement
-        scroller.scrollTop += header.getBoundingClientRect().top - scroller.getBoundingClientRect().top
-      }, day)
-      await page.waitForTimeout(500)
-      await imagesLoaded(page)
-    },
+    // AI 调用记录：窗口设成截取区域的大小，界面按手机布局显示，每条记录的状态都在画面内
+    name: 'ai-calls-card',
+    sizes: ['card'],
+    card: slots.privacy,
+    ...aiCalls,
   },
   {
-    // 音乐播放器：《晚风》的封面和滚动歌词。从第 5 行歌词开始播放（点歌词的一行就跳过去播放），画面上有正在唱的一行
-    name: 'music',
-    sizes: ['wide', 'mobile'],
-    path: (request) => viewerPath(request, ['家庭文档', '音乐'], '晚风.mp3'),
-    prepare: async (page) => {
-      const lines = page.locator('.kb-lyric').filter({ has: page.locator('.kb-lyric-text') })
-      if ((await lines.count()) < 5) throw new Error('音乐播放器上没有歌词')
-      await lines.nth(4).click()
-      await page.locator('.kb-lyric[data-on]').waitFor()
-      await hideFileNav(page)
-      // 等歌词滚动到位
-      await page.waitForTimeout(1200)
-    },
-  },
-  {
-    // 视频播放：海边的视频停在第 5 秒（浏览器原生的播放控件）。H.264 要用 Chrome 播放，Playwright 自带的 Chromium 不带这个解码器
-    name: 'video',
-    chrome: true,
-    sizes: ['wide', 'mobile'],
-    path: (request) => viewerPath(request, ['家庭相册', '2025', '2025-07 海边'], 'VID_20250712_161004.mp4'),
-    prepare: async (page) => {
-      // 等不到跳转完成（加载或解码出错）时报错，不截出黑屏
-      await page.locator('video').evaluate(
-        (video) =>
-          new Promise((resolve, reject) => {
-            const timer = setTimeout(() => reject(new Error('视频没有跳转到第 5 秒')), 15_000)
-            video.addEventListener('seeked', () => (clearTimeout(timer), resolve()), { once: true })
-            video.addEventListener('error', () => (clearTimeout(timer), reject(new Error('视频无法播放'))), { once: true })
-            video.muted = true
-            video.pause()
-            video.currentTime = 5
-          }),
-      )
-      await hideFileNav(page)
-    },
-  },
-  {
-    // 在线编辑：在 ONLYOFFICE 中编辑表格、文档、演示文稿。演示站没有部署编辑器，在本机实例上截（本机实例要先在系统设置中接好 ONLYOFFICE）
-    name: 'sheet',
-    local: true,
-    sizes: ['wide'],
-    path: (request) => viewerPath(request, ['家庭文档', '家庭'], '2025 年家庭开支.xlsx'),
-    prepare: openEditor,
-  },
-  {
-    name: 'doc',
-    local: true,
-    sizes: ['wide'],
-    path: (request) => viewerPath(request, ['林海的工作', '项目'], '周报-2026-第45周.docx'),
-    prepare: (page) => openEditor(page, { spell: true }),
-  },
-  {
-    name: 'slides',
-    local: true,
-    sizes: ['wide'],
-    path: (request) => viewerPath(request, ['林海的工作', '项目'], '2026 Q4 项目计划.pptx'),
-    prepare: openEditor,
-  },
-  {
-    // 打开分享链接看到的页面（京都相册，带水印）。演示站的分享链接只给登录了演示帐号的浏览器看，页面与访客看到的相同
-    name: 'share',
-    sizes: ['wide', 'mobile'],
-    path: async (request) => {
-      const shares = await (await request.get('/api/v1/shares')).json()
-      const share = shares.find((s) => s.title === '2024-10 京都')
-      if (!share) throw new Error('没有京都相册的分享链接')
-      return `/s/${share.token}`
-    },
-    // 链接失效、改了密码等情况下页面上没有相册，等不到时报错
-    prepare: async (page) => {
-      await page.getByText('2024-10 京都').first().waitFor({ timeout: 10_000 })
-      await page.getByRole('button', { name: '全部下载' }).waitFor({ timeout: 10_000 })
-    },
-  },
-  {
-    // 成员周晴能用的功能：会让数据离开设备的三项默认关闭，所有者给周晴开了分享链接
+    // 成员周晴能用的功能：会让数据离开设备的三项默认关闭，所有者给周晴开了分享链接。窗口设成截取区域的大小，界面按手机布局显示。
+    // 「功能」是页面的最后一节，滚不到顶部：去掉上面的资料、文件夹两节，功能一节接在页头（成员的名字）下面
     name: 'member-features',
-    sizes: ['wide', 'mobile'],
+    sizes: ['card'],
+    card: slots.privacy,
     path: async (request) => `/settings/members/${await userId(request, 'family')}`,
-    prepare: (page) => scrollToHeading(page, '功能'),
-  },
-  {
-    // 本地模型：本机内存、运行环境和三个已安装的模型及其内存（上面的厂商、货币不进截图）
-    name: 'local-models',
-    sizes: ['wide', 'mobile'],
-    path: async () => '/settings/ai',
-    prepare: (page) => scrollToHeading(page, '本地模型'),
-  },
-  {
-    // AI 调用记录。最新的记录是后台处理，一排都一样：先以林海的身份搜索两次（真实的调用，记录发起人和耗时），
-    // 列表上方就是这几条，再往下是后台处理的
-    name: 'ai-calls',
-    local: true,
-    sizes: ['wide', 'mobile'],
-    path: async (request) => {
-      for (const params of [{ q: '房租合同什么时候到期' }, { q: '京都的寺庙', kind: 'image' }]) {
-        const res = await request.get(`/api/v1/search?${new URLSearchParams(params)}`)
-        if (!res.ok()) throw new Error(`搜索失败：${res.status()}`)
-      }
-      return '/settings/ai/calls'
-    },
-    prepare: (page) => scrollToHeading(page, '调用记录'),
-    // 推近到最前面的三条记录（两次搜索和一条后台处理，标明本地处理、未发送到云端）
-    zoom: (page) => bounds(page.locator('section').filter({ has: page.getByRole('heading', { name: '调用记录', exact: true }) }).locator('ul > li:nth-child(-n+3)')),
+    prepare: (page) =>
+      page.evaluate(() => {
+        const sections = (names) => [...document.querySelectorAll('section')].filter((s) => names.includes(s.querySelector('h2, h3')?.textContent.trim()))
+        const hidden = sections(['资料', '文件夹'])
+        if (hidden.length !== 2 || sections(['功能']).length !== 1) throw new Error('成员页上找不到资料、文件夹或功能一节')
+        for (const s of hidden) s.remove()
+      }),
   },
 ]
 
 /** locator 选中的元素合起来在页面上的范围（CSS 像素）。一个也没有选中时报错（Keepbay 的界面改了） */
 async function bounds(locator) {
   const rects = await locator.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().toJSON()))
-  if (!rects.length) throw new Error('页面上找不到要推近的部分')
+  if (!rects.length) throw new Error('页面上找不到要推近或截取的部分')
   const x = Math.min(...rects.map((r) => r.left))
   const y = Math.min(...rects.map((r) => r.top))
   return { x, y, width: Math.max(...rects.map((r) => r.right)) - x, height: Math.max(...rects.map((r) => r.bottom)) - y }
+}
+
+/** 截取的范围（CSS 像素）：左上角按 at 算出（不写时为窗口左上角），超出窗口时移回窗口内 */
+async function clipOf(page, { viewport, clip: { width, height }, at }) {
+  const { x, y } = (await at?.(page)) ?? { x: 0, y: 0 }
+  const fit = (v, length, total) => Math.round(Math.min(Math.max(v, 0), total - length))
+  return { x: fit(x, width, viewport.width), y: fit(y, height, viewport.height), width, height }
+}
+
+/** 在线编辑器（两层 iframe 中）元素 selector 的左上角在窗口中的位置（CSS 像素）。 */
+async function editorBox(page, selector) {
+  const box = await editorFrame(page).locator(selector).boundingBox()
+  if (!box) throw new Error(`编辑器中找不到 ${selector}`)
+  return { x: box.x, y: box.y }
+}
+
+/** 截取区域的左上角：locator 选中的元素左上角再向左 dx、向上 dy（CSS 像素）。 */
+async function corner(locator, dx, dy) {
+  const { x, y } = await bounds(locator)
+  return { x: x - dx, y: y - dy }
+}
+
+/** 尺寸 name 的截图窗口、倍数和截取区域（card 按截图中的设置，其余截整个窗口）。 */
+function sizeOf(shot, name) {
+  if (name !== 'card') return { ...sizes[name], clip: sizes[name].viewport }
+  const { width, height, viewport = { width, height }, at } = shot.card
+  if (width > viewport.width || height > viewport.height) throw new Error(`${shot.name} 的截取区域比窗口大`)
+  return { ...sizes.card, viewport, clip: { width, height }, at }
+}
+
+/** 在线编辑器（ONLYOFFICE）所在的 iframe：查看器中的 iframe 里再嵌一层 */
+function editorFrame(page) {
+  return page.frameLocator('iframe').frameLocator('iframe')
 }
 
 /**
@@ -322,7 +464,7 @@ async function viewerPath(request, names, name) {
  */
 async function openEditor(page, { spell = false } = {}) {
   await page.getByRole('button', { name: '编辑', exact: true }).click()
-  const editor = page.frameLocator('iframe').frameLocator('iframe')
+  const editor = editorFrame(page)
   await editor.locator('#editor_sdk canvas, #ws-canvas').first().waitFor({ timeout: 60_000 })
   await editor.locator('.asc-loadmask').waitFor({ state: 'hidden', timeout: 60_000 })
   if (spell) {
@@ -380,7 +522,7 @@ function seed(context, kind, items) {
 
 /** 截一张。返回文件名；推近用的高清图另存为 <名称>-detail-<主题>.webp，同时返回推近后看到的区域占画面的百分比 [x, y, 宽, 高] */
 async function shoot(browser, shot, sizeName, scheme) {
-  const size = sizes[sizeName]
+  const size = sizeOf(shot, sizeName)
   const detail = shot.zoom && sizeName === 'wide'
   const scale = detail ? detailScale : size.scale
   const context = await newContext(browser, { viewport: size.viewport, scale, scheme, view: shot.view })
@@ -396,7 +538,7 @@ async function shoot(browser, shot, sizeName, scheme) {
     await page.mouse.move(0, size.viewport.height - 1)
     await page.waitForTimeout(300)
     const file = `${shot.name}${size.suffix}-${scheme}`
-    const png = await page.screenshot()
+    const png = await page.screenshot({ clip: await clipOf(page, size) })
     // PNG 从标准输入交给 cwebp
     const webp = (name, args = []) => execFileSync('cwebp', ['-quiet', '-q', '82', ...args, '-o', join(out, `${name}.webp`), '--', '-'], { input: png })
     if (!detail) {
@@ -457,8 +599,8 @@ const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'))
 for (const shot of selected) {
   manifest[shot.name] = Object.fromEntries(
     shot.sizes.map((name) => {
-      const { viewport, scale } = sizes[name]
-      return [name, [Math.round(viewport.width * scale), Math.round(viewport.height * scale)]]
+      const { clip, scale } = sizeOf(shot, name)
+      return [name, [Math.round(clip.width * scale), Math.round(clip.height * scale)]]
     }),
   )
   if (regions[shot.name]) manifest[shot.name].detail = regions[shot.name]

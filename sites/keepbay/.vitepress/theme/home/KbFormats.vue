@@ -13,11 +13,11 @@ const rows = [
 
 // 后面的盖在前面的上面：最中间的一张放最后。dx、r 是展开后的横向位移和旋转，sy、fy 是叠起和展开时的纵向位移
 const cards = [
-  { name: 'photos', caption: '照片时间线', style: { '--dx': '-92%', '--r': '-7deg', '--sy': '-24px', '--fy': '22px' } },
-  { name: 'sheet', caption: 'Excel 表格', style: { '--dx': '92%', '--r': '7deg', '--sy': '24px', '--fy': '22px' } },
-  { name: 'video', caption: '视频', style: { '--dx': '-50%', '--r': '-3.5deg', '--sy': '-12px', '--fy': '8px' } },
-  { name: 'doc', caption: 'Word 文档', style: { '--dx': '50%', '--r': '3.5deg', '--sy': '12px', '--fy': '8px' } },
-  { name: 'viewer', caption: '照片和相机 RAW', style: { '--dx': '0%', '--r': '0deg', '--sy': '0px', '--fy': '0px' } },
+  { name: 'format-photos', caption: '照片时间线', style: { '--dx': '-92%', '--r': '-7deg', '--sy': '-24px', '--fy': '22px' } },
+  { name: 'format-sheet', caption: 'Excel 表格', style: { '--dx': '92%', '--r': '7deg', '--sy': '24px', '--fy': '22px' } },
+  { name: 'format-video', caption: '视频', style: { '--dx': '-50%', '--r': '-3.5deg', '--sy': '-12px', '--fy': '8px' } },
+  { name: 'format-doc', caption: 'Word 文档', style: { '--dx': '50%', '--r': '3.5deg', '--sy': '12px', '--fy': '8px' } },
+  { name: 'format-raw', caption: '照片和相机 RAW', style: { '--dx': '0%', '--r': '0deg', '--sy': '0px', '--fy': '0px' } },
 ] as const
 
 const root = ref<HTMLElement>()
@@ -57,7 +57,7 @@ useScrollFrame((still) => {
       </div>
       <div ref="deck" class="deck">
         <figure v-for="card in cards" :key="card.name" :style="card.style">
-          <div class="sx-win shot"><KbShot :name="card.name" size="wide" fit alt="" /></div>
+          <div class="sx-win shot"><KbShot :name="card.name" fit alt="" /></div>
           <figcaption>{{ card.caption }}</figcaption>
         </figure>
       </div>
@@ -168,7 +168,9 @@ figcaption {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* 舞台不固定时高度随内容，卡片区不能按 flex 分剩余高度（会是 0），给扇形留出固定高度 */
   .deck {
+    flex: none;
     height: 46vh;
   }
 
