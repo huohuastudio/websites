@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { SxShot, isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
+import type manifest from '../screenshots.json'
+import NxShot from './NxShot.vue'
 
 // 从下单到售后：流程线随滚动画出，到哪一步点亮哪一步，下方的说明和截图随之切换。
 // 不固定舞台时隐藏流程线，七个步骤按顺序排下来
@@ -10,8 +12,8 @@ interface Step {
   n: string
   h: string
   p: string
-  /** 截图（public/screenshots 中的文件名，不含 -light.webp、-dark.webp） */
-  shot: string
+  /** 截图（screenshots.json 中的名称） */
+  shot: keyof typeof manifest
   alt: string
 }
 
@@ -21,14 +23,14 @@ const STEPS: Step[] = [
     h: '创建套餐',
     p: '设定 CPU、内存、磁盘、带宽和流量，选择可用节点后上架。套餐分为虚拟机和容器两种类型，可以按小时、月、季、年计费；按小时计费的实例从余额实时扣费。',
     shot: 'plans',
-    alt: '套餐列表：配置、价格、库存和地区',
+    alt: '套餐列表：分组、配置、带宽和流量、月付价格和状态',
   },
   {
     n: '订单',
     h: '用户下单',
     p: '新购、续费、升级、附加 IP 和流量包都会生成订单。管理员可以按类型和状态筛选订单，也可以在后台代客下单。',
     shot: 'orders',
-    alt: '订单：新购、续费、升级订单的列表和筛选',
+    alt: '订单列表：按类型、业务、周期和状态筛选',
   },
   {
     n: '支付',
@@ -41,15 +43,15 @@ const STEPS: Step[] = [
     n: '开通实例',
     h: '自动开通',
     p: '支付成功后，系统创建异步任务：创建实例、配置网络、分配 IP。用户在实例详情页的第一屏就能看到 IP、用户名、密码和 SSH 命令。',
-    shot: 'instance',
-    alt: '实例详情：运行状态、资源用量和常用操作',
+    shot: 'instance-access',
+    alt: '用户端的实例详情：IP、用户名、密码和 SSH 命令',
   },
   {
     n: '续费和升级',
     h: '续费和升级',
     p: '用户可以自助续费和升级配置。开启自动续费后，余额充足时系统在到期前 1 天自动续费；到期未续费的实例按设置的宽限天数先冻结、再删除。',
     shot: 'lifecycle',
-    alt: '到期处理设置：提醒、冻结和删除的宽限天数',
+    alt: '实例生命周期设置：续费价格策略、到期暂停和删除的宽限天数',
   },
   {
     n: '工单',
@@ -104,7 +106,7 @@ useScrollFrame((still) => {
           </div>
           <div class="fvis">
             <div class="crop sx-fade-rb">
-              <SxShot :src="`/screenshots/${s.shot}`" :width="2048" :height="1280" :alt="s.alt" />
+              <NxShot :name="s.shot" :alt="s.alt" />
             </div>
           </div>
         </div>
@@ -256,21 +258,21 @@ useScrollFrame((still) => {
   border-radius: 14px 0 0 0;
 }
 
-/* 截图放大取景，显示左上部分（窄屏放得更大），文字才看得清 */
+/* 截图铺满裁切框，左上对齐。宽屏下裁切框 569px 宽，与截图脚本中的显示宽度（show）一致，截图按 1:1 显示 */
 .crop :deep(img) {
-  width: var(--zw, 150%);
-  max-width: none;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
 }
 
-/* 矮视口：步骤条收紧，面板改用较小的留边 */
+/* 矮视口：步骤条收紧（留边不变，裁切框仍是 569px 宽） */
 @media (max-height: 832px) and (min-width: 761px) {
   .rail {
     margin-bottom: 26px;
   }
 
   .fvis {
-    --gut: 24px;
     width: min(100%, calc((var(--sx-vh) - 230px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   }
 }
@@ -317,15 +319,17 @@ useScrollFrame((still) => {
     margin-bottom: 0;
   }
 
+  /* 截图最宽按宽屏下的显示宽度显示，不放大 */
   .fvis {
     width: 100%;
+    max-width: calc(569px + var(--gut, 32px));
   }
 }
 
 @media (max-width: 760px) {
   .fvis {
     --gut: 20px;
-    --zw: 190%;
+    justify-self: start;
   }
 
   .fpane {
@@ -335,6 +339,13 @@ useScrollFrame((still) => {
 
   .fpane h3 {
     font-size: 28px;
+  }
+}
+
+/* 手机宽度下仍铺满：手机多是 3 倍屏，截图本来就要放大，留出空隙反而显得没对齐 */
+@media (max-width: 580px) {
+  .fvis {
+    max-width: none;
   }
 }
 

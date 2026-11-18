@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { SxShot, easeOut, isFlat, pinProgress, seg, smooth, useLayoutCache, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { easeOut, isFlat, pinProgress, seg, smooth, useLayoutCache, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { computed, ref } from 'vue'
+import NxShot from './NxShot.vue'
 
 // 首屏：终端随滚动逐行输入下载、解压、运行三条命令，然后缩小退到左下并淡出，仪表盘从后面放大。
 // 窄屏、视口太矮或减少动态效果时不固定舞台，终端和仪表盘上下排列，命令直接显示完整
@@ -151,7 +152,7 @@ const layout = useLayoutCache(
       <div ref="scene" class="scene">
         <div class="dash sx-plate">
           <div class="sx-win">
-            <SxShot src="/screenshots/dashboard" :width="2048" :height="1280" alt="Novaix 管理面板的仪表盘：收入、订单、实例和节点的概况" priority />
+            <NxShot name="dashboard" alt="Novaix 管理面板的仪表盘：收入、订单、实例和节点的概况" priority />
           </div>
         </div>
         <div

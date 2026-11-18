@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { SxShot, easeOut, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { easeOut, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
+import NxShot from './NxShot.vue'
 
 // 基础设施、运营和集成：上面是格子（截图格和大字格），下面是按四组列出的全部功能。
 // 格子和功能条目按各自的位置随滚动上移淡入；减少动态效果时直接显示
@@ -81,8 +82,8 @@ useScrollFrame((still) => {
             <h3>VPC 私有网络<span class="sx-badge sm">授权版</span></h3>
             <p>基于 OVN 的二层隔离网络。同一 VPC 内的实例通过内网 IP 互相通信，不同 VPC 之间完全隔离。支持子网划分和安全组。</p>
           </div>
-          <div class="img sx-fade-rb" style="--top: 190px; --zw: 125%">
-            <SxShot src="/screenshots/vpc" :width="2048" :height="1280" alt="VPC 详情：子网和接入的实例" />
+          <div class="img sx-fade-rb" style="--top: 190px; --max: 649px">
+            <NxShot name="vpc" alt="VPC 详情：子网和接入的实例" />
           </div>
         </div>
         <div class="cell s2 word">
@@ -104,8 +105,8 @@ useScrollFrame((still) => {
             <h3>节点监控</h3>
             <p>节点的 CPU、内存、磁盘、网络和负载曲线。</p>
           </div>
-          <div class="img sx-fade-rb" style="--top: 140px; --zw: 150%">
-            <SxShot src="/screenshots/node-stats" :width="2048" :height="1280" alt="节点的 CPU、内存、磁盘、网络和负载曲线" />
+          <div class="img sx-fade-rb" style="--top: 140px; --max: 474px">
+            <NxShot name="node-stats" alt="节点的 CPU 使用率趋势图" />
           </div>
         </div>
         <div class="cell s3 shot">
@@ -113,8 +114,8 @@ useScrollFrame((still) => {
             <h3>用户</h3>
             <p>用户列表、余额、实名状态和分组。实名认证支持二要素验证和人脸识别。</p>
           </div>
-          <div class="img sx-fade-rb" style="--top: 170px; --zw: 150%">
-            <SxShot src="/screenshots/users" :width="2048" :height="1280" alt="用户列表、余额、实名状态和分组" />
+          <div class="img sx-fade-rb" style="--top: 170px; --max: 474px">
+            <NxShot name="users" alt="用户列表：角色、状态、余额和实名状态" />
           </div>
         </div>
         <div class="cell s4 shot">
@@ -122,8 +123,8 @@ useScrollFrame((still) => {
             <h3>内容管理</h3>
             <p>公告、文章、帮助中心、FAQ、数据中心等前台内容，默认主题内置对应的页面。</p>
           </div>
-          <div class="img sx-fade-rb" style="--top: 170px; --zw: 125%">
-            <SxShot src="/screenshots/cms" :width="2048" :height="1280" alt="内容管理：公告、文章、帮助中心、FAQ" />
+          <div class="img sx-fade-rb" style="--top: 170px; --max: 649px">
+            <NxShot name="cms" alt="内容管理：公告、文章、帮助中心、FAQ" />
           </div>
         </div>
         <div class="cell s2 word">
@@ -204,7 +205,7 @@ useScrollFrame((still) => {
   font-size: 16px;
 }
 
-/* 裁切框：左、上留边，延伸到右边和底边并渐隐；截图在框内按 --zw 放大取景 */
+/* 裁切框：左、上留边，延伸到右边和底边并渐隐；截图铺满裁切框，左上对齐，宽屏下按 1:1 显示 */
 .img {
   position: absolute;
   inset: var(--top, 160px) 0 0 var(--gut, 32px);
@@ -214,9 +215,10 @@ useScrollFrame((still) => {
 }
 
 .img :deep(img) {
-  width: var(--zw, 100%);
-  max-width: none;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
 }
 
 .cell.big {
@@ -302,6 +304,14 @@ useScrollFrame((still) => {
   line-height: 1.5;
 }
 
+/* 截图最宽为宽屏下的显示宽度（--max，与截图脚本中的 show 一致）：窄屏下格子占满一行时截图不放大，仍按 1:1 显示。
+   手机宽度（≤580px）下仍铺满格子：手机多是 3 倍屏，截图本来就要放大，留出空隙反而显得没对齐 */
+@media (min-width: 581px) {
+  .img {
+    max-width: var(--max, none);
+  }
+}
+
 @media (max-width: 960px) {
   .bento {
     grid-template-columns: 1fr 1fr;
@@ -315,8 +325,8 @@ useScrollFrame((still) => {
     grid-row: auto;
   }
 
+  /* .s3 保持 440px：截图框与宽屏下一样高，截图不放大 */
   .cell.big,
-  .cell.s3,
   .cell.s4 {
     min-height: 460px;
   }

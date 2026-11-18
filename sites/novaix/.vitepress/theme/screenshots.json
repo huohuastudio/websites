@@ -1,0 +1,16 @@
+{
+  "dashboard": {"width":2048,"height":1280},
+  "plans": {"width":1138,"height":688,"dpr":[1,1.25]},
+  "orders": {"width":1138,"height":688,"dpr":[1,1.25]},
+  "payments": {"width":1138,"height":688,"dpr":[1,1.25]},
+  "instance-access": {"width":1138,"height":688,"dpr":[1,1.25]},
+  "lifecycle": {"width":1138,"height":688,"dpr":[1,1.25]},
+  "ticket": {"width":1138,"height":688,"dpr":[1,1.25]},
+  "invoices": {"width":1138,"height":688,"dpr":[1,1.25]},
+  "instance": {"width":1380,"height":862},
+  "vpc": {"width":1298,"height":1102,"dpr":[1,1.25]},
+  "node-stats": {"width":948,"height":601,"dpr":[1,1.25]},
+  "users": {"width":948,"height":541,"dpr":[1,1.25]},
+  "cms": {"width":1298,"height":581,"dpr":[1,1.25]},
+  "plugins": {"width":2000,"height":1250,"dpr":[1,1.25]}
+}

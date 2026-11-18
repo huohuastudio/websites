@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { SxShot, isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { isFlat, pinProgress, seg, smooth, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
+import NxShot from './NxShot.vue'
 
 // 容器和虚拟机：两张卡片随滚动向中间合拢、淡出，变成同一个实例页面的截图。
 // 不固定舞台时两张卡片和截图按顺序排下来
@@ -56,7 +57,7 @@ useScrollFrame((still) => {
         </div>
         <div class="mshot">
           <div class="shotbox">
-            <SxShot class="sx-fade-rb" src="/screenshots/instance" :width="2048" :height="1280" alt="实例详情页：运行状态、资源用量和常用操作" />
+            <NxShot class="sx-fade-rb" name="instance" alt="实例详情页：运行状态、资源用量和常用操作" />
           </div>
           <p class="mcap"><b>LXC 容器</b>和 <b>QEMU/KVM 虚拟机</b>使用同一个实例页面：启停、重装、快照、升级、迁移、救援模式、防火墙和终端。</p>
         </div>

@@ -5,11 +5,15 @@
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
-    "preview": "vitepress preview"
+    "preview": "vitepress preview",
+    "shots": "node scripts/screenshots.mjs"
   },
   "dependencies": {
     "@huohuastudio/theme": "workspace:*",
     "vitepress": "2.0.0-alpha.21",
     "vue": "3.5.44"
+  },
+  "devDependencies": {
+    "playwright": "1.64.1"
   }
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { SxShot, easeOut, seg, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { easeOut, seg, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 import NxMarket from './NxMarket.vue'
+import NxShot from './NxShot.vue'
 
 // 插件和主题：插件类型依次翻入，插件管理的截图从中间展开；下面是插件、主题的说明和市场中的实际列表
 
@@ -51,7 +52,7 @@ useScrollFrame((still) => {
           </div>
         </div>
         <div ref="shot" class="ext-shot" :style="{ '--ci': `${clip}%` }">
-          <SxShot class="sx-fade-rb" src="/screenshots/plugins" :width="2048" :height="1280" alt="插件管理：已安装的插件和插件市场" />
+          <NxShot class="sx-fade-rb" name="plugins" alt="插件管理：已安装的插件和插件市场" />
         </div>
       </div>
       <div class="ext-note">
