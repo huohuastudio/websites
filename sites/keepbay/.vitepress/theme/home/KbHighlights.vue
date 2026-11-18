@@ -11,7 +11,7 @@ const items = [
   { name: 'video', title: '视频。', text: '同名的字幕自动加载，电视录制的 TS 视频也能在线播放。', alt: '查看器中播放一段海边的视频' },
   { name: 'slides', title: '在线编辑。', text: '接好 ONLYOFFICE 或 Collabora Online，多人同时编辑。', alt: '在查看器中用 ONLYOFFICE 编辑演示文稿' },
   { name: 'share', title: '分享页面。', text: '对方不需要帐号，打开链接就能浏览和下载。', alt: '打开分享链接看到的相册，照片排成网格，可以下载' },
-  { name: 'desk-card', title: 'AI 桌面。', text: '用聊天的方式查资料，回答附上相关的文件。专业版。', alt: 'AI 桌面：问家里哪些电器还在保修期内，回答列出保修期限和对应的文件' },
+  { name: 'desk', title: 'AI 桌面。', text: '用聊天的方式查资料，回答附上相关的文件。专业版。', alt: 'AI 桌面：问家里哪些电器还在保修期内，回答列出保修期限和对应的文件' },
 ] as const
 
 const track = ref<HTMLElement>()
@@ -117,7 +117,7 @@ onBeforeUnmount(() => {
         @click="onCard(i)"
       >
         <div class="cap sx-phrase">{{ item.title }}<span>{{ item.text }}</span></div>
-        <div class="img sx-fade-b"><KbShot :name="item.name" size="card" fit :alt="item.alt" /></div>
+        <div class="img sx-fade-b"><KbShot :name="item.name" size="wide" fit :alt="item.alt" /></div>
       </div>
     </div>
     <div class="ctrl">

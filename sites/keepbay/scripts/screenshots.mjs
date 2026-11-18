@@ -20,9 +20,9 @@ import { folderId, folderItems, imagesLoaded, newContext, onDemo, open, site } f
 const out = join(site, 'public/screenshots')
 const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 
-// 截图的尺寸（W31：首页上界面文字的显示尺寸不小于原尺寸的 0.85，Windows 1 倍屏上才看得清，见 docs/plan.md）：
-// - wide：1024 × 640 按 2 倍截，得到 2048 × 1280。首屏、揭开对照、AI 三处显示完整界面的大图（首页上约 680–1040px 宽），
-//   窗口接近显示宽度，界面文字接近原大；1024 是 Keepbay 显示完整侧栏的最小宽度
+// 截图的尺寸（W31：卡片中的局部图，首页上界面文字的显示尺寸不小于原尺寸的 0.85，Windows 1 倍屏上才看得清；wide 大图除外，见下。docs/plan.md）：
+// - wide：1280 × 800 按 1.6 倍截，得到 2048 × 1280。首屏、揭开对照、AI、亮点轮播显示完整界面的大图。
+//   W31 曾改为 1024 × 640，窗口太矮，侧栏底部的「设置」等被截掉，用户定改回 1280 × 800（大图的文字小于 0.85 倍，接受）
 // - mobile：390 × 700 按 3 倍截，得到 1170 × 2100，在官网的手机宽度下换用这张，整页缩小后的宽屏截图看不清
 // - compact：400 × 430 按 3 倍截，得到 1200 × 1290，放在首页搜索一节的结果区，界面按手机布局显示。高度正好放下搜索的前三条结果
 // - panel：480 × 400 按 3 倍截，得到 1440 × 1200，放在首页搜索一节的结果区（宽屏下约 480 × 396），界面按手机布局显示
@@ -32,7 +32,7 @@ const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 //   不再由浏览器缩小（Windows 1 倍屏上缩小的位图文字发虚）。先按 2 倍渲染（倍数 = 2 × show ÷ 区域宽度），再用 Lanczos 缩成另两张：
 //   按 0.9、1.125 这种倍数直接渲染时文字本身就画软了（W31，2026-11-18 对比后定）。旋转显示的格式小卡片做不到 1:1，只出 2 倍一张
 const sizes = {
-  wide: { suffix: '', viewport: { width: 1024, height: 640 }, scale: 2 },
+  wide: { suffix: '', viewport: { width: 1280, height: 800 }, scale: 1.6 },
   mobile: { suffix: '-mobile', viewport: { width: 390, height: 700 }, scale: 3 },
   compact: { suffix: '', viewport: { width: 400, height: 430 }, scale: 3 },
   panel: { suffix: '', viewport: { width: 480, height: 400 }, scale: 3 },
@@ -41,43 +41,27 @@ const sizes = {
 // 写了 show 的 card 截图，除 2 倍的主图外另出的倍数，文件名为 <名称>-<倍数>x-<主题>.webp
 const densities = [1, 1.25]
 
-// card 中截一小块的截图用的窗口，与原来的宽屏截图相同
-const desktop = { width: 1280, height: 800 }
+// 格式小卡片用 wide 的窗口截一小块
+const desktop = sizes.wide.viewport
 
 // 卡片中截图框的尺寸对应的截取区域（CSS 像素），show 是截图框的显示宽度（宽屏下固定）。
 // 界面文字按原尺寸的 0.9 倍显示（区域 = show ÷ 0.9）；0.9 倍时关键内容放不全、或以照片为主的，放宽到 0.8 倍（区域 = show ÷ 0.8，
 // 多放约四分之一的内容），不再更小（W31，2026-11-18 定）：
-// - highlight：「了解亮点」轮播，截图框 816 × 510；highlightMore 是放宽到 0.8 倍的
 // - format：「在网页中直接打开」的扇形小卡片，截图框 368–464px 宽（随视口），按最窄时不小于 0.85 算
 // - privacy：「隐私与安全」卡片的右半边，截图框 484 × 515–528，顶端对齐，矮视口下裁掉底部
 const slots = {
-  highlight: { width: 906, height: 566, show: 816 },
-  highlightMore: { width: 1020, height: 637, show: 816 },
   format: { width: 416, height: 260 },
   privacy: { width: 538, height: 587, show: 484 },
 }
 
-/** 截取区域 slot 放在侧栏（宽 side）右边：窗口宽度是侧栏加上区域，侧栏不进截图 */
-function besideSidebar(side, slot, height) {
-  return { viewport: { width: side + slot.width, height }, ...slot, at: () => ({ x: side, y: 0 }) }
-}
-
 // 首页推近时最多放大 2 倍（zoom.ts），宽度 1000px 的截图框在 2 倍屏上推近后要约 4000 像素宽的图才清晰：
-// 标了 zoom 的截图，宽屏按 4 倍截一次，缩成宽屏的尺寸作主图，推近后看到的区域从同一张图中裁出，主图和高清图出自同一个画面
-const detailScale = 4
+// 标了 zoom 的截图，宽屏按 3 倍截一次，缩成宽屏的尺寸作主图，推近后看到的区域从同一张图中裁出，主图和高清图出自同一个画面
+const detailScale = 3
 
 // 以下是几张截图共用的页面设置
 
 // 京都伏见稻荷的鸟居（查看器中的照片）
 const torii = [['家庭相册', '2024', '2024-10 京都'], 'IMG_20241003_071230.jpg']
-
-// AI 桌面中问保修期的对话（快照中预先问好的，不调用模型）
-const desk = {
-  path: async () => '/?view=desk',
-  session: async (request) => ({ 'keepbay.chat': await conversationId(request, '家里哪些电器还在保修期内') }),
-  // 输入框处演示站专有的说明不进截图（本机实例上没有这一行）
-  prepare: (page) => onDemo && page.getByText('演示站点不能和 AI 对话').evaluate((el) => el.remove()),
-}
 
 // AI 调用记录。最新的记录是后台处理，一排都一样：先以林海的身份搜索两次（真实的调用，记录发起人和耗时），
 // 列表上方就是这几条，再往下是后台处理的
@@ -161,7 +145,10 @@ const shots = [
     // AI 桌面中问保修期的对话（快照中预先问好的，不调用模型）
     name: 'desk',
     sizes: ['wide', 'mobile'],
-    ...desk,
+    path: async () => '/?view=desk',
+    session: async (request) => ({ 'keepbay.chat': await conversationId(request, '家里哪些电器还在保修期内') }),
+    // 输入框处演示站专有的说明不进截图（本机实例上没有这一行）
+    prepare: (page) => onDemo && page.getByText('演示站点不能和 AI 对话').evaluate((el) => el.remove()),
     // 推近到回答中的保修期限表（电器、剩余保修期限和对应的文件）
     zoom: (page) => bounds(page.locator('table')),
   },
@@ -222,19 +209,17 @@ const shots = [
       await hideFileNav(page)
     },
   },
-  // 以下是「了解亮点」轮播的卡片：窗口设成截取区域的大小，查看器、分享页面按这个宽度排版
+  // 以下是「了解亮点」轮播的卡片：卡片较宽（816 × 510），放完整界面，与首屏一样按 wide 截（用户定，W31）。第 6 张用上面的 desk
   {
     // 查看器中的照片（京都伏见稻荷的鸟居）
     name: 'viewer',
-    sizes: ['card'],
-    card: slots.highlight,
+    sizes: ['wide'],
     path: (request) => viewerPath(request, ...torii),
   },
   {
     // 音乐播放器：《晚风》的封面和滚动歌词。从第 5 行歌词开始播放（点歌词的一行就跳过去播放），画面上有正在唱的一行
     name: 'music',
-    sizes: ['card'],
-    card: slots.highlight,
+    sizes: ['wide'],
     path: (request) => viewerPath(request, ['家庭文档', '音乐'], '晚风.mp3'),
     prepare: async (page) => {
       const lines = page.locator('.kb-lyric').filter({ has: page.locator('.kb-lyric-text') })
@@ -248,26 +233,22 @@ const shots = [
   },
   {
     name: 'video',
-    sizes: ['card'],
-    card: slots.highlight,
+    sizes: ['wide'],
     ...video,
   },
   {
     // 在线编辑：在 ONLYOFFICE 中编辑演示文稿。演示站没有部署编辑器，在本机实例上截（本机实例要先在系统设置中接好 ONLYOFFICE）。
-    // 截编辑区和上方的工具栏，左侧的幻灯片列表、外层的标题栏和下方的备注区不进截图（编辑器在 iframe 中，按窗口中的位置截）。按 0.8 倍截，多放幻灯片的内容
     name: 'slides',
     local: true,
-    sizes: ['card'],
-    card: { viewport: { width: 280 + slots.highlightMore.width, height: 800 }, ...slots.highlightMore, at: () => ({ x: 280, y: 85 }) },
+    sizes: ['wide'],
     path: (request) => viewerPath(request, ['林海的工作', '项目'], '2026 Q4 项目计划.pptx'),
     prepare: (page) => openEditor(page, { spell: true }),
   },
   {
     // 打开分享链接看到的页面（京都相册，带水印）。演示站的分享链接只给登录了演示帐号的浏览器看，页面与访客看到的相同。
-    // 从相册的标题截起，下面是两行照片，上方的页头不进截图。按 0.8 倍截，第二排的文件名也放得下。手机截图放在首屏的手机画面中
+    // 手机截图放在首屏的手机画面中
     name: 'share',
-    sizes: ['card', 'mobile'],
-    card: { viewport: { width: slots.highlightMore.width, height: 800 }, ...slots.highlightMore, at: async (page) => ({ x: 0, y: (await bounds(page.locator('main'))).y }) },
+    sizes: ['wide', 'mobile'],
     path: async (request) => {
       const shares = await (await request.get('/api/v1/shares')).json()
       const share = shares.find((s) => s.title === '2024-10 京都')
@@ -279,13 +260,6 @@ const shots = [
       await page.getByText('2024-10 京都').first().waitFor({ timeout: 10_000 })
       await page.getByRole('button', { name: '全部下载' }).waitFor({ timeout: 10_000 })
     },
-  },
-  {
-    // AI 桌面的对话：截取区域放在侧栏（236px）右边；下方的输入框不进截图。按 0.8 倍截，回答和附带的文件放得下
-    name: 'desk-card',
-    sizes: ['card'],
-    card: besideSidebar(236, slots.highlightMore, 800),
-    ...desk,
   },
   // 以下是「在网页中直接打开」的五张小卡片：在 1280 × 800 的窗口中截一小块
   {
@@ -341,7 +315,7 @@ const shots = [
     // 格子约 649 × 630，按 0.8 倍截，多放照片；手机宽度下换用手机截图（首屏的手机画面也用它）
     name: 'photos',
     sizes: ['card', 'mobile'],
-    card: besideSidebar(56, { width: 811, height: 787, show: 649 }, 787),
+    card: { viewport: { width: 56 + 811, height: 787 }, width: 811, height: 787, show: 649, at: () => ({ x: 56, y: 0 }) },
     ...photos,
   },
   {
@@ -425,7 +399,7 @@ function sizeOf(shot, name) {
   if (name !== 'card') return { ...sizes[name], clip: sizes[name].viewport }
   const { width, height, viewport = { width, height }, at, show } = shot.card
   if (width > viewport.width || height > viewport.height) throw new Error(`${shot.name} 的截取区域比窗口大`)
-  return { ...sizes.card, viewport, clip: { width, height }, at, show, scale: show ? (2 * show) / width : sizes.card.scale }
+  return { ...sizes.card, viewport, clip: { width, height }, at, show, scale: show ? (sizes.card.scale * show) / width : sizes.card.scale }
 }
 
 /** 在线编辑器（ONLYOFFICE）所在的 iframe：查看器中的 iframe 里再嵌一层 */

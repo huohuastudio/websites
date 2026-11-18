@@ -4,7 +4,7 @@ import manifest from '../screenshots.json'
 
 // 界面截图（public/screenshots/ 中由 scripts/screenshots.mjs 生成，尺寸见 screenshots.json）：浅色、深色各一张，按网站当前的主题显示其中一张；
 // 有手机截图（mobile）时，首页舞台不固定的手机宽度下（≤760px，与 showcase.css 一致）换用手机截图；card 是卡片中的局部图，compact、panel 是搜索一节结果区的截图。
-// size 指定只用其中一种（如只用卡片的局部图、只用手机截图），不随页面宽度切换；fit 时铺满容器（object-fit: cover，位置用 style 中的 object-position 调）。
+// size 指定只用其中一种（如只用宽屏截图、只用手机截图），不随页面宽度切换；fit 时铺满容器（object-fit: cover，位置用 style 中的 object-position 调）。
 // 浅色、深色和两种尺寸都渲染出来，由 CSS 按 <html> 上的 dark 类和页面宽度显示其中一张：服务端渲染与客户端一致，不会水合不一致。
 // 都懒加载：不显示的那几张不会下载。class、style 等属性加到每一张图片上。
 // detail 时叠上推近用的高清图（清单中有 detail 的截图才有，见 zoom.ts），只在首页舞台固定时显示。
@@ -13,7 +13,7 @@ defineOptions({ inheritAttrs: false })
 
 type Size = 'wide' | 'mobile' | 'compact' | 'panel' | 'card'
 
-const props = defineProps<{ name: keyof typeof manifest; alt: string; size?: 'wide' | 'mobile' | 'card'; fit?: boolean; detail?: boolean }>()
+const props = defineProps<{ name: keyof typeof manifest; alt: string; size?: 'wide' | 'mobile'; fit?: boolean; detail?: boolean }>()
 
 const { detail: region, dpr, ...sizes }: Partial<Record<Size, number[]>> & { detail?: number[]; dpr?: number[] } = manifest[props.name]
 const variants = Object.entries(sizes)
