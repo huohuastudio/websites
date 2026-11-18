@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { SxShot, easeOut, isFlat, pinProgress, seg, smooth, useLayoutCache, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { easeOut, isFlat, pinProgress, seg, smooth, useLayoutCache, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
 import { BUY_URL, DEMO_URL } from './links'
+import LsShot from './LsShot.vue'
 import { lerp } from './util'
 
 // 首屏：文件卡片飞进上传页，再由按日期分组的图片管理页从下方推上来
@@ -103,10 +104,10 @@ const layout = useLayoutCache(
         <div class="sx-enter d4 sx-plate">
           <div ref="frame" class="sx-win stack2">
             <div class="layer up">
-              <SxShot src="/screenshots/upload" :width="1600" :height="1000" alt="上传页面：批量选择的图片排在上传队列中" priority />
+              <LsShot name="upload" alt="上传页面：批量选择的图片排在上传队列中" priority />
             </div>
             <div class="layer ph">
-              <SxShot src="/screenshots/photos" :width="1600" :height="1000" alt="图片管理页面：图片按日期分组排列" />
+              <LsShot name="photos" alt="图片管理页面：图片按日期分组排列" />
             </div>
           </div>
         </div>

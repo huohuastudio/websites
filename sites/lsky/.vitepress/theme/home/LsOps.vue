@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import { SxShot, isFlat, pinProgress, prefersReducedMotion, seg, smooth, stageTop, useScrollFrame } from '@huohuastudio/theme/showcase'
+import { isFlat, pinProgress, prefersReducedMotion, seg, smooth, stageTop, useScrollFrame } from '@huohuastudio/theme/showcase'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import LsShot from './LsShot.vue'
 
 // 运营：竖向滚动推动卡片横向移动
 
-/** 截图卡片：public/screenshots 中的文件名（不含 -light.webp、-dark.webp） */
+/** 截图卡片：截图名称见 screenshots.json */
 const shots = [
-  { src: 'orders', h: '套餐和订单', p: '出售会员（角色组）套餐和容量套餐，支持优惠券。', alt: '后台的订单管理：套餐、金额和支付状态' },
+  { name: 'orders', h: '套餐和订单', p: '出售会员（角色组）套餐和容量套餐，支持优惠券。', alt: '后台的订单管理：套餐、金额和支付状态' },
   {
-    src: 'payments',
+    name: 'payments',
     h: '在线支付',
     p: '支持支付宝、微信支付、银联、PayPal、Stripe 和易支付。在角色组中勾选可用的支付驱动，该组的用户下单时才能使用。',
     alt: '后台的支付驱动列表',
   },
-  { src: 'ticket', h: '工单', p: '用户提交工单，管理员在后台查看对话并回复。', alt: '后台的工单详情：用户与管理员的对话' },
-]
+  { name: 'ticket', h: '工单', p: '用户提交工单，管理员在后台查看对话并回复。', alt: '后台的工单详情：用户与管理员的对话' },
+] as const
 
 const sec = ref<HTMLElement>()
 const track = ref<HTMLElement>()
@@ -72,16 +73,16 @@ useScrollFrame((still) => {
               <p>用户、角色组、储存和各类驱动，都在后台管理。</p>
             </div>
             <div class="v sx-fade-rb">
-              <SxShot src="/screenshots/dashboard" :width="1600" :height="1000" alt="管理后台的仪表板" />
+              <LsShot name="dashboard" alt="管理后台的仪表板" />
             </div>
           </div>
-          <div v-for="c in shots" :key="c.src" class="oc shot">
+          <div v-for="c in shots" :key="c.name" class="oc shot">
             <div class="t">
               <h3>{{ c.h }}</h3>
               <p>{{ c.p }}</p>
             </div>
             <div class="v sx-fade-rb">
-              <SxShot :src="`/screenshots/${c.src}`" :width="1600" :height="1000" :alt="c.alt" />
+              <LsShot :name="c.name" :alt="c.alt" />
             </div>
           </div>
           <div class="col">
@@ -368,6 +369,13 @@ useScrollFrame((still) => {
 @media (prefers-reduced-motion: reduce) {
   .track {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+/* 一列时截图卡片比宽屏下宽、截图放大（截图按宽屏下的显示宽度 448px 出图），手机以上排成两列。放在最后，减少动态效果时也用两列 */
+@media (min-width: 581px) and (max-width: 760px) {
+  .track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 </style>

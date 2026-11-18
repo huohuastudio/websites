@@ -152,7 +152,7 @@ Coupon::create(['type' => 'percent', 'name' => '年付 8 折', 'code' => 'YEAR80
 
 // ---- 支付驱动 ----
 $pay = fn (string $name, string $provider, string $intro) => Driver::create(['type' => 'payment', 'name' => $name, 'intro' => $intro, 'options' => ['provider' => $provider]]);
-$drivers = [$pay('支付宝', 'alipay', '当面付和电脑网站支付'), $pay('微信支付', 'wechat', 'Native 扫码支付'), $pay('PayPal', 'paypal', '海外用户'), $pay('Stripe', 'stripe', '银行卡支付')];
+$drivers = [$pay('支付宝', 'alipay', '当面付和电脑网站支付'), $pay('微信支付', 'wechat', 'Native 扫码支付'), $pay('PayPal', 'paypal', '海外用户'), $pay('Stripe', 'stripe', '银行卡支付'), $pay('银联', 'unipay', '电脑支付和扫码支付'), $pay('易支付', 'epay', '聚合支付接口')];
 foreach ([$default, $pro, $team] as $g) {
     $g->drivers()->attach(collect($drivers)->mapWithKeys(fn ($d) => [$d->id => ['type' => 'payment']])->all());
 }

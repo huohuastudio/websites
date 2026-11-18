@@ -5,10 +5,10 @@
 // 然后执行 site-shots-w24/seed.sql（节点组、工单、支付、发票、VPC）和 polish.py（公网地址换成文档网段、名称和时间更像真实运营），
 // 重启服务。账号 admin / admin123。测试环境没有真实节点：实例运行状态、节点监控用模拟数据（见 mock）
 import { chromium } from 'playwright'
-import { execFileSync } from 'node:child_process'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { bounds, clipOf, corner, save, sizeOf, writeManifest } from '../../../scripts/shots-lib.mjs'
 
 const base = process.env.NOVAIX_URL ?? 'http://127.0.0.1:18062'
 const site = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -22,10 +22,8 @@ const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 // 首页上显示宽度固定的（写了显示宽度 show），按显示尺寸出 1 倍、1.25 倍、2 倍三张，首页按屏幕挑选、1:1 显示，
 // 不再由浏览器缩小（Windows 1 倍屏上缩小的位图文字发虚）。先按 2 倍渲染（倍数 = 2 × show ÷ 区域宽度），再用 Lanczos 缩成另两张：
 // 按 0.9、1.125 这种倍数直接渲染时文字本身就画软了（W31，2026-11-18 对比后定）。
-// 在固定舞台中缩放显示的（仪表盘、实例）做不到 1:1，按 2 倍截一张
+// 在固定舞台中缩放显示的（仪表盘、实例）做不到 1:1，按 2 倍截一张。出图的做法见 scripts/shots-lib.mjs
 const wide = { width: 1024, height: 640 }
-// 写了 show 的截图，除 2 倍的主图外另出的倍数，文件名为 <名称>-<倍数>x-<主题>.webp
-const densities = [1, 1.25]
 
 // 首页上截图框的尺寸对应的截取区域（CSS 像素），show 是截图框的显示宽度（宽屏下固定）。
 // 截图框铺满（object-fit: cover，左上对齐），区域的高度按 show 换算后不小于截图框的高度：
@@ -81,19 +79,6 @@ async function mock(page) {
 
 // 首次使用引导的高亮和弹层
 const hideGuide = '[data-tour="setup-guide"],.driver-popover,.driver-overlay{display:none!important}'
-
-/** locator 选中的第一个元素在窗口中的位置（CSS 像素） */
-async function bounds(locator) {
-  const box = await locator.first().boundingBox()
-  if (!box) throw new Error(`找不到元素：${locator}`)
-  return box
-}
-
-/** 截取区域的左上角：locator 选中的元素左上角再向左 dx、向上 dy（CSS 像素） */
-async function corner(locator, dx, dy) {
-  const { x, y } = await bounds(locator)
-  return { x: x - dx, y: y - dy }
-}
 
 /** 表格中列名为 name 的表头 */
 const th = (page, name) => page.locator('main th').filter({ hasText: new RegExp(`^${name}$`) })
@@ -164,30 +149,6 @@ const unknown = names.filter((n) => !all.some((s) => s.name === n))
 if (unknown.length) throw new Error(`没有这些截图：${unknown.join('、')}`)
 const shots = names.length ? all.filter((s) => names.includes(s.name)) : all
 
-/** 截取的范围（CSS 像素）：左上角按 at 算出，超出窗口时移回窗口内 */
-async function clipOf(page, { viewport, width, height, at }) {
-  const { x, y } = (await at?.(page)) ?? { x: 0, y: 0 }
-  const fit = (v, length, total) => Math.round(Math.min(Math.max(v, 0), total - length))
-  return { x: fit(x, width, viewport.width), y: fit(y, height, viewport.height), width, height }
-}
-
-/** 截图的区域和倍数：写了 show 的按 2 倍显示尺寸渲染，其余按 2 倍 */
-function sizeOf(shot) {
-  const { area } = shot
-  if (area.width > area.viewport.width || area.height > area.viewport.height) throw new Error(`${shot.name} 的截取区域比窗口大`)
-  return { ...area, scale: area.show ? (2 * area.show) / area.width : 2 }
-}
-
-const maxBuffer = 256 * 1024 * 1024
-
-/** 存成 WebP：界面图无损压缩通常更小，色块和渐变多的有损（质量 90）更小，两种都试，存较小的一种 */
-function webp(name, png) {
-  const encode = (args) => execFileSync('cwebp', ['-quiet', ...args, '-o', '-', '--', '-'], { input: png, maxBuffer })
-  const lossless = encode(['-lossless', '-z', '9'])
-  const lossy = encode(['-q', '90'])
-  writeFileSync(join(out, `${name}.webp`), lossless.length <= lossy.length ? lossless : lossy)
-}
-
 /** 登录管理面板；portal 时再以 2 号用户的身份进入用户端（管理员的「以该用户身份登录」） */
 async function login(page, portal) {
   await page.goto(base + '/admin/login')
@@ -234,14 +195,7 @@ for (const scheme of ['light', 'dark']) {
       await page.waitForTimeout(1200 + (shot.wait ?? 0))
       const png = await page.screenshot({ clip: await clipOf(page, size) })
       if (errors.length) throw new Error(`${shot.name} 的页面出错：${errors.join('；')}`)
-      webp(`${shot.name}-${scheme}`, png)
-      if (size.show) {
-        // 主图是 2 倍，按百分比缩小，宽度正好是 show × d，与主图同比例
-        for (const d of densities) {
-          const resized = execFileSync('magick', ['png:-', '-filter', 'Lanczos', '-resize', `${d * 50}%`, 'png:-'], { input: png, maxBuffer })
-          webp(`${shot.name}-${d}x-${scheme}`, resized)
-        }
-      }
+      save(out, shot.name, scheme, png, size.show)
       console.log('✓', shot.name, scheme)
     } finally {
       await context.close()
@@ -250,10 +204,5 @@ for (const scheme of ['light', 'dark']) {
 }
 await browser.close()
 
-// 清单：名称 → 主图的像素宽高（浅色、深色相同）和另出的倍数（NxShot 按它写 srcset）。只更新这次截了的，按 all 中的顺序排列，去掉已经没有的
-const manifest = JSON.parse(readFileSync(manifestFile, 'utf8'))
-for (const [shot, { width, height, scale, show }] of sizes) {
-  manifest[shot.name] = { width: Math.round(width * scale), height: Math.round(height * scale), ...(show && { dpr: densities }) }
-}
-const lines = all.filter((s) => manifest[s.name]).map((s) => `  ${JSON.stringify(s.name)}: ${JSON.stringify(manifest[s.name])}`)
-writeFileSync(manifestFile, `{\n${lines.join(',\n')}\n}\n`)
+// 清单：只更新这次截了的（NxShot 按它写 srcset）
+writeManifest(manifestFile, all, sizes)

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { SxShot, easeOut, seg, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
+import { easeOut, seg, useScrollFrame, viewProgress } from '@huohuastudio/theme/showcase'
 import { ref } from 'vue'
+import LsShot from './LsShot.vue'
 
 // 相册和分享：截图（白底区域，放在底板上）随滚动放大到原大，右侧要点依次出现，访问密码逐位填入
 
@@ -40,7 +41,7 @@ useScrollFrame((still) => {
         <div ref="fig" class="fig">
           <div class="sx-plate">
             <div class="sx-win">
-              <SxShot src="/screenshots/albums" :width="1600" :height="1000" alt="相册页面" />
+              <LsShot name="albums" alt="相册页面" />
             </div>
           </div>
           <div ref="lock" class="lock" aria-hidden="true">
@@ -173,6 +174,14 @@ useScrollFrame((still) => {
     top: auto;
     width: auto;
     margin-top: 16px;
+  }
+}
+
+/* 截图占满一行时不比宽屏下大（截图按宽屏下的显示宽度 557px 出图，见 scripts/screenshots.mjs）；手机上仍铺满 */
+@media (min-width: 581px) and (max-width: 760px) {
+  .fig {
+    justify-self: center;
+    width: min(100%, calc(557px + 2 * var(--sx-plate-pad)));
   }
 }
 </style>

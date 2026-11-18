@@ -1,0 +1,9 @@
+{
+  "upload": {"width":2048,"height":1280},
+  "photos": {"width":2048,"height":1280},
+  "albums": {"width":1114,"height":698,"dpr":[1,1.25]},
+  "dashboard": {"width":2048,"height":1280},
+  "orders": {"width":896,"height":977,"dpr":[1,1.25]},
+  "payments": {"width":896,"height":977,"dpr":[1,1.25]},
+  "ticket": {"width":896,"height":977,"dpr":[1,1.25]}
+}
