@@ -4,7 +4,7 @@
 
 大部分问题在这两处都能看到原因。
 
-这里按主题收集了常见的问题。如果没有找到答案，请在 [GitHub](https://github.com/huohuastudio/keepbay-releases/issues) 上提交 Issue，不便公开的内容请发邮件到 support@huohuastudio.com。我们会把常见的问题补充到这里。
+这里按主题收集了常见的问题。如果没有找到答案，请在 [GitHub](https://github.com/huohuastudio/keepbay-releases/issues) 上提交 Issue，提交时请附上版本号。不便公开的诊断信息和日志，请发送至 support@huohuastudio.com。我们会把常见的问题补充到这里。
 
 在 Keepbay 的「系统设置 › 关于」中点「提交问题」，也可以打开这个页面。提交时请附上同一页中「复制版本信息」复制的内容。
 

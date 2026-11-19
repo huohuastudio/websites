@@ -107,7 +107,7 @@ sudo journalctl -u keepbay -f
 
 ## 诊断信息 {#diagnostics}
 
-遇到问题需要求助时，在维护页的「诊断信息」中点「生成」，下载诊断文件，附在 [GitHub](https://github.com/huohuastudio/keepbay-releases/issues) 的 Issue 中，或发邮件到 support@huohuastudio.com。
+遇到问题需要求助时，在维护页的「诊断信息」中点「生成」，下载诊断文件，附在 [GitHub](https://github.com/huohuastudio/keepbay-releases/issues) 的 Issue 中。不便公开时，请发送至 support@huohuastudio.com。
 
 诊断文件包含：版本和系统信息、依赖检测结果、设置、最近 2000 行日志、数据库检查结果、文件夹和任务的统计。
 
