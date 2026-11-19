@@ -203,7 +203,7 @@ sudo /opt/keepbay/keepbay mount:grant --read-only /srv/photos   # 只读，添�
 
 里面每个文件和子目录的作用、能否删除，见[目录和文件](./directories#data-dir)。
 
-迁移到新设备时，建议复制整个数据目录。
+迁移到新设备时，建议复制整个数据目录。已激活专业版的，在新设备上启动后会自动联网重新激活，见[专业版](./pro#rebind)。
 
 如果只用备份恢复数据库，请另外复制 `secret.key`，原因见[备份和维护](./backup#secret-key)。
 
