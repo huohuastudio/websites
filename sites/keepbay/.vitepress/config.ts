@@ -53,6 +53,7 @@ export default defineSiteConfig({
           { text: '照片时间线', link: '/docs/photos' },
           { text: '上传和下载', link: '/docs/upload' },
           { text: '搜索', link: '/docs/search' },
+          { text: '空间分析', link: '/docs/space' },
           { text: '回收站和撤销', link: '/docs/trash' },
           { text: '离线下载', link: '/docs/offline-download' },
           { text: 'WebDAV', link: '/docs/webdav' },

@@ -8,7 +8,7 @@ import KbShot from '../visuals/KbShot.vue'
 const rows = [
   ['*照片', 'JPEG', 'PNG', 'HEIC', 'WebP', 'AVIF', 'GIF', 'TIFF', 'SVG', '*相机 RAW', '索尼 ARW', '尼康 NEF', '佳能 CR2', '佳能 CR3', '富士 RAF', '松下 RW2', '奥林巴斯 ORF', 'DNG', '*实况照片'],
   ['*视频', 'MP4', 'MOV', 'WebM', 'TS', 'M2TS', 'MTS', '*字幕', 'SRT', 'VTT', 'ASS', 'SSA', '*音乐', 'MP3', 'AAC', 'FLAC', 'WAV', 'OGG', 'Opus', 'LRC 歌词'],
-  ['*文档', 'PDF', 'Word .docx', 'Excel .xlsx', '.xls', '.ods', 'CSV', 'TSV', 'PowerPoint', '*文本和代码', 'Markdown', 'JSON', 'XML', '语法高亮', '*压缩包', 'zip', 'tar.gz', '解压到这里'],
+  ['*文档', 'PDF', 'Word .docx', 'Excel .xlsx', '.xls', '.ods', 'CSV', 'TSV', 'PowerPoint', '*文本和代码', 'Markdown', 'JSON', 'XML', '语法高亮', '*压缩包', 'zip', 'tar.gz', '7z', 'rar', '不解压查看'],
 ].map((row) => row.map((text) => (text.startsWith('*') ? { text: text.slice(1), key: true } : { text, key: false })))
 
 // 后面的盖在前面的上面：最中间的一张放最后。dx、r 是展开后的横向位移和旋转，sy、fy 是叠起和展开时的纵向位移
