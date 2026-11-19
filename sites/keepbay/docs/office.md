@@ -1,6 +1,6 @@
 # 在线编辑 Office 文档 {#office}
 
-从 1.0.0-beta.8 起，Keepbay 可以对接自己部署的 Office 编辑器，在网页中编辑 Word、Excel、PowerPoint 等文档，多人可以同时编辑同一个文档。免费版可用。
+Keepbay 可以对接自己部署的 Office 编辑器，在网页中编辑 Word、Excel、PowerPoint 等文档，多人可以同时编辑同一个文档。免费版可用。
 
 Keepbay 不自带编辑器。支持两种，任选其一：
 

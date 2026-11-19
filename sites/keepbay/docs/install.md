@@ -49,7 +49,7 @@ keepbay_<版本>_linux_amd64/
 ├── keepbay        # 主程序，前端页面已经编译在里面
 ├── lib/           # libvips 等动态库和字体配置
 ├── INSTALL.md     # 安装说明
-├── CHANGELOG.md   # 更新日志（0.1.0-beta.6 起）
+├── CHANGELOG.md   # 更新日志
 ├── LICENSE
 ├── NOTICE
 └── licenses/      # 第三方组件的许可证
@@ -92,7 +92,7 @@ sha256sum -c --ignore-missing checksums.txt
 
 sudo mkdir -p /opt/keepbay/versions
 sudo tar -xzf keepbay_linux_amd64.tar.gz -C /opt/keepbay/versions --no-same-owner
-# 解压出的目录名带版本号，如 keepbay_1.0.0-beta.11_linux_amd64
+# 解压出的目录名带版本号，下一行的 <版本> 换成实际的版本号
 sudo ln -sfn versions/keepbay_<版本>_linux_amd64 /opt/keepbay/current
 sudo ln -sfn current/keepbay /opt/keepbay/keepbay
 

@@ -1,6 +1,6 @@
 # 用 Docker 安装 {#docker}
 
-从 1.0.0-beta.9 起提供 Docker 镜像 `0xxb/keepbay`，支持 x86_64 和 arm64，已带 ffmpeg（视频缩略图、HEIC 照片）。不需要 `--privileged`，在 Docker 默认的安全配置下沙箱正常可用。
+Keepbay 提供 Docker 镜像 `0xxb/keepbay`，支持 x86_64 和 arm64，已带 ffmpeg（视频缩略图、HEIC 照片）。不需要 `--privileged`，在 Docker 默认的安全配置下沙箱正常可用。
 
 不用 Docker 时，按[安装](./install)一页直接安装。
 
