@@ -118,7 +118,7 @@ useScrollFrame((still) => {
   top: calc(var(--sx-nav) + 44px + var(--i) * 18px);
   display: grid;
   grid-template-columns: 1fr 1fr;
-  height: min(560px, 72vh);
+  height: min(672px, 76vh);
   margin-bottom: 64px;
   overflow: hidden;
   border-radius: 28px;

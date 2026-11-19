@@ -59,3 +59,15 @@ const { frontmatter } = useData()
     />
   </div>
 </template>
+
+<style>
+/* Keepbay 首页各版块的内容区比共用的宽（1080 → 1296），卡片和截图按 1.2 倍放大。价格、常见问题和结尾仍用共用的宽度。
+   --kb-wrap 也供各版块按内容区算外侧留白 */
+.kb-home {
+  --kb-wrap: 1296px;
+}
+
+.kb-home > section:not(#pricing, #faq, #start) .sx-wrap {
+  max-width: var(--kb-wrap);
+}
+</style>

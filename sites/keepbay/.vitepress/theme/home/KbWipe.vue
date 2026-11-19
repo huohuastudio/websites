@@ -63,7 +63,7 @@ useScrollFrame((still) => {
 .frame {
   --chrome: calc(212px + var(--sx-stage-pad) + var(--sx-stage-gap));
   position: relative;
-  width: min(1000px, 84vw, calc((var(--sx-vh) - var(--chrome)) * 1.6));
+  width: min(1200px, 88vw, calc((var(--sx-vh) - var(--chrome)) * 1.6));
   aspect-ratio: 16 / 10;
   margin: 0 auto;
   overflow: hidden;
@@ -138,7 +138,7 @@ useScrollFrame((still) => {
 /* 舞台不固定时不受舞台高度限制 */
 @media (max-width: 760px), (max-height: 640px), (prefers-reduced-motion: reduce) {
   .frame {
-    width: min(1000px, calc(100vw - 48px));
+    width: min(1200px, calc(100vw - 48px));
   }
 }
 

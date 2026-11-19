@@ -94,7 +94,7 @@ useScrollFrame((still) => {
   grid-template-columns: 5fr 6fr;
   gap: 64px;
   align-items: center;
-  padding-inline: max(24px, calc((100vw - 1080px) / 2 + 24px));
+  padding-inline: max(24px, calc((100vw - var(--kb-wrap)) / 2 + 24px));
 }
 
 .steps {

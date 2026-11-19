@@ -125,7 +125,7 @@ const startOffset = useLayoutCache(
   position: absolute;
   left: 50%;
   top: calc(50% - var(--sx-nav) / 2);
-  width: min(1040px, 78vw, calc((var(--sx-vh) - var(--sx-nav) - 48px) * 1.6));
+  width: min(1248px, 82vw, calc((var(--sx-vh) - var(--sx-nav) - 48px) * 1.6));
   transform: translate(-50%, -50%) translateY(var(--dy, 0px)) scale(var(--s, 1));
   perspective: 2200px;
 }
@@ -187,7 +187,7 @@ const startOffset = useLayoutCache(
     position: relative;
     left: auto;
     top: auto;
-    width: min(1040px, 78vw);
+    width: min(1248px, 82vw);
     margin: 56px auto 0;
     transform: none;
   }

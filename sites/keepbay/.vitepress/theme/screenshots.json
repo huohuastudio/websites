@@ -10,13 +10,13 @@
   "video": {"wide":[2048,1280]},
   "slides": {"wide":[2048,1280]},
   "share": {"wide":[2048,1280],"mobile":[1170,2100]},
-  "format-photos": {"card":[832,520]},
-  "format-sheet": {"card":[832,520]},
-  "format-video": {"card":[832,520]},
-  "format-doc": {"card":[832,520]},
-  "format-raw": {"card":[832,520]},
-  "photos": {"card":[1298,1260],"mobile":[1170,2100],"dpr":[1,1.25]},
-  "members": {"card":[598,521],"dpr":[1,1.25]},
-  "ai-calls-card": {"card":[968,1056],"dpr":[1,1.25]},
-  "member-features": {"card":[968,1056],"dpr":[1,1.25]}
+  "format-photos": {"wide":[2048,1280]},
+  "format-sheet": {"wide":[2048,1280]},
+  "format-video": {"wide":[2048,1280]},
+  "format-doc": {"wide":[2048,1280]},
+  "format-raw": {"wide":[2048,1280]},
+  "photos": {"card":[1586,1539],"mobile":[1170,2100],"dpr":[1,1.25]},
+  "members": {"card":[742,646],"dpr":[1,1.25]},
+  "ai-calls-card": {"card":[1184,1292],"dpr":[1,1.25]},
+  "member-features": {"card":[1184,1292],"dpr":[1,1.25]}
 }

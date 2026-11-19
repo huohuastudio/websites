@@ -11,12 +11,14 @@ const rows = [
   ['*文档', 'PDF', 'Word .docx', 'Excel .xlsx', '.xls', '.ods', 'CSV', 'TSV', 'PowerPoint', '*文本和代码', 'Markdown', 'JSON', 'XML', '语法高亮', '*压缩包', 'zip', 'tar.gz', '7z', 'rar', '不解压查看'],
 ].map((row) => row.map((text) => (text.startsWith('*') ? { text: text.slice(1), key: true } : { text, key: false })))
 
-// 后面的盖在前面的上面：最中间的一张放最后。dx、r 是展开后的横向位移和旋转，sy、fy 是叠起和展开时的纵向位移
+// 后面的盖在前面的上面：最中间的一张放最后。dx、r 是展开后的横向位移和旋转，sy、fy 是叠起和展开时的纵向位移。
+// 截图是完整界面，左侧的卡片露出截图的左半边、右侧的露出右半边：表格的数据、Word 的正文在左半边，放在左侧；
+// 照片时间线的右半边是照片和日期条，放在右侧。最外侧的位移按 1440 宽时旋转后的卡片仍在屏幕内取
 const cards = [
-  { name: 'format-photos', caption: '照片时间线', style: { '--dx': '-92%', '--r': '-7deg', '--sy': '-24px', '--fy': '22px' } },
-  { name: 'format-sheet', caption: 'Excel 表格', style: { '--dx': '92%', '--r': '7deg', '--sy': '24px', '--fy': '22px' } },
-  { name: 'format-video', caption: '视频', style: { '--dx': '-50%', '--r': '-3.5deg', '--sy': '-12px', '--fy': '8px' } },
-  { name: 'format-doc', caption: 'Word 文档', style: { '--dx': '50%', '--r': '3.5deg', '--sy': '12px', '--fy': '8px' } },
+  { name: 'format-sheet', caption: 'Excel 表格', style: { '--dx': '-82%', '--r': '-7deg', '--sy': '-24px', '--fy': '22px' } },
+  { name: 'format-photos', caption: '照片时间线', style: { '--dx': '82%', '--r': '7deg', '--sy': '24px', '--fy': '22px' } },
+  { name: 'format-doc', caption: 'Word 文档', style: { '--dx': '-44%', '--r': '-3.5deg', '--sy': '-12px', '--fy': '8px' } },
+  { name: 'format-video', caption: '视频', style: { '--dx': '44%', '--r': '3.5deg', '--sy': '12px', '--fy': '8px' } },
   { name: 'format-raw', caption: '照片和相机 RAW', style: { '--dx': '0%', '--r': '0deg', '--sy': '0px', '--fy': '0px' } },
 ] as const
 
@@ -117,7 +119,7 @@ figure {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(34vw, 480px, calc((var(--sx-vh) - 368px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
+  width: min(36vw, 576px, calc((var(--sx-vh) - 368px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   margin: 0;
   transform: translate(-50%, -50%) translateX(calc(var(--f, 0) * var(--dx))) translateY(calc((1 - var(--f, 0)) * var(--sy) + var(--f, 0) * var(--fy))) rotate(calc(var(--f, 0) * var(--r)));
 }
@@ -145,7 +147,7 @@ figcaption {
 @media (max-height: 832px) and (min-width: 761px) {
   /* 矮视口的其余部分更紧凑，底部仍留出与原来相同的余量 */
   figure {
-    width: min(34vw, 480px, calc((var(--sx-vh) - 392px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
+    width: min(36vw, 576px, calc((var(--sx-vh) - 392px - var(--sx-stage-pad) - var(--sx-stage-gap)) * 1.6));
   }
 }
 
@@ -163,7 +165,7 @@ figcaption {
   }
 
   figure {
-    width: min(34vw, 480px);
+    width: min(36vw, 576px);
   }
 }
 
@@ -175,7 +177,7 @@ figcaption {
   }
 
   figure {
-    width: min(34vw, 480px, 74vh);
+    width: min(36vw, 576px, 74vh);
   }
 
   .rows div {

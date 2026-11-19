@@ -41,16 +41,16 @@ useScrollFrame((still) => {
             <h3>照片时间线</h3>
             <p>照片和视频跨文件夹按拍摄时间排在一起，按天分组，右侧的日期条按年、月跳转。</p>
           </div>
-          <div class="img sx-fade-rb" style="--op: center top; --zo: 50% 0; --max: 649px">
+          <div class="img sx-fade-rb" style="--op: center top; --zo: 50% 0; --max: 793px">
             <KbShot name="photos" fit alt="照片时间线：照片按天分组排成等高的行，右侧是按年份标出的日期条" />
           </div>
         </div>
-        <div :ref="cell" class="cell s2 side" style="--max: 299px">
+        <div :ref="cell" class="cell s2 side" style="--max: 371px">
           <div class="txt">
             <h3>一家人共用</h3>
             <p>按文件夹授权只读或读写。</p>
           </div>
-          <div class="img sx-fade-rb" style="--top: 120px">
+          <div class="img sx-fade-rb" style="--top: 127px">
             <KbShot name="members" fit alt="成员周晴的文件夹授权：周晴的文件、家庭相册为读写，家庭文档为只读" />
           </div>
         </div>
@@ -82,7 +82,7 @@ useScrollFrame((still) => {
 
 .cell {
   position: relative;
-  min-height: 380px;
+  min-height: 450px;
   overflow: hidden;
   border-radius: 28px;
   background: var(--sx-card);
@@ -135,7 +135,7 @@ h3 {
 .big {
   grid-column: span 4;
   grid-row: span 2;
-  min-height: 780px;
+  min-height: 920px;
 }
 
 .s2 {
@@ -182,7 +182,7 @@ h3 {
   }
 }
 
-/* 格子占满一行、又放得下左右两栏时，成员授权的截图放在文字右边，贴住格子的右边缘（截图宽 299px，不放大） */
+/* 格子占满一行、又放得下左右两栏时，成员授权的截图放在文字右边，贴住格子的右边缘（截图宽 371px，不放大） */
 @media (max-width: 960px) and (min-width: 581px) {
   .side .txt {
     padding-right: calc(var(--max) + 64px);

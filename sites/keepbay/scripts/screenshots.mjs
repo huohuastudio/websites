@@ -21,7 +21,7 @@ const out = join(site, 'public/screenshots')
 const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 
 // 截图的尺寸（W31：卡片中的局部图，首页上界面文字的显示尺寸不小于原尺寸的 0.85，Windows 1 倍屏上才看得清；wide 大图除外，见下。docs/plan.md）：
-// - wide：1280 × 800 按 1.6 倍截，得到 2048 × 1280。首屏、揭开对照、AI、亮点轮播显示完整界面的大图。
+// - wide：1280 × 800 按 1.6 倍截，得到 2048 × 1280。首屏、揭开对照、AI、亮点轮播、格式小卡片显示完整界面的大图。
 //   W31 曾改为 1024 × 640，窗口太矮，侧栏底部的「设置」等被截掉，用户定改回 1280 × 800（大图的文字小于 0.85 倍，接受）
 // - mobile：390 × 700 按 3 倍截，得到 1170 × 2100，在官网的手机宽度下换用这张，整页缩小后的宽屏截图看不清
 // - compact：400 × 430 按 3 倍截，得到 1200 × 1290，放在首页搜索一节的结果区，界面按手机布局显示。高度正好放下搜索的前三条结果
@@ -30,7 +30,7 @@ const manifestFile = join(site, '.vitepress/theme/screenshots.json')
 //   区域与卡片中截图框的宽高比相同，宽度约为截图框最大显示宽度 ÷ 0.9（见下面的 slots）。
 //   截图框宽度固定的（card 中写了显示宽度 show），按显示尺寸出 1 倍、1.25 倍、2 倍三张，首页按屏幕挑选、1:1 显示，
 //   不再由浏览器缩小（Windows 1 倍屏上缩小的位图文字发虚）。先按 2 倍渲染（倍数 = 2 × show ÷ 区域宽度），再用 Lanczos 缩成另两张：
-//   按 0.9、1.125 这种倍数直接渲染时文字本身就画软了（W31，2026-11-18 对比后定）。旋转显示的格式小卡片做不到 1:1，只出 2 倍一张
+//   按 0.9、1.125 这种倍数直接渲染时文字本身就画软了（W31，2026-11-18 对比后定）
 const sizes = {
   wide: { suffix: '', viewport: { width: 1280, height: 800 }, scale: 1.6 },
   mobile: { suffix: '-mobile', viewport: { width: 390, height: 700 }, scale: 3 },
@@ -41,17 +41,12 @@ const sizes = {
 // 写了 show 的 card 截图，除 2 倍的主图外另出的倍数，文件名为 <名称>-<倍数>x-<主题>.webp
 const densities = [1, 1.25]
 
-// 格式小卡片用 wide 的窗口截一小块
-const desktop = sizes.wide.viewport
-
 // 卡片中截图框的尺寸对应的截取区域（CSS 像素），show 是截图框的显示宽度（宽屏下固定）。
-// 界面文字按原尺寸的 0.9 倍显示（区域 = show ÷ 0.9）；0.9 倍时关键内容放不全、或以照片为主的，放宽到 0.8 倍（区域 = show ÷ 0.8，
-// 多放约四分之一的内容），不再更小（W31，2026-11-18 定）：
-// - format：「在网页中直接打开」的扇形小卡片，截图框 368–464px 宽（随视口），按最窄时不小于 0.85 算
-// - privacy：「隐私与安全」卡片的右半边，截图框 484 × 515–528，顶端对齐，矮视口下裁掉底部
+// 区域按 W31 的规则取：显示宽度 ÷ 0.9，关键内容放不全或以照片为主的 ÷ 0.8（2026-11-18 定）。2026-11-19 首页的卡片按 1.2 倍放大，
+// 区域不变、show 随截图框放大，界面文字约为原尺寸的 1–1.1 倍（免费版的 photos、members 写在各自的截图中）：
+// - privacy：「隐私与安全」卡片的右半边，截图框 592 × 562–640，顶端对齐，矮视口下裁掉底部
 const slots = {
-  format: { width: 416, height: 260 },
-  privacy: { width: 538, height: 587, show: 484 },
+  privacy: { width: 538, height: 587, show: 592 },
 }
 
 // 首页推近时最多放大 2 倍（zoom.ts），宽度 1000px 的截图框在 2 倍屏上推近后要约 4000 像素宽的图才清晰：
@@ -261,53 +256,46 @@ const shots = [
       await page.getByRole('button', { name: '全部下载' }).waitFor({ timeout: 10_000 })
     },
   },
-  // 以下是「在网页中直接打开」的五张小卡片：在 1280 × 800 的窗口中截一小块
+  // 以下是「在网页中直接打开」的五张小卡片：完整界面（1280 × 800，按 1.6 倍），看得出是在网页中打开的（2026-11-19 用户定）。
+  // 照片、视频与亮点轮播的查看器、视频大图用不同的文件，首页上不出现同样的画面。表格、Word 用查看器自带的预览（演示站没有部署在线编辑器）
   {
-    // 照片时间线：从一天的日期标题截起
+    // 照片时间线：滚到春节的一组照片
     name: 'format-photos',
-    sizes: ['card'],
-    card: { viewport: desktop, ...slots.format, at: (page) => corner(page.getByText(photoDay).first(), 16, 16) },
+    sizes: ['wide'],
     ...photos,
   },
   {
-    // Excel 表格：从表格区的左上角（行号和列标）截起，功能区和公式栏不进截图
+    // Excel 表格：表格画出来以后上方显示单元格的提示
     name: 'format-sheet',
-    local: true,
-    sizes: ['card'],
-    card: { viewport: desktop, ...slots.format, at: (page) => editorBox(page, '#ws-canvas') },
+    sizes: ['wide'],
     path: (request) => viewerPath(request, ['家庭文档', '家庭'], '2025 年家庭开支.xlsx'),
-    prepare: openEditor,
-  },
-  {
-    // 视频画面的左下角，带播放按钮、时间和进度条
-    name: 'format-video',
-    sizes: ['card'],
-    card: {
-      viewport: desktop,
-      ...slots.format,
-      at: async (page) => {
-        const b = await bounds(page.locator('video'))
-        return { x: b.x, y: b.y + b.height - slots.format.height }
-      },
+    prepare: async (page) => {
+      await page.getByText('点单元格查看完整内容').waitFor({ timeout: 15_000 })
+      await page.waitForTimeout(500)
     },
+  },
+  {
+    // 视频：日常中的另一段视频，停在第 5 秒
+    name: 'format-video',
+    sizes: ['wide'],
     ...video,
+    path: (request) => viewerPath(request, ['家庭相册', '2025', '日常'], 'VID_20251003_091237.mp4'),
   },
   {
-    // Word 文档：纸张上的标题和前两节，功能区不进截图（编辑器在 iframe 中，按窗口中的位置截）。
-    // 首页扇形中这张的左半边被中间的卡片盖住，正文放在截图的右半边
+    // Word 文档：在沙箱 iframe 中渲染，等到其中有内容
     name: 'format-doc',
-    local: true,
-    sizes: ['card'],
-    card: { viewport: desktop, ...slots.format, at: () => ({ x: 160, y: 340 }) },
+    sizes: ['wide'],
     path: (request) => viewerPath(request, ['林海的工作', '项目'], '周报-2026-第45周.docx'),
-    prepare: (page) => openEditor(page, { spell: true }),
+    prepare: async (page) => {
+      await page.frameLocator('iframe[title="周报-2026-第45周.docx"]').locator('body *').first().waitFor({ timeout: 15_000 })
+      await page.waitForTimeout(1000)
+    },
   },
   {
-    // 查看器中照片的一部分（鸟居的入口），工具栏和缩略图不进截图
+    // 查看器中的照片：京都的另一张
     name: 'format-raw',
-    sizes: ['card'],
-    card: { viewport: desktop, ...slots.format, at: () => ({ x: 430, y: 150 }) },
-    path: (request) => viewerPath(request, ...torii),
+    sizes: ['wide'],
+    path: (request) => viewerPath(request, ['家庭相册', '2024', '2024-10 京都'], 'IMG_20241005_154709.jpg'),
   },
   // 以下是「免费版就是完整的网盘」的格子
   {
@@ -315,14 +303,14 @@ const shots = [
     // 格子约 649 × 630，按 0.8 倍截，多放照片；手机宽度下换用手机截图（首屏的手机画面也用它）
     name: 'photos',
     sizes: ['card', 'mobile'],
-    card: { viewport: { width: 56 + 811, height: 787 }, width: 811, height: 787, show: 649, at: () => ({ x: 56, y: 0 }) },
+    card: { viewport: { width: 56 + 811, height: 787 }, width: 811, height: 787, show: 793, at: () => ({ x: 56, y: 0 }) },
     ...photos,
   },
   {
     // 成员 family（周晴）的授权：两个文件夹读写、一个只读，没授权的看不到。格子约 299 × 260，窗口设成截取区域的大小，界面按手机布局显示
     name: 'members',
     sizes: ['card'],
-    card: { width: 332, height: 289, show: 299 },
+    card: { width: 332, height: 289, show: 371 },
     path: async (request) => `/settings/members/${await userId(request, 'family')}`,
     // 滚到「文件夹」一节（上面的资料一节不进截图），标题上方留一点空。
     // 突出文件夹和只读、读写：标题下的说明、服务器上的路径和复制路径的按钮不进截图（每个文件夹都要找到，否则报错）
@@ -379,19 +367,6 @@ async function clipOf(page, { viewport, clip: { width, height }, at }) {
   const { x, y } = (await at?.(page)) ?? { x: 0, y: 0 }
   const fit = (v, length, total) => Math.round(Math.min(Math.max(v, 0), total - length))
   return { x: fit(x, width, viewport.width), y: fit(y, height, viewport.height), width, height }
-}
-
-/** 在线编辑器（两层 iframe 中）元素 selector 的左上角在窗口中的位置（CSS 像素）。 */
-async function editorBox(page, selector) {
-  const box = await editorFrame(page).locator(selector).boundingBox()
-  if (!box) throw new Error(`编辑器中找不到 ${selector}`)
-  return { x: box.x, y: box.y }
-}
-
-/** 截取区域的左上角：locator 选中的元素左上角再向左 dx、向上 dy（CSS 像素）。 */
-async function corner(locator, dx, dy) {
-  const { x, y } = await bounds(locator)
-  return { x: x - dx, y: y - dy }
 }
 
 /** 尺寸 name 的截图窗口、倍数和截取区域（card 按截图中的设置，其余截整个窗口）。 */

@@ -148,7 +148,7 @@ onBeforeUnmount(() => {
 .track {
   display: flex;
   gap: 24px;
-  padding-inline: max(24px, calc((100vw - 1080px) / 2 + 24px));
+  padding-inline: max(24px, calc((100vw - var(--kb-wrap)) / 2 + 24px));
   transform: translateX(calc(var(--hx, 0px) + var(--drag, 0px)));
   transition: transform 0.9s var(--sx-ease);
   touch-action: pan-y;
@@ -160,7 +160,7 @@ onBeforeUnmount(() => {
 }
 
 .card {
-  flex: 0 0 min(880px, 84vw);
+  flex: 0 0 min(1056px, 88vw);
   overflow: hidden;
   border-radius: 28px;
   background: var(--sx-panel);
