@@ -64,7 +64,7 @@ useScrollFrame((still) => {
         <div :ref="cell" class="cell s6 word">
           <div class="txt">
             <h3>安全功能不收费</h3>
-            <p>两步验证、通行密钥，以及用 Authentik、Keycloak、Google、Microsoft、GitHub 等外部帐号登录，都在免费版中。</p>
+            <p>两步验证、通行密钥、登录的人机验证，以及用 Authentik、Keycloak、Google、Microsoft、GitHub 等外部帐号登录，都在免费版中。</p>
           </div>
           <div class="k sx-phrase" style="padding-top: 24px">两步验证　通行密钥　外部帐号</div>
         </div>
