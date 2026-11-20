@@ -88,7 +88,7 @@ volumes:
 
 ## 挂载文件夹 {#folders}
 
-容器只能看到挂载进去的路径。推荐挂载一个上级目录（如 `/volume1:/files`），之后在 Keepbay 中添加其中任意子文件夹都不用改 compose.yaml；添加上级目录以外的位置（如另一块硬盘）时，才要在 compose.yaml 中加一行挂载，再运行 `docker compose up -d`。
+容器只能看到挂载进去的路径。推荐挂载一个放资料的总目录（如 `/volume1:/files`），之后在 Keepbay 中添加其中任意子文件夹、以及以后在其中新建的文件夹，都不用改 compose.yaml；添加上级目录以外的位置（如另一块硬盘）时，才要在 compose.yaml 中加一行挂载，再运行 `docker compose up -d`。
 
 | 做法 | 写法 | 添加新文件夹 | 只读 |
 |---|---|---|---|
