@@ -29,6 +29,7 @@ Keepbay 只在以下情况主动访问外网，其中大部分需要您手动操
 | 外部帐号登录 | 您配置的身份提供方 | 标准的 OIDC 流程 |
 | 通知 | Bark 服务器、您的 SMTP 服务器，企业微信、钉钉、飞书、Telegram 的服务器 | 通知的标题和正文 |
 | 离线下载 | 您给的网址、BT 网络、yt-dlp 访问的网站 | 下载请求 |
+| tracker 订阅（所有者添加订阅后，按设置的间隔，默认每天一次） | 所有者填写的订阅地址 | 普通的请求 |
 | 测试代理 | GitHub、Hugging Face | 只读响应头 |
 | 获取自定义的模型清单（只在用 `--model-manifest` 或环境变量 `KEEPBAY_MODEL_MANIFEST` 指定了地址时；所有者打开「AI 模型」设置时，最多每小时一次） | 您指定的地址 | 普通的请求 |
 
@@ -231,7 +232,7 @@ Tailscale 的地址段（100.64.0.0/10）也在拒绝之列，离线下载无法
 
 BT 下载连接 HTTPS 的 tracker 时校验证书。
 
-所有者设置的[附加 tracker](./offline-download#trackers) 会加到之后新建的 BT 任务中，私有种子不加。tracker 能看到下载者的 IP 地址和正在下载的种子，所以默认为空。
+所有者设置的[附加 tracker](./offline-download#trackers) 会加到之后新建的 BT 任务中，私有种子不加。tracker 能看到下载者的 IP 地址和正在下载的种子，所以默认为空。[订阅](./offline-download#tracker-subs)的 tracker 列表同样只加到新建的公开种子任务中，默认不订阅；取列表时只请求所有者填写的订阅地址。
 
 ## 诊断信息 {#diagnostics}
 

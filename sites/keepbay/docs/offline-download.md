@@ -72,6 +72,7 @@ Keepbay 按以下顺序查找 yt-dlp：「视频网站」一节中填写的 yt-d
 | BT 端口映射 | 用 UPnP 在路由器上自动打开端口，可以连接更多来源，但会把这台设备的这个端口暴露到外网 |
 | BT 上传速度上限 | BT 下载过程中给其他节点上传的速度 |
 | 附加 tracker | 新建 BT 任务时自动加上的 tracker，默认为空，见[附加 tracker](#trackers) |
+| tracker 订阅 | 按地址订阅公共的 tracker 列表，按更新间隔自动更新，默认不订阅，见[tracker 订阅](#tracker-subs) |
 | yt-dlp 路径 | 选填。留空时使用 Keepbay 安装的，没有时在 PATH 中查找，见[下载视频网站的视频](#yt-dlp) |
 | 自动更新 | Keepbay 安装的 yt-dlp 和 Deno 每天检查一次新版本 |
 
@@ -94,13 +95,45 @@ BT 下载与其他用户之间的连接、DHT 始终直连，不经过代理，�
 - 私有种子（PT 站的种子）不加。否则会违反站点的规则，帐号可能被封禁
 - 已经有的任务不变
 
-默认为空，Keepbay 不预置公共 tracker 列表。公共 tracker 经常失效，列表需要您自己维护，失效的请删除。
+默认为空，Keepbay 不预置公共 tracker 列表。公共 tracker 经常失效，手动填写的需要您自己维护，失效的请删除。也可以订阅公共的 tracker 列表，自动更新，见[tracker 订阅](#tracker-subs)。
 
 :::warning
 tracker 能看到下载者的 IP 地址和正在下载的种子。填写的 tracker 越多，能看到这些信息的服务器越多。请只填写您信任的 tracker。
 :::
 
 附加的 tracker 与种子自带的连接方式相同：http、https 在离线下载经过代理时使用代理，https 校验证书，udp 直接连接。
+
+### tracker 订阅 {#tracker-subs}
+
+网上有公开维护的 tracker 列表，维护者会定期去掉失效的地址。在「系统设置 › 离线下载」的「tracker 订阅」一节中添加列表的地址，Keepbay 按更新间隔自动取回其中的 tracker。
+
+取回的 tracker 与手动填写的附加 tracker 合并，去掉重复的，再加到之后新建的 BT 任务中。规则与[附加 tracker](#trackers) 相同：私有种子不加，磁力链接确认不是私有种子后才加，已有的任务不变。
+
+默认不订阅。添加订阅有两种方式：
+
+- **添加订阅**：填写订阅地址
+- **添加常用的订阅**：填入 [ngosang/trackerslist](https://github.com/ngosang/trackerslist) 的 trackers_best 列表，地址为 `https://cdn.jsdelivr.net/gh/ngosang/trackerslist@master/trackers_best.txt`。这里用的是 jsDelivr 的地址，因为 raw.githubusercontent.com 在国内经常无法连接
+
+订阅地址只支持 http、https，不能是局域网或本机的地址，最多 10 个。添加和移除后立即保存。
+
+更新间隔可选每 6 小时、每 12 小时、每天、每周，默认每天。点「立即更新」，马上取回全部订阅。
+
+每个订阅显示取到的 tracker 个数和上次更新的时间。更新失败时显示原因，继续使用上次取到的列表，1 小时后再试。
+
+订阅地址返回的内容按以下规则读取：
+
+| 项目 | 要求 |
+|---|---|
+| 格式 | 每行一个 tracker；`#` 开头的行是注释，空行忽略 |
+| 每一行 | 与手动填写的检查相同：只支持 http、https 和 udp，不能是局域网或本机的地址。不正确的行跳过 |
+| 内容大小 | 最大 256 KB，超过时记为更新失败 |
+| 个数 | 每个订阅最多取前 200 个；与手动填写的合计最多 500 个，手动填写的在前 |
+
+取订阅列表默认经过代理，可以在「系统设置 › 网络 › 使用代理的功能」中关闭「tracker 订阅」，见[使用代理的功能](./proxy#usage)。这项只影响取列表，BT 任务连接 tracker 时仍按「离线下载」的设置。
+
+:::warning
+上面关于 tracker 的提醒同样适用于订阅的列表：tracker 能看到下载者的 IP 地址和正在下载的种子，而订阅的列表中有哪些 tracker 由列表的维护者决定。请确认来源可信后再订阅。
+:::
 
 ## 成员使用离线下载 {#members}
 

@@ -48,6 +48,7 @@ Environment=NO_PROXY=localhost,127.0.0.1
 | 外部帐号登录 | 经过代理 | 连接 Google、Microsoft、GitHub 等提供方 |
 | 在线编辑 | 经过代理 | 读取编辑器支持的格式和验签用的公钥，见[在线编辑](./office) |
 | 通知 | 经过代理 | Bark、企业微信、钉钉、飞书、Telegram 通知 |
+| tracker 订阅 | 经过代理 | 取回离线下载中订阅的 tracker 列表，见[tracker 订阅](./offline-download#tracker-subs) |
 | 本地模型 | 不经过 | 下载模型和运行环境、读取模型清单 |
 | 离线下载 | 不经过 | 按链接下载文件和视频，BT 的 tracker 和 HTTP 下载源，安装和更新 yt-dlp、Deno |
 
