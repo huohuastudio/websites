@@ -299,6 +299,20 @@ const shots = [
   },
   // 以下是「免费版就是完整的网盘」的格子
   {
+    // 照片页的「地点」：上方是照片地图（内置的离线底图，按位置聚合），下面是城市卡片。首页「人物、宠物和地点」一节的第三幕
+    name: 'places',
+    sizes: ['wide', 'mobile'],
+    path: async () => '/photos?tab=places',
+    storage: { 'keepbay.infoPanel': 'false' },
+    prepare: async (page) => {
+      // 地图的聚合点是 DOM 元素，出现时底图已经开始绘制；再等瓦片和字形画完
+      await page.locator('.kb-photo-map .maplibregl-marker').first().waitFor({ timeout: 20_000 })
+      await page.waitForTimeout(2500)
+    },
+    // 首页推近到地图上照片聚在一起的地方（各个聚合点合起来的范围）
+    zoom: (page) => bounds(page.locator('.kb-photo-map .maplibregl-marker')),
+  },
+  {
     // 照片时间线：截取区域放在图标栏（56px，768–1023px 宽时侧栏收成图标栏）右边。
     // 格子约 649 × 630，按 0.8 倍截，多放照片；手机宽度下换用手机截图（首屏的手机画面也用它）
     name: 'photos',

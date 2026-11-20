@@ -50,7 +50,7 @@ export default defineSiteConfig({
         collapsed: false,
         items: [
           { text: '浏览和预览', link: '/docs/files' },
-          { text: '照片时间线', link: '/docs/photos' },
+          { text: '照片', link: '/docs/photos' },
           { text: '上传和下载', link: '/docs/upload' },
           { text: '搜索', link: '/docs/search' },
           { text: '空间分析', link: '/docs/space' },
@@ -67,6 +67,7 @@ export default defineSiteConfig({
           { text: `模型设置 ${pro}`, link: '/docs/ai-models' },
           { text: `AI 桌面 ${pro}`, link: '/docs/ai-desk' },
           { text: `语义搜索 ${pro}`, link: '/docs/semantic-search' },
+          { text: `人物和宠物 ${pro}`, link: '/docs/people' },
           { text: `AI 标签 ${pro}`, link: '/docs/ai-tags' },
           { text: '收件箱', link: '/docs/inbox' },
           { text: `日期提醒 ${pro}`, link: '/docs/reminders' },

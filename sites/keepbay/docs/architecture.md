@@ -292,11 +292,15 @@ flowchart TD
 
 回环地址、局域网地址、不带点的主机名、`.local` 等后缀视为本地，比如本机或局域网中的 Ollama；其余都视为云端，必须使用 HTTPS。
 
-本地模型目前有三个，通过 ONNX Runtime 运行：
+本地模型通过 ONNX Runtime 运行：
 
 - bge-small-zh-v1.5：文本向量
 - Chinese-CLIP ViT-B/16：图像向量
 - PP-OCRv5 mobile：文字识别
+- SFace（默认）或 AuraFace v1：人脸识别，用于认识的人。人脸检测用的 YuNet 编译在程序中
+- D-FINE S + DINOv2 small：宠物识别，先检测照片中的猫、狗和鸟，再生成向量与宠物的样本比较
+
+人脸和宠物识别只用本地模型，不提供云端的选项，见[人物和宠物](./people#privacy)。
 
 模型清单用 ed25519 签名，下载后核对 SHA256。
 

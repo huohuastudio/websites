@@ -13,6 +13,12 @@ const account = {
   password: process.env.KEEPBAY_DEMO_PASSWORD ?? 'keepbay-demo',
 }
 
+/** 用演示帐号登录：浏览器上下文的 request 或单独的接口上下文，登录后的 Cookie 留在其中 */
+export async function login(request) {
+  const res = await request.post('/api/v1/auth/login', { headers: { 'X-Keepbay-Request': '1' }, data: account })
+  if (!res.ok()) throw new Error(`登录失败：${res.status()}`)
+}
+
 /**
  * 新建登录好的浏览器上下文。view：文件夹的视图（Keepbay 存在浏览器本地，键为 keepbay.views.<用户 ID>）。
  * 演示帐号是共用的，访客可能存了固定的浅色或深色：读偏好时去掉外观设置，按 colorScheme 显示（不改帐号上存的）
@@ -26,8 +32,7 @@ export async function newContext(browser, { viewport, scale, scheme, view }) {
     locale: 'zh-CN',
   })
   try {
-    const login = await context.request.post('/api/v1/auth/login', { headers: { 'X-Keepbay-Request': '1' }, data: account })
-    if (!login.ok()) throw new Error(`登录失败：${login.status()}`)
+    await login(context.request)
     if (view) {
       const me = await (await context.request.get('/api/v1/auth/me')).json()
       await context.addInitScript(

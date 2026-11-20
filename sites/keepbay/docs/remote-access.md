@@ -57,7 +57,8 @@ sequenceDiagram
 1. 原样转发 `Host`，并写好 `X-Forwarded-Host`、`X-Forwarded-For`、`X-Forwarded-Proto`
 2. 不限制请求体大小，至少要能容纳 16 MiB（16,777,216 字节）：网页上传时每块 16 MiB；[WebDAV](./webdav#reverse-proxy) 一次上传整个文件，要完全不限制
 3. 不缓冲响应，读超时不能过短：任务进度通过 SSE 长连接推送，下载大文件也需要较长时间
-4. 在 Keepbay 中设置[可信代理](#trusted-proxies)
+4. 原样转发 Range 请求，不缓存响应：照片地图按需读取内置底图的一部分，视频播放和拖动进度条也依赖它
+5. 在 Keepbay 中设置[可信代理](#trusted-proxies)
 
 Keepbay 不使用 WebSocket，无需配置 `Upgrade` 相关的头。
 
@@ -91,6 +92,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_buffering off;               # SSE 和大文件下载不要先攒在代理里
         proxy_request_buffering off;       # 上传边收边转
+        proxy_cache off;                   # 不缓存，否则 Range 请求不转发，见下文
         proxy_read_timeout 1h;
         proxy_send_timeout 1h;
     }
@@ -102,6 +104,8 @@ server {
 `location` 要写成 `^~ /`，不要只写 `/`。宝塔等面板生成的站点配置中有按正则匹配的规则，如禁止访问 `LICENSE`、`.env` 等敏感文件，以及图片、js、css 的缓存规则。
 
 nginx 中正则规则优先于普通的 `location /`。只写 `/` 时，`/api/v1/license` 这类请求会被这些规则拦下，授权信息无法读取；图片、脚本等请求也可能不经过 Keepbay。加上 `^~` 后，匹配到这个 `location` 的请求不再检查正则规则，全部转发给 Keepbay。
+
+宝塔的 nginx 全局打开了代理缓存，要在 `location` 中加 `proxy_cache off;`。否则 nginx 不把 Range 请求（只读取文件的一部分）转发给 Keepbay，[照片地图](./photos#map)无法显示，视频也只能整份读取。照片地图遇到这种情况时，会提示"服务器的反向代理没有转发 Range 请求"。
 
 ## 可信代理 {#trusted-proxies}
 

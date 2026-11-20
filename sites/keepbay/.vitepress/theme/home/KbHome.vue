@@ -10,6 +10,7 @@ import KbHighlights from './KbHighlights.vue'
 import KbInbox from './KbInbox.vue'
 import KbLit from './KbLit.vue'
 import KbNotify from './KbNotify.vue'
+import KbPeople from './KbPeople.vue'
 import KbPrivacy from './KbPrivacy.vue'
 import KbRemote from './KbRemote.vue'
 import KbScrub from './KbScrub.vue'
@@ -29,6 +30,7 @@ const { frontmatter } = useData()
     <KbScrub />
     <KbFormats />
     <KbFind />
+    <KbPeople />
     <KbLit />
     <KbPrivacy />
     <KbFree />
