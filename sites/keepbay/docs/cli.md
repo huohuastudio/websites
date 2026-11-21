@@ -388,7 +388,7 @@ sudo systemctl start keepbay
 
 ### mount:grant {#mount-grant}
 
-给运行 Keepbay 的用户访问一个文件夹的权限，添加文件夹之前运行。只支持 Linux，要以 root 运行。
+给运行 Keepbay 的用户访问文件夹的权限，添加文件夹之前运行。可以一次写多个文件夹，依次设置。只支持 Linux，要以 root 运行。
 
 ```bash
 sudo /opt/keepbay/keepbay mount:grant /srv/data
