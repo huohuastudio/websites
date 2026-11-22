@@ -150,7 +150,7 @@ sudo docker compose up -d
 
 ## 外网访问 {#remote-access}
 
-与直接安装相同（见[外网访问](./remote-access)），只是[可信代理](./remote-access#trusted-proxies)写在 compose.yaml 的 `environment` 中：`KEEPBAY_TRUSTED_PROXIES` 的值是反向代理连到容器时的来源地址。代理在宿主机上时，是 Docker 网络的网关（`docker network inspect <网络名>` 中的 `Gateway`，如 `172.18.0.1`）；代理也是容器、在同一个 Docker 网络中时，是代理容器的地址。
+与直接安装相同（见[外网访问](./remote-access)），只是[可信代理](./remote-access#trusted-proxies)写在 compose.yaml 的 `environment` 中，而且使用默认的桥接网络时一定要设置（容器中的本机地址只有容器自己；使用 host 网络时规则同直接安装）：`KEEPBAY_TRUSTED_PROXIES` 的值是反向代理连到容器时的来源地址。代理在宿主机上时，是 Docker 网络的网关（`docker network inspect <网络名>` 中的 `Gateway`，如 `172.18.0.1`）；代理也是容器、在同一个 Docker 网络中时，是代理容器的地址。
 
 部署在子路径下时在 `environment` 中加 `KEEPBAY_BASE_PATH: /keepbay/`。监听端口、子路径等都用环境变量设置，不要改容器的启动命令（`command`）：健康检查按环境变量连接服务，改了启动命令的参数会被判为不健康。
 

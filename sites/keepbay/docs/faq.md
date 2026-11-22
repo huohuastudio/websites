@@ -84,11 +84,15 @@ sudo /opt/keepbay/keepbay service:install --user keepbay --data-dir /srv/keepbay
 
 ### 经反向代理访问，登录时提示"请求来源不正确"？ {#csrf-rejected}
 
-原因是没有设置可信代理。
+原因是 Keepbay 根据代理传来的信息算出的本站地址，与浏览器实际访问的地址不一致。1.0.0-beta.15 起，提示中会写明这两个地址，可以据此判断是哪一项不对。
 
-Keepbay 默认不信任 `X-Forwarded-*` 请求头，因此会认为自己的地址是 `http://127.0.0.1:8899`，而浏览器发来的请求来源是 `https://您的域名`，两者不一致，请求会被拒绝。
+常见原因有三个：
 
-按[外网访问](./remote-access#trusted-proxies)设置 `KEEPBAY_TRUSTED_PROXIES` 后重启即可。设置后仍有提示的，请检查代理是否原样转发了 `Host`、是否带了 `X-Forwarded-Proto`。
+- 代理不在可信代理中：代理在其他机器上，或者用的是 1.0.0-beta.14 及更早的版本。按[可信代理](./remote-access#trusted-proxies)设置
+- 代理没有发送 `X-Forwarded-Proto`、`X-Forwarded-Host`（宝塔的反向代理默认不发）
+- 前面有 CDN，CDN 用 HTTP 回源，代理传来的协议是 http
+
+后两种见[宝塔面板、CDN](./remote-access#baota-cdn)。
 
 ### 忘记了密码？被锁定了？ {#forgot-password}
 

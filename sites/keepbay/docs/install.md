@@ -217,6 +217,8 @@ sudo /opt/keepbay/keepbay mount:grant --read-only /srv/data   # 只读，添加�
 
 HEVC 解码涉及专利授权，因此 Keepbay 不附带 ffmpeg。未安装时 HEIC 文件显示为普通文件，仍可下载。安装后在「系统设置 › 媒体处理」中点击「重新检测」，无需重启。
 
+ffmpeg 默认在 PATH 中查找。不在 PATH 中时（如群晖套件装的），或者装了多个版本、要指定其中一个时，从 1.0.0-beta.15 起可以在「系统设置 › 媒体处理」中填写 ffmpeg 程序的完整路径，如 `/var/packages/ffmpeg7/target/bin/ffmpeg`，ffprobe 使用同一目录中的。见[媒体处理](./folders#media)。
+
 yt-dlp 用于离线下载视频网站的视频。所有者可以在「系统设置 › 离线下载」中由 Keepbay 安装 yt-dlp 和下载 YouTube 要用的 Deno，装好后自动更新；也可以自行安装。见[离线下载](./offline-download#yt-dlp)。
 
 本地 AI 模型属于专业版。语义搜索、以图搜图、识别图片中的文字、认识的人和宠物用的模型，以及运行它们的 ONNX Runtime，都在「系统设置 › AI 模型」中按需下载，不占安装包的体积。

@@ -130,7 +130,7 @@ flowchart TD
 |---|---|---|---|
 | `--listen` | `KEEPBAY_LISTEN` | `0.0.0.0:8899` | 监听地址 |
 | `--data-dir` | `KEEPBAY_DATA_DIR` | `/var/lib/keepbay` | 数据目录 |
-| `--trusted-proxies` | `KEEPBAY_TRUSTED_PROXIES` | 空 | 可信反向代理的 IP 或网段，逗号分隔，见[外网访问](./remote-access#trusted-proxies) |
+| `--trusted-proxies` | `KEEPBAY_TRUSTED_PROXIES` | 本机地址 | 可信反向代理的 IP 或网段，逗号分隔；`none` 表示不信任任何代理。1.0.0-beta.14 及更早的版本默认为空，见[外网访问](./remote-access#trusted-proxies) |
 | `--base-path` | `KEEPBAY_BASE_PATH` | `/` | 部署的子路径，如 `/keepbay/`，见[外网访问](./remote-access#base-path) |
 | `--log-level` | `KEEPBAY_LOG_LEVEL` | `info` | 日志级别：`debug`、`info`、`warn`、`error` |
 
@@ -146,7 +146,7 @@ sudo systemctl edit keepbay
 
 ```ini
 [Service]
-Environment=KEEPBAY_TRUSTED_PROXIES=127.0.0.1,::1
+Environment=KEEPBAY_TRUSTED_PROXIES=192.168.1.10
 Environment=KEEPBAY_LOG_LEVEL=debug
 ```
 

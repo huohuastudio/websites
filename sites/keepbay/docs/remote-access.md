@@ -26,7 +26,7 @@ Tailscale 的连接本身是加密的，因此这里可以使用 HTTP。
 sudo tailscale serve --bg 8899
 ```
 
-此时 `tailscale serve` 相当于一个反向代理，需要按[可信代理](#trusted-proxies)一节把 `127.0.0.1,::1` 设为可信代理，否则登录时会提示"请求来源不正确"。
+此时 `tailscale serve` 相当于一个反向代理，从本机连到 Keepbay。1.0.0-beta.15 起 Keepbay 默认信任本机地址，不用另外设置；更早的版本要按[可信代理](#trusted-proxies)一节把 `127.0.0.1,::1` 设为可信代理，否则登录时会提示"请求来源不正确"。
 
 ## NAS 自带的远程访问 {#nas}
 
@@ -58,7 +58,7 @@ sequenceDiagram
 2. 不限制请求体大小，至少要能容纳 16 MiB（16,777,216 字节）：网页上传时每块 16 MiB；[WebDAV](./webdav#reverse-proxy) 一次上传整个文件，要完全不限制
 3. 不缓冲响应，读超时不能过短：任务进度通过 SSE 长连接推送，下载大文件也需要较长时间
 4. 原样转发 Range 请求，不缓存响应：照片地图按需读取内置底图的一部分，视频播放和拖动进度条也依赖它
-5. 在 Keepbay 中设置[可信代理](#trusted-proxies)
+5. 代理在其他机器上时，在 Keepbay 中设置[可信代理](#trusted-proxies)（1.0.0-beta.14 及更早的版本，代理在本机上也要设置）
 
 Keepbay 不使用 WebSocket，无需配置 `Upgrade` 相关的头。
 
@@ -109,40 +109,62 @@ nginx 中正则规则优先于普通的 `location /`。只写 `/` 时，`/api/v1
 
 ## 可信代理 {#trusted-proxies}
 
-代理转发的请求，对 Keepbay 而言都来自 `127.0.0.1`。访客的真实 IP、原始域名、是否使用 HTTPS，都记录在 `X-Forwarded-*` 请求头中。
+代理转发的请求，对 Keepbay 而言都来自代理的地址。访客的真实 IP、原始域名、是否使用 HTTPS，都记录在 `X-Forwarded-*` 请求头中。
 
-但这些请求头可以被任意伪造，因此 Keepbay 默认不采信，只有连接来自您指定的可信代理时才采信。
+这些请求头可以被任意伪造，因此 Keepbay 只在连接来自可信代理时才采信。
+
+没有设置时，可信代理是本机地址（`127.0.0.0/8`、`::1`）：代理和 Keepbay 在同一台机器上、转发到 `127.0.0.1` 时，不用另外设置。这是 1.0.0-beta.15 起的默认值；1.0.0-beta.14 及更早的版本默认不信任任何代理，要按下面的方法写上 `127.0.0.1,::1`。
+
+代理在其他机器上，或转发到本机的局域网 IP 时，要设置可信代理：
 
 ```bash
 sudo systemctl edit keepbay
 ```
 
-写入下面两行，保存后重启：
+把下面两行写在打开的文件顶部两行注释之间。写在 `### Lines below this comment will be discarded` 以下的内容会被丢弃，设置不会生效。
 
 ```ini
 [Service]
-Environment=KEEPBAY_TRUSTED_PROXIES=127.0.0.1,::1
+Environment=KEEPBAY_TRUSTED_PROXIES=192.168.1.10
 ```
 
 ```bash
 sudo systemctl restart keepbay
 ```
 
-代理和 Keepbay 在同一台机器上时，填写 `127.0.0.1,::1`。
+填写代理的 IP 或网段，如 `192.168.1.10` 或 `192.168.1.0/24`。多个地址用逗号分隔，不支持主机名。
 
-代理在其他机器上时，填写代理的 IP 或网段，如 `192.168.1.10` 或 `192.168.1.0/24`。多个地址用逗号分隔，不支持主机名。
+设置后以设置为准，不再默认信任本机地址。同时还有本机上的代理时，把 `127.0.0.1,::1` 一起写上。
 
-设置后：
+用 frp、`ssh -R` 等 TCP 转发把外网的连接转到本机时，请求头原样来自访问者。这种情况要把 `KEEPBAY_TRUSTED_PROXIES` 设为 `none`（不信任任何代理），否则访问者可以伪造 IP，绕过登录和分享链接的限流。
+
+采信请求头后：
 
 真实 IP：从 `X-Forwarded-For` 的最右边向左查找，跳过可信代理，第一个不可信的地址即为访客地址。最左边的值可以由访客任意填写，因此不直接采用。登录限流、日志、分享链接限流都按这个 IP 计算。
 
 域名和协议：取 `X-Forwarded-Host` 和 `X-Forwarded-Proto` 的最后一个值，用于跨站请求检查、Cookie 的 `Secure` 属性和通行密钥。
 
-未设置可信代理就通过代理访问，会出现两个问题。
+代理没有被信任时会出现两个问题。
 
-一是登录、上传等操作提示"请求来源不正确，请刷新页面后重试"。原因是 Keepbay 认为自己的地址是 `http://127.0.0.1:8899`，而浏览器发送的来源是 `https://drive.example.com`，两者不一致。
+一是登录、上传等操作提示"请求来源不正确"。原因是 Keepbay 认为自己的地址是 `http://127.0.0.1:8899` 这类内部地址，而浏览器发送的来源是 `https://drive.example.com`，两者不一致。1.0.0-beta.15 起，提示中会写明浏览器访问的地址和服务器收到的地址；代理不在可信代理中时会说明这一点，并在服务日志中记下代理的地址。
 
 二是所有人的 IP 都显示为代理的地址，任何一个人多次输错密码，所有用户都会被限流。
+
+### 宝塔面板、CDN {#baota-cdn}
+
+宝塔的反向代理默认不发送 `X-Forwarded-Proto` 和 `X-Forwarded-Host`。用 HTTPS 访问时，Keepbay 会认为自己的地址是 http，登录提示"请求来源不正确"。要在 网站 › 反向代理 › 配置文件 的 `location` 中加上：
+
+```nginx
+proxy_set_header X-Forwarded-Proto $scheme;
+proxy_set_header X-Forwarded-Host $http_host;
+```
+
+"目标 URL"要填 `http://127.0.0.1:8899`（或改过的端口），不要填服务器的公网 IP、局域网 IP 或域名，否则连接不是来自本机地址，不会被信任。
+
+网站前面还有 CDN、CDN 用 HTTP 回源时，nginx 的 `$scheme` 是 `http`，登录同样会提示"请求来源不正确"。二选一处理：
+
+- 把 `X-Forwarded-Proto` 写成固定的 `https`：`proxy_set_header X-Forwarded-Proto https;`（网站只用 HTTPS 访问时）
+- 在 CDN 中把回源协议改为 HTTPS
 
 ## 子路径 {#base-path}
 
