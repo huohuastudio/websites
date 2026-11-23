@@ -218,8 +218,9 @@ export function defineSiteConfig(options: SiteOptions) {
 
     async buildEnd({ outDir }) {
       await writeFile(join(outDir, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${hostname}/sitemap.xml\n`)
-      // Cloudflare 默认让所有文件每次都回源校验；/assets/ 下的文件名带哈希，内容变了文件名就变，可以长期缓存
-      await writeFile(join(outDir, '_headers'), '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n')
+      // Cloudflare 默认让所有文件每次都回源校验；/assets/ 下的文件名带哈希，内容变了文件名就变，可以长期缓存。
+      // Cloudflare 给 .txt 的类型不带字符集，浏览器会按本地编码显示中文（乱码），llms.txt 要写明 UTF-8
+      await writeFile(join(outDir, '_headers'), '/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n\n/llms.txt\n  Content-Type: text/plain; charset=utf-8\n')
     },
 
     themeConfig: {
