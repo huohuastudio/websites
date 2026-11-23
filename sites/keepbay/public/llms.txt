@@ -1,0 +1,56 @@
+# Keepbay
+
+> Keepbay 是面向个人和家庭的自部署私有网盘，装在自己的 Linux 服务器、NAS 或电脑上（也可以用 Docker 安装）。它直接管理硬盘上已有的文件夹，只建立索引，不导入、不改动目录结构，停用后文件原样留在原处。专业版用本地运行的模型读取证件、合同、发票和保修卡，提取到期日并提前提醒，可以按意思搜索文档、按画面搜索照片。
+
+要点：
+
+- 文件留在原来的文件夹里。程序的数据（索引、标签、AI 结果）只存在自己的数据库中，不改动文件内容。删除先进回收站，移动、改名、删除都可以撤销
+- 数据只在用户自己的设备上。AI 默认在本机运行；使用云端模型时，界面写明发送什么、发给谁，每次调用都有记录。程序不收集统计、遥测和崩溃报告
+- 安装：一个程序文件加一个 `lib/` 目录，不需要另装数据库或 Web 服务器，支持 Linux x86_64 和 arm64；也可以用 Docker 安装。首次启动在浏览器中完成设置
+- 使用：电脑和手机的浏览器都能用，不需要另装 App；也支持 WebDAV
+- 价格：免费版是完整的网盘，不限文件夹和文件数量，家庭成员最多 2 人（含所有者）。专业版 ¥199，永久使用，含 1 年更新，续一年更新 ¥79；不是订阅制，更新到期后已安装的版本照常可用，安全修复始终免费
+- 状态：内测中（1.0.0-beta），专业版将在 1.0.0 正式版发布时开始销售
+- 适合：想把家里的照片、证件、合同、文档放在自己设备上统一管理，又不想把文件导入某个专有格式的人。不适合企业和团队协作场景（没有多租户、复杂权限等功能）
+- 开发者：火花工作室（Spark Studio）
+
+## 入门
+
+- [Keepbay 介绍](https://keepbay.app/docs/introduce): 是什么、与其他网盘的区别、当前状态
+- [普通安装](https://keepbay.app/docs/install): Linux 上用程序文件安装、运行环境要求
+- [用 Docker 安装](https://keepbay.app/docs/docker): Docker Compose 安装、挂载已有文件夹
+- [首次设置](https://keepbay.app/docs/setup): 设置向导、添加文件夹
+- [专业版](https://keepbay.app/docs/pro): 免费版与专业版的区别、价格、试用、授权和设备
+- [常见问题](https://keepbay.app/docs/faq)
+
+## 文件和照片（免费版）
+
+- [文件夹](https://keepbay.app/docs/folders): 添加已有文件夹、只读和读写、忽略规则
+- [浏览和预览](https://keepbay.app/docs/files): Office、PDF、相机 RAW、HEIC、视频和音频的预览
+- [照片](https://keepbay.app/docs/photos): 照片时间线、地点和照片地图
+- [搜索](https://keepbay.app/docs/search): 文件名（支持拼音）、文档全文、标签和智能文件夹
+- [分享和水印](https://keepbay.app/docs/share): 分享链接的有效期、密码、访问记录，收集文件
+- [成员和权限](https://keepbay.app/docs/members): 家庭成员按文件夹授权只读或读写
+- [回收站和撤销](https://keepbay.app/docs/trash)
+- [WebDAV](https://keepbay.app/docs/webdav)
+- [在线编辑 Office 文档](https://keepbay.app/docs/office): 对接自己部署的 Collabora 或 ONLYOFFICE
+
+## AI 功能（专业版）
+
+- [语义搜索](https://keepbay.app/docs/semantic-search): 按意思搜索文档、按画面搜索照片、搜索图片中的文字
+- [日期提醒](https://keepbay.app/docs/reminders): 从证件、合同、发票、保修卡中提取到期日并提醒
+- [AI 桌面](https://keepbay.app/docs/ai-desk): 用对话的方式查找资料，回答附上相关文件
+- [收件箱](https://keepbay.app/docs/inbox): 放进收件箱的文件按规则自动整理
+- [人物和宠物](https://keepbay.app/docs/people)
+- [模型设置](https://keepbay.app/docs/ai-models): 本地模型和云端模型的选择
+
+## 隐私和安全
+
+- [隐私与安全](https://keepbay.app/docs/privacy): 数据存放位置、联网清单、AI 发送的内容
+- [外部帐号登录](https://keepbay.app/docs/sso)
+- [技术架构](https://keepbay.app/docs/architecture)
+
+## 其他
+
+- [在线演示](https://demo.keepbay.app)
+- [下载和更新日志](https://github.com/huohuastudio/keepbay-releases/releases)
+- [问题反馈](https://github.com/huohuastudio/keepbay-releases/issues)
