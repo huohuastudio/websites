@@ -9,7 +9,8 @@
     "shots": "node scripts/screenshots.mjs",
     "recordings": "node scripts/recordings.mjs",
     "og": "node scripts/og.mjs",
-    "people": "node scripts/people.mjs"
+    "people": "node scripts/people.mjs",
+    "window-frame": "node scripts/window-frame.mjs"
   },
   "dependencies": {
     "@huohuastudio/theme": "workspace:*",
