@@ -7,7 +7,7 @@ Keepbay 是一个自部署的私有网盘，装在您自己的服务器或 NAS �
 专业版增加 AI 整理和搜索功能。AI 默认在您自己的设备上运行。
 
 ::: warning 内测阶段
-Keepbay 目前处于内测阶段（1.0.0-beta），功能和界面还会调整，暂时只提供 Linux 安装包。用于存放重要资料前，请先做好备份。
+Keepbay 目前处于内测阶段（1.0.0-beta），功能和界面还会调整。支持 Linux（x86_64、arm64）的安装包和 Docker。用于存放重要资料前，请先做好备份。
 
 遇到问题或有建议，请在 [GitHub](https://github.com/huohuastudio/keepbay-releases/issues) 上提交 Issue，提交时请附上版本号。不便公开的诊断信息和日志，请发送至 support@huohuastudio.com。
 :::
