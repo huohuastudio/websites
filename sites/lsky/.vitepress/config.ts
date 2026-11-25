@@ -7,7 +7,7 @@ const FREE_V2 = '/docs/archive/free/v2/'
 const PRO_V1 = '/docs/archive/enterprise/v1/'
 
 export default defineSiteConfig({
-  hostname: 'https://www.lsky.pro',
+  hostname: 'https://lsky.pro',
   title: 'Lsky Pro+',
   description: '图床和云端相册程序',
   dir: 'sites/lsky',

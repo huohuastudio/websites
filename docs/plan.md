@@ -8,7 +8,7 @@
 - **域名**：每个产品的官网和文档用同一个域名，文档在 `/docs/` 下：
   - Keepbay：`keepbay.app`、`keepbay.app/docs/`
   - Novaix：`novaix.cc`、`novaix.cc/docs/`
-  - Lsky Pro+：`www.lsky.pro`、`www.lsky.pro/docs/`
+  - Lsky Pro+：`lsky.pro`、`lsky.pro/docs/`
 - **托管**：Cloudflare Workers 静态资源（W5 开工时改定，不用 Pages：控制台已把 Pages 列为旧版工作流），每个站点一个 Worker，都连这个仓库，各自设根目录和构建监听路径（站点目录或共用主题变了才构建）；不用 GitHub Actions
 - **按 VitePress 的惯例做**：不再有"产品切换"（每个产品一个站点）；版本切换做成顶部导航中的下拉菜单，每个版本有自己的路径和侧栏
 - **外观沿用 VitePress 默认主题**（2026-11-13 用户定）：不按工作室设计规范改颜色、字体、阴影，只设各站点的品牌色和标识
@@ -65,7 +65,7 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 - 官网首页：一句话介绍、截图、单文件部署说明、功能、插件和主题市场（构建时取 novaix-releases 的 index.json）、价格（免费版和授权版对比）、FAQ、行动按钮；保留许可、条款、隐私三页
 - 下载、更新日志链到 GitHub Releases；演示站链 demo.novaix.cc
 
-### Lsky Pro+（www.lsky.pro）
+### Lsky Pro+（lsky.pro）
 - 文档：当前版（guide 15 页、advanced 6 页）迁到 `/docs/`；旧版本（free v1、free v2、enterprise v1）放到 `/docs/archive/...`，导航中用版本下拉切换；文件名统一为小写（旧版本中有大小写混用），修好已经失效的链接；约 25 张挂在外站（box.kancloud.cn 等）的图片下载到本地
 - 官网首页：介绍、功能、价格（免费版已停更，付费版）、FAQ、行动按钮；主题列表页 `/themes`（构建时取 lsky-pro-themes 的 index.json）；去掉过期活动横条、36 MB 视频（换成截图或压缩过的短视频）、`useDomainCheck`
 - 导航保留演示、社区、正版查询、授权中心等外链
@@ -160,7 +160,7 @@ W5 开工时用户定：本仓库不处理旧文档域名（docs.huohuastudio.co
   - 照片出现前有约 4 秒的等待：Keepbay 等目录 3 秒没有新变化才核对（等文件写完），录屏按真实时间，不剪掉这段
   - 终端面板浅色、深色下都用深色
   - 没有暂停按钮：只遵循"减少动态效果"，离开视口时暂停（WCAG 2.2.2 要求超过 5 秒的自动播放内容能暂停，需要时可以在窗口框角上加一个暂停按钮）
-- **统计**（同日用户定）：三个站点都用 Cloudflare Web Analytics，不用 Google Analytics（不设 Cookie，不需要同意框）。keepbay.app、novaix.cc 由 Cloudflare 自动注入；www.lsky.pro 走另一家 CDN，用户提供令牌后在站点配置中填 `analyticsToken`
+- **统计**（同日用户定）：三个站点都用 Cloudflare Web Analytics，不用 Google Analytics（不设 Cookie，不需要同意框）。keepbay.app、novaix.cc 由 Cloudflare 自动注入；lsky.pro 走另一家 CDN，用户提供令牌后在站点配置中填 `analyticsToken`
 
 ## W21 Keepbay 首页观感（2026-11-15 用户定）
 

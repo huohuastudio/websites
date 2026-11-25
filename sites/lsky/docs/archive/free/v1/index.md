@@ -2,7 +2,7 @@
 
 ![Lsky Pro Logo](./images/lsky-pro-logo.png)
 
-项目主页：[https://www.lsky.pro](https://www.lsky.pro)
+项目主页：[https://lsky.pro](https://lsky.pro)
 
 项目仓库地址：[https://github.com/lsky-org/lsky-pro/tree/v1.6.4](https://github.com/lsky-org/lsky-pro/tree/v1.6.4)
 

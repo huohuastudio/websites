@@ -6,7 +6,7 @@ Keepbay、Novaix、Lsky Pro+ 的官网和文档，基于 VitePress。
 |---|---|
 | `sites/keepbay` | https://keepbay.app |
 | `sites/novaix` | https://novaix.cc |
-| `sites/lsky` | https://www.lsky.pro |
+| `sites/lsky` | https://lsky.pro |
 | `packages/theme` | 共用主题 |
 
 ```bash
