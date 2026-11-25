@@ -63,7 +63,7 @@ package.json           pnpm 工作区；VitePress 等依赖锁定精确版本
 ### Novaix（novaix.cc）
 - 文档：`huohuastudio-docs/docs/novaix/` 49 页迁到 `/docs/`，侧栏沿用 8 组（简介、部署、基础设施、业务运营、系统功能、通知与登录、扩展、参考）；修好依赖根路径的链接（如 `/novaix/shared-ip`）和图片路径；文档中不能出现 "Incus"（旧仓库的写作规范）
 - 官网首页：一句话介绍、截图、单文件部署说明、功能、插件和主题市场（构建时取 novaix-releases 的 index.json）、价格（免费版和授权版对比）、FAQ、行动按钮；保留许可、条款、隐私三页
-- 下载、更新日志链到 GitHub Releases；演示站链 novaix.huohuastudio.com
+- 下载、更新日志链到 GitHub Releases；演示站链 demo.novaix.cc
 
 ### Lsky Pro+（www.lsky.pro）
 - 文档：当前版（guide 15 页、advanced 6 页）迁到 `/docs/`；旧版本（free v1、free v2、enterprise v1）放到 `/docs/archive/...`，导航中用版本下拉切换；文件名统一为小写（旧版本中有大小写混用），修好已经失效的链接；约 25 张挂在外站（box.kancloud.cn 等）的图片下载到本地

@@ -146,7 +146,7 @@ const layout = useLayoutCache(
         <p class="sx-lead sx-enter d3">面向中小型 VPS 服务商。单个可执行文件部署，内置数据库。容器和虚拟机统一管理，自带计费、工单和内容管理。</p>
         <div ref="actions" class="sx-actions sx-enter d3">
           <a class="sx-btn primary" :href="RELEASES">下载安装</a>
-          <a class="sx-btn ghost" href="https://novaix.huohuastudio.com">在线演示</a>
+          <a class="sx-btn ghost" href="https://demo.novaix.cc">在线演示</a>
         </div>
       </div>
       <div ref="scene" class="scene">

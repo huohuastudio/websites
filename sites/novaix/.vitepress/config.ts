@@ -15,7 +15,7 @@ export default defineSiteConfig({
   mermaid: true,
   nav: [
     { text: '文档', link: '/docs/introduce', activeMatch: '^/docs/' },
-    { text: '演示', link: 'https://novaix.huohuastudio.com' },
+    { text: '演示', link: 'https://demo.novaix.cc' },
     { text: '下载', link: `${RELEASES}/releases/latest` },
     { text: '更新日志', link: `${RELEASES}/releases` },
     { text: '购买授权', link: 'https://huohuastudio.com/products/novaix#plans' },
